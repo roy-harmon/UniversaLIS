@@ -103,7 +103,9 @@ namespace IMMULIS
                     CommState.HaveData();
                     // Change state
                     ChangeToTransENQState();
+#if DEBUG
                     AppendToLog("HaveData complete.");
+#endif
                }
           }
 
@@ -111,22 +113,30 @@ namespace IMMULIS
           {
                CommState = new IdleState();
                transTimer.Reset(-1);
+#if DEBUG
                AppendToLog("CommState changed to IdleState!");
+#endif
           }
           public void ChangeToTransENQState()
           {
                CommState = new TransENQState();
+#if DEBUG
                AppendToLog("CommState changed to TransENQState!");
+#endif
           }
           public void ChangeToTransWaitState()
           {
                CommState = new TransWaitState();
+#if DEBUG
                AppendToLog("CommState changed to TransWaitState!");
+#endif
           }
           public void ChangeToRcvWaitState()
           {
                CommState = new RcvWaitState();
+#if DEBUG
                AppendToLog("CommState changed to RcvWaitState!");
+#endif
           }
 
           public void TransTimeout()

@@ -62,7 +62,9 @@ namespace IMMULIS
                     ComPort.Send(Constants.ENQ);
                     // Set transTimer = 15
                     transTimer.Reset(15);
+#if DEBUG
                     AppendToLog("Transaction timer reset: 15.");
+#endif
                }
           }
 

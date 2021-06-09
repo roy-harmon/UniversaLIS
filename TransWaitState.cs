@@ -28,8 +28,10 @@ namespace IMMULIS
           }
           public void RcvACK()
           {
+#if DEBUG
                AppendToLog("CurrentMessage.FrameList.Count: " + CurrentMessage.FrameList.Count);
                AppendToLog("CurrentFrameCounter: " + CurrentFrameCounter);
+#endif
                // If all frames have been sent, end the transmission and reset the frame counter.
                if (CurrentMessage.FrameList.Count == CurrentFrameCounter)
                {
