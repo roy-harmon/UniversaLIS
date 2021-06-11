@@ -48,7 +48,7 @@ The program runs as a Windows service under a Local System account. After instal
 This program will eventually support all modes of operation available on the IMMULITE. The active communication mode is determined by the "LIS Host Query Mode" setting in the analyzer's LIS Parameters configuration screen.
 * For "Unidirectional" mode: 
   * Results are transmitted from the analyzer to the LIS and inserted into a database for storage and retrieval.
-* For "Bidirectional" mode (WORK-IN-PROGRESS): 
+* For "Bidirectional" mode: 
   * Pending test requests are pulled from a database (specified in the config file) and sent to the analyzer.
   * These test orders are stored in the analyzer's Worklist pending assignment to a sample cup.
   * When the operator enters data into the "Accession #" field on the analyzer's Worklist Entry screen, the relevant patient and test order information is populated automatically if the entered value matches a sample number in the list sent by the LIS.
@@ -57,9 +57,7 @@ This program will eventually support all modes of operation available on the IMM
 * For "Bidirectional Query" mode:
   * Like "Bidirectional" mode, but if the "Accession #" input does not match an existing record in the Worklist, the analyzer queries the LIS for any pending test orders for the sample.
 
-NOTE: "Bidirectional mode" currently has some bugs involving resolution of the "contention state" wherein both LIS and analyzer attempt to start sending a message at the same time.
-
-Please also note that "Control" and "Verify" samples may be supported in the future, but initially, the focus is entirely on patient samples.
+Please note that "Control" and "Verify" samples may be supported in the future, but initially, the focus is entirely on patient samples.
 
 ## User Interface
 
