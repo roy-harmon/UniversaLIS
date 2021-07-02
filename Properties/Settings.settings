@@ -1,0 +1,45 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="IMMULIS.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="SerialPortNum" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">COM4</Value>
+    </Setting>
+    <Setting Name="SerialPortBaudRate" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">9600</Value>
+    </Setting>
+    <Setting Name="SerialPortParity" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="SerialPortDataBits" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">8</Value>
+    </Setting>
+    <Setting Name="SerialPortStopBits" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="LIS_ID" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">LIS</Value>
+    </Setting>
+    <Setting Name="LIS_Password" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ConnectionString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Data Source=127.0.0.1\SQLExpress;Initial Catalog=LISDB;Integrated Security=True</Value>
+    </Setting>
+    <Setting Name="SenderAddress" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="SenderPhone" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ReceiverID" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">IMMULITE</Value>
+    </Setting>
+    <Setting Name="AutoSendOrders" Type="System.Boolean" Scope="Application">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="AutoSendInterval" Type="System.Double" Scope="Application">
+      <Value Profile="(Default)">15000</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
