@@ -335,7 +335,7 @@ namespace IMMULIS
                     }
                     foreach (var patient in response.Patients)
                     { // go through added patients in response and give them their corresponding orders from the database based on Patient_Name, Sample_Number, and Test_ID
-                      // then update database that those orders are pending
+                      // then update database that those orders are sent
                          string requestID = "";
                          using (SqlCommand cmmand = conn.CreateCommand())
                          {
@@ -356,7 +356,7 @@ namespace IMMULIS
                               reder.Close();
                          }
                          using (SqlCommand command = conn.CreateCommand())
-                         { // update database that the orders just added to the current patient in the forloop are now pending
+                         { // update database that the orders just added to the current patient in the forloop are now sent
                               command.CommandText = "UPDATE IMM_RequestOrders SET PendingSending = 0 WHERE RequestPID = @RequestID";
                               command.Parameters.AddWithValue("@RequestID", requestID);
                               command.ExecuteNonQuery();

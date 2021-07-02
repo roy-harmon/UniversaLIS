@@ -27,8 +27,7 @@ namespace IMMULIS
           }
 
         /* 
-         * Is called by RcvInput(inputstring) because inputstring was equal to Constants.ACK aka "\x06",
-         * which means the previous message was successfully recieved
+         * the previous message was successfully recieved
          */
         public void RcvACK()
           {
