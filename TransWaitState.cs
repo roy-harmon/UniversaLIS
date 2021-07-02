@@ -32,17 +32,15 @@ namespace IMMULIS
                AppendToLog("CurrentMessage.FrameList.Count: " + CurrentMessage.FrameList.Count);
                AppendToLog("CurrentFrameCounter: " + CurrentFrameCounter);
 #endif
-               // If all frames have been sent, end the transmission and reset the frame counter.
+               // If all frames have been sent, end the transmission.
                if (CurrentMessage.FrameList.Count == CurrentFrameCounter)
                {
                     ComPort.Send(Constants.EOT);
-                    CurrentFrameCounter = 0;
-                    transTimer.Reset(-1);
                     CurrentMessage = new MessageBody();
                }
                else
                {
-                    // Send next frame.
+                    // Otherwise, send next frame.
                     ComPort.Send(CurrentMessage.FrameList[CurrentFrameCounter]);
                     CurrentFrameCounter++;
                     // Reset the NAK count to 0.
@@ -54,12 +52,18 @@ namespace IMMULIS
 
           public void RcvData(string InputString)
           {
-               // This shouldn't come up, so ignore it for now. Maybe we'll add some logging here when we have time.
+               // Data frames should always be preceded by other signals, so for now, just log it.
+               // Signal the instrument to interrupt the transmission with an EOT.
+               AppendToLog("Data received in TransWait state: " + InputString);
+               ComPort.Send(Constants.EOT);
           }
 
           public void RcvENQ()
           {
-               // This really shouldn't happen. Let's ignore it and see if it goes away.
+               // This really shouldn't happen.
+               // The instrument is supposed to send an EOT first to get us to stop transmitting.
+               // Nevertheless, log the occurrence for troubleshooting purposes.
+               AppendToLog("ENQ received in TransWait state.");
           }
 
           public void RcvEOT()
@@ -67,8 +71,8 @@ namespace IMMULIS
                /* This is a Receiver Interrupt request. 
                *  Ideally, this would cause the host to stop transmitting, enter the idle state,
                *  and not try to send again for at least 15 seconds.
-               *  
-               *  Or, we could choose not to honor the interrupt request, 
+               *  TODO: Honor Receiver Interrupt requests.
+               *  Or, we could choose to ignore the interrupt request, 
                *  in which case we could treat this as a positive acknowledgement and keep going.
                *  We'll start with that for now.
                */
@@ -93,7 +97,8 @@ namespace IMMULIS
 
           void ILISState.HaveData()
           {
-               throw new NotImplementedException();
+               // It doesn't matter if we have data to send. We're already sending something.
+               AppendToLog("HaveData called in TransWait state.");
           }
      }
 }

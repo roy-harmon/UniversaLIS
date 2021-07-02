@@ -48,6 +48,11 @@ namespace IMMULIS
                     // Transition to TransWaitState.
                     ChangeToTransWaitState();
                }
+               if (CommState is TransWaitState && CurrentMessage.FrameList.Count < CurrentFrameCounter)
+               {
+                    // When all frames have been sent, return to IdleState.
+                    ChangeToIdleState();
+               }
           }
 
           public void RcvData(string InputString)
@@ -112,6 +117,7 @@ namespace IMMULIS
           public void ChangeToIdleState()
           {
                CommState = new IdleState();
+               CurrentFrameCounter = 0;
                transTimer.Reset(-1);
 #if DEBUG
                AppendToLog("CommState changed to IdleState!");
@@ -155,7 +161,7 @@ namespace IMMULIS
                     }
                     CurrentMessage = new MessageBody();
                     CurrentFrameCounter = 0;
-                    CommState = new IdleState();
+                    ChangeToIdleState();
                }
           }
           public void RcvTimeout()
