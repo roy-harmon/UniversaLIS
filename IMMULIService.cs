@@ -753,7 +753,6 @@ namespace IMMULIS
                     output += Elements["Processing ID"] + "|";
                     output += Elements["Version #"] + "|";
                     output += Elements["Message Date + Time"] + Constants.CR + Constants.ETX;
-                    output += CHKSum(output) + Constants.CR + Constants.LF;
                     return output;
                }
 
@@ -793,20 +792,30 @@ namespace IMMULIS
                }
                private void FrameMessage(string InputString)
                {
-                    if (InputString.Length > 240)
+                    /* According to the ASTM E1381-95 standard, frames longer than 240 characters 
+                    *  -- 247 characters including frame overhead (<STX>[FrameNumber]...<ETX>[Checksum]<CR><LF>) --
+                    *  are sent as one or more intermediate frames followed by an end frame. 
+                    *  Shorter messages are sent as a single end frame.
+                    *  Intermediate frames use <ETB> in place of <ETX> to indicate that it is continued
+                    *  in the next frame. 
+                    *  This procedure splits long frames into intermediate frames if necessary
+                    *  before appending the checksum and <CR><LF> and adding the frame to the message FrameList.
+                    */
+                    if (InputString.Length > 243) // <STX> + FrameNumber + 240-character frame + <ETX> = 243
                     {
-                         string firstString = InputString.Substring(0, 235);
+                         string firstString = InputString.Substring(0, 242); // 242 to make room for the <ETB>
                          firstString += Constants.ETB;
                          firstString += CHKSum(firstString);
                          firstString += Constants.CR + Constants.LF;
                          int iLength = InputString.Length - firstString.Length;
-                         string nextString = InputString.Substring(235, iLength);
-                         FrameList.Add(firstString);
-                         FrameMessage(nextString);
+                         string nextString = InputString.Substring(firstString.Length, iLength); // The remainder of the string
+                         FrameList.Add(firstString); // Add intermediate frame to list           // is passed to this function recursively
+                         FrameMessage(nextString);                                               // to be added as its own frame(s)
                     }
                     else
                     {
-                         FrameList.Add(InputString);
+                         InputString += CHKSum(InputString) + Constants.CR + Constants.LF; // Tag on the checksum and <CR><LF>
+                         FrameList.Add(InputString); // Add the end frame
                     }
                }
                public void PrepareToSend()
@@ -843,9 +852,7 @@ namespace IMMULIS
                     {
                          Terminator = 'N';
                     }
-                    string term = Constants.STX + IncrementFrameCount().ToString() + "L|1|" + Terminator + Constants.CR + Constants.ETX;
-                    term += CHKSum(term) + Constants.CR + Constants.LF;
-                    TerminationMessage = term;
+                    TerminationMessage = Constants.STX + IncrementFrameCount().ToString() + "L|1|" + Terminator + Constants.CR + Constants.ETX;
                     FrameMessage(TerminationMessage);
                     isReady = true;
                }
@@ -916,7 +923,6 @@ namespace IMMULIS
                     output += Elements["Date/Time Test Started"] + "|";
                     output += Elements["Date/Time Test Completed"] + "|";
                     output += Elements["Instrument ID"] + Constants.CR + Constants.ETX;
-                    output += CHKSum(output) + Constants.CR + Constants.LF;
                     return output;
                }
           }
@@ -1041,7 +1047,6 @@ namespace IMMULIS
                     output += Elements["Nosocomial Infection Flag"] + "|";
                     output += Elements["Specimen Service"] + "|";
                     output += Elements["Specimen Institution"] + Constants.CR + Constants.ETX;
-                    output += CHKSum(output) + Constants.CR + Constants.LF;
                     return output;
                }
           }
@@ -1166,7 +1171,6 @@ namespace IMMULIS
                     output += Elements["Hospital Service"] + "|";
                     output += Elements["Hospital Institution"] + "|";
                     output += Elements["Dosage Category"] + Constants.CR + Constants.ETX;
-                    output += CHKSum(output) + Constants.CR + Constants.LF;
                     return output;
                }
           }
@@ -1245,7 +1249,6 @@ namespace IMMULIS
                     output += Elements["User Field 1"] + "|";
                     output += Elements["User Field 2"] + "|";
                     output += Elements["Status Codes"] + Constants.CR + Constants.ETX;
-                    output += CHKSum(output) + Constants.CR + Constants.LF;
                     return output;
                }
           }
