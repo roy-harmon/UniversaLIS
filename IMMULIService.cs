@@ -91,11 +91,34 @@ namespace IMMULIS
           {
                try
                {
-                    AppendToLog("Service stopping.");
-                    ComPort.Close();
-                    AppendToLog("Port closed.");
                     idleTimer.Stop();
                     idleTimer.Dispose();
+                    AppendToLog("Service stopping.");
+                    /* TODO: Update the request table so that any unsent messages will be sent next time the service runs.
+                     * This may require adding an ID field to the Order class.
+                     */
+                    while (OutboundMessageQueue.Count > 0)
+                    {
+                         MessageBody message = OutboundMessageQueue.Dequeue();
+
+                         using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+                         {
+                              foreach (Patient patientItem in message.Patients)
+                              {
+                                   foreach (Order orderItem in patientItem.Orders)
+                                   {
+                                        using (SqlCommand command = conn.CreateCommand())
+                                        {
+                                             command.CommandText = "UPDATE IMM_RequestOrders SET PendingSending = 1 WHERE ReqOrderID = @OrderID";
+                                             command.Parameters.AddWithValue("@OrderID", orderItem.OrderID);
+                                             command.ExecuteNonQuery();
+                                        }
+                                   }
+                              }
+                         }
+                    }
+                    ComPort.Close();
+                    AppendToLog("Port closed.");
                }
                catch (Exception ex)
                {
@@ -201,11 +224,11 @@ namespace IMMULIS
                     {
                          intermediateFrame += messageLine.Substring(0, position);
                     }
-                    return;
+                    return; // Don't process yet.
                }
                else
                {
-                    if (bInterFrame)
+                    if (bInterFrame) // If it's an intermediate frame, trim off the frame number and concatenate with previous frame.
                     {
                          intermediateFrame += messageLine.Substring(2, position);
                          messageLine = intermediateFrame;
@@ -292,7 +315,7 @@ namespace IMMULIS
                          // Exit function.
                          return orderCount;
                     }
-                    MessageBody response = new MessageBody();
+                    MessageBody responseMessage = new MessageBody();
                     int patientCount;
                     using (SqlCommand sqlCommand = conn.CreateCommand())
                     { // Check to see how many patients are associated with the sample.
@@ -301,7 +324,7 @@ namespace IMMULIS
                          patientCount = (int)sqlCommand.ExecuteScalar();
                     }
                     
-                    string sqlMainQuery = "SELECT * FROM vwPendingRequests WHERE Patient_Name LIKE @Patient_Name AND  Test_ID LIKE @Test_ID AND Sample_Number LIKE @Sample_Number;";
+                    string sqlMainQuery = "SELECT * FROM vwPendingRequests WHERE Patient_Name LIKE @Patient_Name AND Test_ID LIKE @Test_ID AND Sample_Number LIKE @Sample_Number;";
                     string sqlPatientQuery = "SELECT Patient_ID, Patient_Name, BirthDate, Patient_Sex FROM vwPendingRequests WHERE (Sample_Number LIKE @Sample_Number) AND (Test_ID LIKE @Test_ID) GROUP BY Patient_ID, Patient_Name, BirthDate, Patient_Sex";
 
                     
@@ -314,41 +337,41 @@ namespace IMMULIS
                               testID = "%";
                          }
                          command.Parameters.AddWithValue("@Test_ID", testID);
-                         SqlDataReader reader = command.ExecuteReader();
-                         if (reader.HasRows == false)
+                         SqlDataReader patientReader = command.ExecuteReader();
+                         if (patientReader.HasRows == false)
                          {
                               return 0;
                          }
                          else
                          {
-                              while (reader.Read())
+                              while (patientReader.Read())
                               {
-                                   response.Patients.Add(new Patient($"|{response.Patients.Count + 1}|{reader["Patient_ID"]}|||{reader["Patient_Name"]}||{reader["BirthDate"]}|{reader["Patient_Sex"]}||||||||||||||||||||||||||"));
+                                   responseMessage.Patients.Add(new Patient($"|{responseMessage.Patients.Count + 1}|{patientReader["Patient_ID"]}|||{patientReader["Patient_Name"]}||{patientReader["BirthDate"]}|{patientReader["Patient_Sex"]}||||||||||||||||||||||||||"));
                               }
                          }
                          
-                         reader.Close();
+                         patientReader.Close();
                     }
-                    foreach (var patient in response.Patients)
+                    foreach (var patient in responseMessage.Patients)
                     {
                          string requestID = "";
-                         using (SqlCommand cmmand = conn.CreateCommand())
+                         using (SqlCommand orderCommand = conn.CreateCommand())
                          {
-                              cmmand.CommandText = sqlMainQuery;
-                              cmmand.Parameters.AddWithValue("@Patient_Name", patient.Elements["Patient Name"]);
-                              cmmand.Parameters.AddWithValue("@Sample_Number", SampleNumber);
+                              orderCommand.CommandText = sqlMainQuery;
+                              orderCommand.Parameters.AddWithValue("@Patient_Name", patient.Elements["Patient Name"]);
+                              orderCommand.Parameters.AddWithValue("@Sample_Number", SampleNumber);
                               if (testID == "ALL")
                               {
                                    testID = "%";
                               }
-                              cmmand.Parameters.AddWithValue("@Test_ID", testID);
-                              SqlDataReader reder = cmmand.ExecuteReader();
-                              while (reder.Read())
+                              orderCommand.Parameters.AddWithValue("@Test_ID", testID);
+                              SqlDataReader orderReader = orderCommand.ExecuteReader();
+                              while (orderReader.Read())
                               {
-                                   patient.Orders.Add(new Order($"|{patient.Orders.Count + 1}|{reder["Sample_Number"]}||{reder["Test_ID"]}|{reder["Priority"]}|{reder["Order_DateTime"]}|{reder["Collection_DateTime"]}|||||||||||{reder["RequestPID"]}||||||||||||"));
-                                   requestID = reder["RequestPID"].ToString();
+                                   patient.Orders.Add(new Order($"|{patient.Orders.Count + 1}|{orderReader["Sample_Number"]}||{orderReader["Test_ID"]}|{orderReader["Priority"]}|{orderReader["Order_DateTime"]}|{orderReader["Collection_DateTime"]}|||||||||||{orderReader["RequestPID"]}||||||||||||", (int)orderReader["ReqOrderID"]));
+                                   requestID = orderReader["RequestPID"].ToString();
                               }
-                              reder.Close();
+                              orderReader.Close();
                          }
                          using (SqlCommand command = conn.CreateCommand())
                          {
@@ -360,13 +383,13 @@ namespace IMMULIS
                     
                     if (isQuery == true)
                     {
-                         response.Terminator = 'F';
+                         responseMessage.Terminator = 'F';
                     }
                     else
                     {
-                         response.Terminator = 'N';
+                         responseMessage.Terminator = 'N';
                     }
-                    ProcessMessage(response);
+                    ProcessMessage(responseMessage);
                     return orderCount;
                }
           }
@@ -912,11 +935,19 @@ namespace IMMULIS
                     }
                }
 
+               public int OrderID;
+
                public List<Result> Results = new List<Result>();
 
                public Order(string orderMessage)
                {
                     SetOrderString(orderMessage);
+               }
+
+               public Order(string orderMessage, int orderID)
+               {
+                    SetOrderString(orderMessage);
+                    OrderID = orderID;
                }
 
                public Order()
