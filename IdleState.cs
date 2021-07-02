@@ -60,7 +60,7 @@ namespace IMMULIS
                {
                     // Send ENQ
                     ComPort.Send(Constants.ENQ);
-                    // Set transTimer = 15
+                    // Set transTimer = 15 | wait 15 seconds for machine to respond
                     transTimer.Reset(15);
 #if DEBUG
                     AppendToLog("Transaction timer reset: 15.");

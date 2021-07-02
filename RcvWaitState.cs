@@ -33,7 +33,7 @@ namespace IMMULIS
           }
 
           public void RcvData(string InputString)
-          {
+          { // recieve data from immulite
                // Compare the frame number and checksum to see whether the frame is good or bad.
                bool isFrameGood;
                // Compare frame numbers.
@@ -84,6 +84,7 @@ namespace IMMULIS
                     position = message.IndexOf(Constants.ETB);
                     if (position < 0)
                     {
+                        //neither the ETX or ETB were found in the message
                          return false;
                     }
                }

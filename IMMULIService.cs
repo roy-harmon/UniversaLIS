@@ -76,6 +76,7 @@ namespace IMMULIS
           private void IdleTime(object o, System.Timers.ElapsedEventArgs elapsedEvent)
           {
                idleTimer.Stop();
+               //check to see if commState is in IdleState and if there are any messages to be sent out
                commState.IdleCheck();
                idleTimer.Start();
           }
@@ -189,6 +190,7 @@ namespace IMMULIS
                     AppendToLog($"Invalid message: {messageLine}");
                     return;
                }
+               // Check if messageLine is an intermediate frame
                int position = messageLine.IndexOf(Constants.ETB);
                if (position >= 0)
                {
@@ -251,9 +253,10 @@ namespace IMMULIS
                }
           }
 
-
           private static int SendPatientOrders(string SampleNumber, string testID)
           {
+                //true = patient orders being sent in response to a query
+                //false = patient orders NOT being sent in response to a query
                bool isQuery = true;
                // If no SampleNumber is provided, use the % wildcard to get all pending orders.
                if (SampleNumber.Length == 0)
@@ -306,7 +309,7 @@ namespace IMMULIS
 
                     
                     using (SqlCommand command = conn.CreateCommand())
-                    {
+                    { // Add Patients based on their sample number and tests pending
                          command.CommandText = sqlPatientQuery;
                          command.Parameters.AddWithValue("@Sample_Number", SampleNumber);
                          if (testID == "ALL")
@@ -316,13 +319,13 @@ namespace IMMULIS
                          command.Parameters.AddWithValue("@Test_ID", testID);
                          SqlDataReader reader = command.ExecuteReader();
                          if (reader.HasRows == false)
-                         {
+                         { // No patients to add
                               return 0;
                          }
                          else
                          {
                               while (reader.Read())
-                              {
+                              { // Read through retrieved information from database and fill response with patients from that info
                                    response.Patients.Add(new Patient($"|{response.Patients.Count + 1}|{reader["Patient_ID"]}|||{reader["Patient_Name"]}||{reader["BirthDate"]}|{reader["Patient_Sex"]}||||||||||||||||||||||||||"));
                               }
                          }
@@ -330,7 +333,8 @@ namespace IMMULIS
                          reader.Close();
                     }
                     foreach (var patient in response.Patients)
-                    {
+                    { // go through added patients in response and give them their corresponding orders from the database based on Patient_Name, Sample_Number, and Test_ID
+                      // then update database that those orders are pending
                          string requestID = "";
                          using (SqlCommand cmmand = conn.CreateCommand())
                          {
@@ -344,14 +348,14 @@ namespace IMMULIS
                               cmmand.Parameters.AddWithValue("@Test_ID", testID);
                               SqlDataReader reder = cmmand.ExecuteReader();
                               while (reder.Read())
-                              {
+                              { // add orders requested from the database to the patient
                                    patient.Orders.Add(new Order($"|{patient.Orders.Count + 1}|{reder["Sample_Number"]}||{reder["Test_ID"]}|{reder["Priority"]}|{reder["Order_DateTime"]}|{reder["Collection_DateTime"]}|||||||||||{reder["RequestPID"]}||||||||||||"));
                                    requestID = reder["RequestPID"].ToString();
                               }
                               reder.Close();
                          }
                          using (SqlCommand command = conn.CreateCommand())
-                         {
+                         { // update database that the orders just added to the current patient in the forloop are now pending
                               command.CommandText = "UPDATE IMM_RequestOrders SET PendingSending = 0 WHERE RequestPID = @RequestID";
                               command.Parameters.AddWithValue("@RequestID", requestID);
                               command.ExecuteNonQuery();
@@ -652,6 +656,21 @@ namespace IMMULIS
                private int FrameCounter { get; set; }
                public List<Patient> Patients = new List<Patient>();
                public List<Query> Queries = new List<Query>();
+
+              /* * Message Terminator Record Definitions: *
+               * 
+               *  * Record Types Definition: *
+               * L = Terminator Record                          |   Supported
+               * ----------------------------------------------------------------------
+               *  * Termination Codes: *
+               * N = Normal Termination                         |   Supported
+               * T = Sender Aborted                             |   Not Supported
+               * R = Reciever Aborted                           |   Not Supported
+               * E = Unknown System Error                       |   Not Supported
+               * Q = Error in last request for information      |   Required With Query
+               * I = No information available from last query   |   Required With Query
+               * F = Last request for information processed     |   Required With Query
+               */
                public char Terminator { get; set; }
 
                public string TerminationMessage
@@ -704,6 +723,7 @@ namespace IMMULIS
                     Elements["Message Date + Time"] = inArray[13];
                }
 
+               // returns header info as a string formatted according to the Immulite/LIS Manual
                private string GetHeaderString()
                {
                     // Anything missing should be added as an empty string.
@@ -738,6 +758,7 @@ namespace IMMULIS
                {
                     string dateString;
                     DateTime dateTime = DateTime.Now;
+                    //formats the date
                     dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                     dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
                     string header = Constants.STX + $"1H|\\^&||{Properties.Settings.Default.LIS_Password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
@@ -768,22 +789,26 @@ namespace IMMULIS
                     }
                     return FrameCounter;
                }
+                
+                /* adds InputString to framelist.
+                 * splits in to two if necessary.
+                 */
                private void FrameMessage(string InputString)
                {
-                    if (InputString.Length > 240)
-                    {
-                         string firstString = InputString.Substring(0, 235);
-                         firstString += Constants.ETB;
+                    if (InputString.Length > 240) //240 chars max length of a message
+                    { //split InputString into two messages
+                         string firstString = InputString.Substring(0, 235); //take first 235 chars because 5 chars are needed for the message information
+                         firstString += Constants.ETB;                      
                          firstString += CHKSum(firstString);
                          firstString += Constants.CR + Constants.LF;
                          int iLength = InputString.Length - firstString.Length;
                          string nextString = InputString.Substring(235, iLength);
                          FrameList.Add(firstString);
-                         FrameMessage(nextString);
+                         FrameMessage(nextString); // recursive call for second half of string
                     }
                     else
                     {
-                         FrameList.Add(InputString);
+                         FrameList.Add(InputString); // TODO: Recalculate checksum for last frame of multi-frame messages.
                     }
                }
                public void PrepareToSend()
@@ -866,7 +891,8 @@ namespace IMMULIS
                     Elements["Date/Time Test Completed"] = inArray[12];
                     Elements["Instrument ID"] = inArray[13].Substring(0, inArray[13].IndexOf(Constants.CR));
                }
-
+               
+                // returns result info as a string formatted according to the Immulite/LIS Manual
                private string GetResultString()
                {
                     // Anything missing should be added as an empty string.
@@ -967,7 +993,8 @@ namespace IMMULIS
                     Elements["Specimen Institution"] = inArray[30];
                }
 
-               private string GetOrderString()
+            // returns order info as a string formatted according to the Immulite/LIS Manual
+            private string GetOrderString()
                {
                     // Anything missing should be added as an empty string.
                     string[] elementArray = { "FrameNumber", "Sequence#", "Specimen ID (Accession#)", "Instrument Specimen ID", "Universal Test ID", "Priority", "Order Date/Time", "Collection Date/Time", "Collection End Time", "Collection Volume", "Collector ID", "Action Code", "Danger Code", "Relevant Clinical Info", "Date/Time Specimen Received", "Specimen Descriptor", "Ordering Physician", "Physician's Telephone Number", "User Field No.1", "User Field No.2", "Lab Field No.1", "Lab Field No.2", "Date/Time results reported or last modified", "Instrument Charge to Computer System", "Instrument Section ID", "Report Types", "Reserved Field", "Location or ward of Specimen Collection", "Nosocomial Infection Flag", "Specimen Service", "Specimen Institution" };
@@ -1042,7 +1069,10 @@ namespace IMMULIS
                     SetPatientString("|1|||||||||||||||||||||||||||||||||");
                }
 
-               private void SetPatientString(string input)
+            /* Fills Elements dictionary with info from input string.
+             * Look at constructors for example of input.
+            */
+            private void SetPatientString(string input)
                {
                     string[] inArray = input.Split('|');
                     if (inArray.Length < 35)
@@ -1087,6 +1117,7 @@ namespace IMMULIS
                     Elements["Dosage Category"] = inArray[34];
                }
 
+               // returns patient info as a string formatted according to the Immulite/LIS Manual
                private string GetPatientString()
                {
                     // Anything missing should be added as an empty string.
@@ -1166,6 +1197,9 @@ namespace IMMULIS
 
                public Dictionary<string, string> Elements = new Dictionary<string, string>();
 
+               /* Fills Elements dictionary with info from input string.
+                * Look at constructors for example of input.
+                */
                private void SetQueryString(string input)
                {
                     string[] inArray = input.Split('|');
@@ -1189,6 +1223,7 @@ namespace IMMULIS
                     Elements["Status Codes"] = inArray[12];
                }
 
+               // returns query info as a string formatted according to the Immulite/LIS Manual
                private string GetQueryString()
                {    // This method shouldn't actually be used, since the LIS shouldn't be sending any queries.
                     // Anything missing should be added as an empty string.
@@ -1222,16 +1257,16 @@ namespace IMMULIS
           public static class Constants
           {
                // These are the ANSI control codes used by the IMMULITE serial communications protocol.
-               public const string ACK = "\x06";
+               public const string ACK = "\x06"; //acknowledgement signal
 
-               public const string NAK = "\x15";
-               public const string ENQ = "\x05";
-               public const string EOT = "\x04";
-               public const string STX = "\x02";
-               public const string ETX = "\x03";
-               public const string CR = "\x0D";
-               public const string LF = "\x0A";
-               public const string ETB = "\x17";
+               public const string NAK = "\x15"; //negative acknoledgement signal (didn't recieve it or can't recieve)
+               public const string ENQ = "\x05"; //enquiry character (check if other side available)
+               public const string EOT = "\x04"; //End of Transmission character
+               public const string STX = "\x02"; //start of text (first char of message)
+               public const string ETX = "\x03"; //end of text (signals end of the text portion of a message)
+               public const string CR = "\x0D";  //carriage return (comes before ETX and CheckSum)
+               public const string LF = "\x0A";  //line feed (marks end of frame following carriage return)
+               public const string ETB = "\x17"; //used instead of ETX to mark intermediate frame
           }
 
           // <summary>Method invoked when service is started from a debugging console.</summary>

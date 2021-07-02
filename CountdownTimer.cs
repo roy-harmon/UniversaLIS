@@ -26,23 +26,28 @@ namespace IMMULIS
                }
           }
 
+          /* Reset Timer with the currently defined duration */
           public void Reset()
           {
                timer.Stop();
                remainingDuration = duration;
                timer.Start();
           }
+
+          /* Reset Timer with a new duration length */
           public void Reset(int NewDuration)
           {
                duration = NewDuration;
                remainingDuration = duration;
           }
+          //Length of the Timer
           private int duration;
+          //Current count of time left, starting from duration and going to 0
           public int remainingDuration;
           private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
           public event EventHandler Timeout;
           public void OnTimeout()
-          {
+          { 
                Timeout?.Invoke(this, EventArgs.Empty);
           }
 

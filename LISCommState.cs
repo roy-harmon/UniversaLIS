@@ -56,14 +56,16 @@ namespace IMMULIS
           }
 
           public void RcvENQ()
-          {
+          { 
                CommState.RcvENQ();
                if (CommState is IdleState)
                {
+                    // Transition to TransWaitState
                     ChangeToRcvWaitState();
                }
                if (CommState is TransENQState)
                {
+                    // Transition to IdleState
                     ChangeToIdleState();
                }
           }
@@ -87,11 +89,13 @@ namespace IMMULIS
           {
                CommState.RcvNAK();
                if (CommState is TransWaitState && numNAK == 6)
-               {
+               { // recieved too many NAKs in TransWaitSate which means the message was not going through, so give up and go back to IdleState
+                    // Transition to IdleState
                     ChangeToIdleState();
                }
                if (CommState is TransENQState)
-               {
+               { // machine is busy
+                    // Transition to IdleState
                     ChangeToIdleState();
                }
           }
@@ -99,7 +103,7 @@ namespace IMMULIS
           public void HaveData()
           {
                if (CommState is IdleState)
-               {
+               { // enquire about the data that CommState has
                     CommState.HaveData();
                     // Change state
                     ChangeToTransENQState();
