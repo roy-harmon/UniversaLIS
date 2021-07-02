@@ -11,6 +11,7 @@ namespace IMMULIS
           {
           }
 
+          /* Sends information to the machine's serial port */
           public void Send(string messageText)
           {
                AppendToLog($"Out: \t{messageText}");
@@ -21,6 +22,11 @@ namespace IMMULIS
                }
           }
           public static readonly EventWaitHandle logOpen = new EventWaitHandle(true, EventResetMode.AutoReset);
+
+          /* 
+           * Appends a timestamped text to a new line in the current log file
+           * If a log file hasn't been created for the day AppendToLog is called, it creates the log file
+           */
           public static void AppendToLog(string txt)
           {
                string publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");

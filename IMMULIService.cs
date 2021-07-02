@@ -132,7 +132,7 @@ namespace IMMULIS
                 * parse the message line-by-line.
                 */
                CommPort sp = (CommPort)sender;
-               string buffer = System.Text.Encoding.Default.GetString(e.Data);
+               string buffer = System.Text.Encoding.Default.GetString(e.Data); //store recieved data into a string
                bool timedOut = false;
                try
                {
@@ -161,6 +161,7 @@ namespace IMMULIS
                     AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
 #endif
                     AppendToLog($"In: \t{buffer}");
+                    // update state based on recieved message
                     commState.RcvInput(buffer);
                     idleTimer.Start();
                }
@@ -429,8 +430,8 @@ namespace IMMULIS
                     }
                     else
                     {
-                         int pID;
-                         int oID;
+                         int pID; // patient ID
+                         int oID; // order ID
 #if DEBUG 
                          AppendToLog("Connecting to database.");
 #endif
@@ -496,7 +497,7 @@ namespace IMMULIS
                                         SqlParameter sqlOutParameter = new SqlParameter("@ID", SqlDbType.Int)
                                         {
                                              Direction = ParameterDirection.Output
-                                        };
+                                        }; 
                                         _ = command.Parameters.Add(sqlOutParameter);
                                         _ = command.ExecuteNonQuery();
                                         pID = int.Parse(command.Parameters["@ID"].Value.ToString());
@@ -542,6 +543,7 @@ namespace IMMULIS
                                         AppendToLog("Adding order.");
                                         using (SqlCommand command = new SqlCommand("spIMMOrder", conn))
                                         {
+                                             // fillSqlCommand with information about the order
                                              command.CommandType = CommandType.StoredProcedure;
                                              _ = command.Parameters.AddWithValue("@Patient_ID", pID);
                                              _ = command.Parameters.AddWithValue("@Sample_Number", order.Elements["Specimen ID (Accession#)"]);
@@ -582,6 +584,7 @@ namespace IMMULIS
                                              AppendToLog("Adding result.");
                                              using (SqlCommand command = new SqlCommand("spIMMResult", conn))
                                              {
+                                                  // fill SqlCommand with information about the result
                                                   command.CommandType = CommandType.StoredProcedure;
                                                   _ = command.Parameters.AddWithValue("@Order_ID", oID);
                                                   _ = command.Parameters.AddWithValue("@Test_Code", result.Elements["Universal Test ID"]);
@@ -592,14 +595,17 @@ namespace IMMULIS
                                                   _ = command.Parameters.AddWithValue("@AbnormalityTesting", result.Elements["Nature of Abnormality Testing"]);
                                                   _ = command.Parameters.AddWithValue("@ResultStatus", result.Elements["Result Status"]);
                                                   _ = command.Parameters.AddWithValue("@Operator", result.Elements["Operator ID"]);
+                                                  // Format datetime information of the result
                                                   string dtStart = result.Elements["Date/Time Test Started"];
                                                   DateTime start = new DateTime(Convert.ToInt32(dtStart.Substring(0, 4)), Convert.ToInt32(dtStart.Substring(4, 2)), Convert.ToInt32(dtStart.Substring(6, 2)), Convert.ToInt32(dtStart.Substring(8, 2)), Convert.ToInt32(dtStart.Substring(10, 2)), Convert.ToInt32(dtStart.Substring(12, 2)));
                                                   _ = command.Parameters.AddWithValue("@TestStarted", start);
                                                   string dtEnd = result.Elements["Date/Time Test Completed"];
                                                   DateTime end = new DateTime(Convert.ToInt32(dtEnd.Substring(0, 4)), Convert.ToInt32(dtEnd.Substring(4, 2)), Convert.ToInt32(dtEnd.Substring(6, 2)), Convert.ToInt32(dtEnd.Substring(8, 2)), Convert.ToInt32(dtEnd.Substring(10, 2)), Convert.ToInt32(dtEnd.Substring(12, 2)));
                                                   _ = command.Parameters.AddWithValue("@TestCompleted", end);
+                                                  // trim ETX and CR
                                                   char[] trimmings = { '\x03', '\x0D' };
                                                   _ = command.Parameters.AddWithValue("@Instrument_ID", result.Elements["Instrument ID"].Trim(trimmings));
+                                                  //execute sqlcommand
                                                   _ = command.ExecuteNonQuery();
                                              }
                                         }
@@ -798,6 +804,7 @@ namespace IMMULIS
                     if (InputString.Length > 240) //240 chars max length of a message
                     { //split InputString into two messages
                          string firstString = InputString.Substring(0, 235); //take first 235 chars because 5 chars are needed for the message information
+                         // Add ETB because we know there will be another frame after this
                          firstString += Constants.ETB;                      
                          firstString += CHKSum(firstString);
                          firstString += Constants.CR + Constants.LF;

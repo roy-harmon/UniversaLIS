@@ -103,7 +103,7 @@ namespace IMMULIS
           public void HaveData()
           {
                if (CommState is IdleState)
-               { // enquire about the data that CommState has
+               { // Execute the IdleState's HaveData to start the transfer
                     CommState.HaveData();
                     // Change state
                     ChangeToTransENQState();

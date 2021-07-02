@@ -29,16 +29,26 @@ namespace IMMULIS
             ContinuousRead();
         }
 
+        /* 
+         * Infinitely loops through kickoffRead method
+         */
         private void ContinuousRead()
         {
             byte[] buffer = new byte[4096];
             Action kickoffRead = null;
+            //read incoming message and store in buffer
             kickoffRead = (Action)(() => BaseStream.BeginRead(buffer, 0, buffer.Length, delegate (IAsyncResult ar)
             {
+                //size of the message being recieved
+                //the size is anywhere between 0 and the size of the buffer variable
                 int count = BaseStream.EndRead(ar);
+                //create a byte array the size of the message being recieved
                 byte[] dst = new byte[count];
+                // copy relevant portion of buffer (the message) into dst so there is no extra space in the array
                 Buffer.BlockCopy(buffer, 0, dst, 0, count);
+                //store message
                 OnDataReceived(dst);
+                // loop
                 kickoffRead();
             }, null)); kickoffRead();
         }
