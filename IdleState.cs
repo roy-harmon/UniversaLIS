@@ -36,6 +36,7 @@ namespace IMMULIS
           public void RcvData(string InputString)
           {
                // Ignore... Possibly log the input for later reference?
+               AppendToLog("Data received in idle state: " + InputString);
           }
 
           public void RcvENQ()
@@ -45,17 +46,19 @@ namespace IMMULIS
 
           public void RcvEOT()
           {
-               // Ignore
+               // Ignore, but log it.
+               AppendToLog("EOT received in idle state.");
           }
 
           public void RcvNAK()
           {
                // Ignore. It's just trying to get a rise out of you.
+               AppendToLog("NAK received in idle state.");
           }
 
           public void HaveData()
           {
-
+               // If there's data to send, check the timers before sending.
                if (ContentTimer.remainingDuration <= 0 && BusyTimer.remainingDuration <= 0)
                {
                     // Send ENQ

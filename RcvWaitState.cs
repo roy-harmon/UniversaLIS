@@ -30,6 +30,7 @@ namespace IMMULIS
           public void RcvACK()
           {
                // This shouldn't happen. Ignore it, I guess, and hope the instrument gets its act together.
+               AppendToLog("ACK received in RcvWait state.");
           }
 
           public void RcvData(string InputString)
@@ -105,6 +106,7 @@ namespace IMMULIS
           {
                // This shouldn't happen since we already received the ENQ that brought us to this state.
                // Ignore it, I guess, and hope the instrument finds what it's looking for.
+               AppendToLog("ENQ received in RcvWait state.");
           }
 
           public void RcvEOT()
@@ -123,11 +125,13 @@ namespace IMMULIS
           public void RcvNAK()
           {
                // This shouldn't happen. Ignore it, I guess, and hope the instrument feels better soon.
+               AppendToLog("NAK received in RcvWait state.");
           }
 
           void ILISState.HaveData()
           {
-               throw new System.NotImplementedException();
+               // It doesn't matter if we have data to send. We're receiving right now.
+               AppendToLog("HaveData called in RcvWait state.");
           }
      }
 }

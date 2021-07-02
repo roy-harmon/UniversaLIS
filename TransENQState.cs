@@ -41,6 +41,7 @@ namespace IMMULIS
           public void RcvData(string InputString)
           {
                // Ignore
+               AppendToLog("Data received in TransENQ state: " + InputString);
           }
 
           public void RcvENQ()
@@ -54,8 +55,8 @@ namespace IMMULIS
                /* This is a Receiver Interrupt request. 
                *  Ideally, this would cause the host to stop transmitting, enter the idle state,
                *  and not try to send again for at least 15 seconds.
-               *  
-               *  Or, we could choose not to honor the interrupt request, 
+               *  TODO: Honor Receiver Interrupt requests.
+               *  Or, we could choose to ignore the interrupt request, 
                *  in which case we could treat this as a positive acknowledgement and keep going.
                *  We'll start with that for now.
                */
@@ -70,7 +71,8 @@ namespace IMMULIS
 
           void ILISState.HaveData()
           {
-               throw new System.NotImplementedException();
+               // It doesn't matter if we have data to send. We're already trying to send.
+               AppendToLog("HaveData called in TransENQ state.");
           }
      }
 }
