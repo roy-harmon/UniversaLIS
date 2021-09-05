@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace IMMULIS
 {
-     public class CommPort : ReliableSerialPort
+     public class CommPort : SerialPort //ReliableSerialPort
      {
           public CommPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits)
           {

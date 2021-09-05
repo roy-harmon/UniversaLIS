@@ -1,0 +1,23 @@
+interface1:
+    lis_id: LIS
+    lis_password: 
+    receiver_id:    IMMULITE
+    port:
+        name:   COM4
+        baud:   9600
+        parity: None
+        databits:   8
+        stopbits:   1
+        handshake:  None
+
+interface2:
+    lis_id: LIS
+    lis_password: 
+    receiver_id:    CLINITEK
+    port:
+        name:   COM5
+        baud:   19200
+        parity: None
+        databits:   8
+        stopbits:   1
+        handshake:  None

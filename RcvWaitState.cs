@@ -1,4 +1,4 @@
-﻿using static IMMULIS.IMMULIService;
+﻿using static IMMULIS.ServiceMain;
 
 namespace IMMULIS
 {
@@ -6,6 +6,7 @@ namespace IMMULIS
      {
           // Track the current frame number to ensure that the received frame is correct.
           public int ExpectedFrame = 1;
+          protected internal CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)
@@ -56,20 +57,20 @@ namespace IMMULIS
                if (isFrameGood)
                {
                     // Send ACK 
-                    ComPort.Send(Constants.ACK);
+                    comm.ComPort.Send(Constants.ACK);
                     // Reset rcvTimer to 30 seconds.
-                    rcvTimer.Reset(30);
+                    comm.rcvTimer.Reset(30);
                     // Increment frame number.
                     ExpectedFrame = ++ExpectedFrame % 8;
                     // Actually handle the frame.
-                    ParseMessageLine(InputString);
+                    comm.ParseMessageLine(InputString);
                }
                else
                {
                     // Send NAK
-                    ComPort.Send(Constants.NAK);
+                    comm.ComPort.Send(Constants.NAK);
                     // Reset rcvTimer to 30 seconds.
-                    rcvTimer.Reset(30);
+                    comm.rcvTimer.Reset(30);
                }
 
           }
@@ -112,13 +113,13 @@ namespace IMMULIS
           public void RcvEOT()
           {
                // Discard last incomplete message (if applicable).
-               if (CurrentMessage.Terminator < 'E')
+               if (comm.CurrentMessage.Terminator < 'E')
                {
-                    CurrentMessage = new MessageBody();
+                    comm.CurrentMessage = new Message();
                }
                else
                {
-                    ProcessMessage(CurrentMessage);
+                    comm.ProcessMessage(comm.CurrentMessage);
                }
           }
 

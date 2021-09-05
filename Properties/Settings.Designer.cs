@@ -25,10 +25,10 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("COM4")]
-        public string SerialPortNum {
+        [global::System.Configuration.DefaultSettingValueAttribute("COM4,9600,None,8,1,None;COM5,19200,None,8,1")]
+        public string SerialPorts {
             get {
-                return ((string)(this["SerialPortNum"]));
+                return ((string)(this["SerialPorts"]));
             }
         }
         
@@ -43,10 +43,10 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0")]
-        public int SerialPortParity {
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public global::System.IO.Ports.Parity SerialPortParity {
             get {
-                return ((int)(this["SerialPortParity"]));
+                return ((global::System.IO.Ports.Parity)(this["SerialPortParity"]));
             }
         }
         
@@ -61,10 +61,10 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("1")]
-        public int SerialPortStopBits {
+        [global::System.Configuration.DefaultSettingValueAttribute("One")]
+        public global::System.IO.Ports.StopBits SerialPortStopBits {
             get {
-                return ((int)(this["SerialPortStopBits"]));
+                return ((global::System.IO.Ports.StopBits)(this["SerialPortStopBits"]));
             }
         }
         
@@ -88,6 +88,7 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=127.0.0.1\\SQLExpress;Initial Catalog=LISDB;Integrated Security=True")]
         public string ConnectionString {
             get {
@@ -137,6 +138,15 @@ namespace IMMULIS.Properties {
         public double AutoSendInterval {
             get {
                 return ((double)(this["AutoSendInterval"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("None")]
+        public global::System.IO.Ports.Handshake SerialPortHandshake {
+            get {
+                return ((global::System.IO.Ports.Handshake)(this["SerialPortHandshake"]));
             }
         }
     }

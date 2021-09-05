@@ -1,7 +1,7 @@
 ﻿
 namespace IMMULIS
 {
-     partial class IMMULIService
+     partial class ServiceMain
      {
           /// <summary> 
           /// Required designer variable.

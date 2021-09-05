@@ -1,10 +1,11 @@
-﻿using static IMMULIS.IMMULIService;
+﻿using static IMMULIS.ServiceMain;
 
 namespace IMMULIS
 {
      public class LISCommState : ILISState
      {
           public ILISState CommState { get; set; }
+          protected internal CommFacilitator comm;
           public LISCommState()
           {
                CommState = new IdleState();
@@ -48,7 +49,7 @@ namespace IMMULIS
                     // Transition to TransWaitState.
                     ChangeToTransWaitState();
                }
-               if (CommState is TransWaitState && CurrentMessage.FrameList.Count < CurrentFrameCounter)
+               if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count < comm.CurrentFrameCounter)
                {
                     // When all frames have been sent, return to IdleState.
                     ChangeToIdleState();
@@ -80,7 +81,7 @@ namespace IMMULIS
                {
                     // Return to Idle.
                     ChangeToIdleState();
-                    if (OutboundMessageQueue.Count > 0)
+                    if (comm.OutboundMessageQueue.Count > 0)
                     {
                          // Don't make the operator wait for the timer tick.
                          IdleCheck();
@@ -91,7 +92,7 @@ namespace IMMULIS
           public void RcvNAK()
           {
                CommState.RcvNAK();
-               if (CommState is TransWaitState && numNAK == 6)
+               if (CommState is TransWaitState && comm.numNAK == 6)
                {
                     ChangeToIdleState();
                }
@@ -117,8 +118,8 @@ namespace IMMULIS
           public void ChangeToIdleState()
           {
                CommState = new IdleState();
-               CurrentFrameCounter = 0;
-               transTimer.Reset(-1);
+               comm.CurrentFrameCounter = 0;
+               comm.transTimer.Reset(-1);
 #if DEBUG
                AppendToLog("CommState changed to IdleState!");
 #endif
@@ -150,17 +151,17 @@ namespace IMMULIS
                if (CommState is TransENQState || CommState is TransWaitState)
                {
                     // Send EOT and return to idle state.
-                    ComPort.Send(Constants.EOT);
+                    comm.ComPort.Send(Constants.EOT);
                     if (CommState is TransWaitState)
                     {
-                         if (CurrentMessage.FrameList.Count > CurrentFrameCounter)
+                         if (comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
                          {
-                              OutboundMessageQueue.Enqueue(CurrentMessage);
-                              CurrentMessage = new MessageBody();
+                              comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
+                              comm.CurrentMessage = new Message();
                          }
                     }
-                    CurrentMessage = new MessageBody();
-                    CurrentFrameCounter = 0;
+                    comm.CurrentMessage = new Message();
+                    comm.CurrentFrameCounter = 0;
                     ChangeToIdleState();
                }
           }
@@ -169,13 +170,13 @@ namespace IMMULIS
                if (CommState is RcvWaitState)
                {
                     // Discard last incomplete message.
-                    if (CurrentMessage.Terminator < 'E')
+                    if (comm.CurrentMessage.Terminator < 'E')
                     {
-                         CurrentMessage = new MessageBody();
+                         comm.CurrentMessage = new Message();
                     }
                     else
                     {
-                         ProcessMessage(CurrentMessage);
+                         comm.ProcessMessage(comm.CurrentMessage);
                     }
                     // Return to idle state.
                     CommState = new IdleState();
@@ -185,7 +186,7 @@ namespace IMMULIS
           {
                if (CommState is IdleState)
                {
-                    if (OutboundMessageQueue.Count > 0)
+                    if (comm.OutboundMessageQueue.Count > 0)
                     {
                          HaveData();
                     }
