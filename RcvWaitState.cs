@@ -115,7 +115,7 @@ namespace IMMULIS
                // Discard last incomplete message (if applicable).
                if (comm.CurrentMessage.Terminator < 'E')
                {
-                    comm.CurrentMessage = new Message();
+                    comm.CurrentMessage = new Message(comm);
                }
                else
                {

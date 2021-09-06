@@ -25,51 +25,6 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("COM4,9600,None,8,1,None;COM5,19200,None,8,1")]
-        public string SerialPorts {
-            get {
-                return ((string)(this["SerialPorts"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("9600")]
-        public int SerialPortBaudRate {
-            get {
-                return ((int)(this["SerialPortBaudRate"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("None")]
-        public global::System.IO.Ports.Parity SerialPortParity {
-            get {
-                return ((global::System.IO.Ports.Parity)(this["SerialPortParity"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("8")]
-        public int SerialPortDataBits {
-            get {
-                return ((int)(this["SerialPortDataBits"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("One")]
-        public global::System.IO.Ports.StopBits SerialPortStopBits {
-            get {
-                return ((global::System.IO.Ports.StopBits)(this["SerialPortStopBits"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("LIS")]
         public string LIS_ID {
             get {
@@ -116,15 +71,6 @@ namespace IMMULIS.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("IMMULITE")]
-        public string ReceiverID {
-            get {
-                return ((string)(this["ReceiverID"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool AutoSendOrders {
             get {
@@ -138,15 +84,6 @@ namespace IMMULIS.Properties {
         public double AutoSendInterval {
             get {
                 return ((double)(this["AutoSendInterval"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("None")]
-        public global::System.IO.Ports.Handshake SerialPortHandshake {
-            get {
-                return ((global::System.IO.Ports.Handshake)(this["SerialPortHandshake"]));
             }
         }
     }

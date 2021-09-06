@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.ServiceProcess;
+using YamlDotNet.RepresentationModel;
 // TODO: Add internal database while keeping external database option.
 // TODO: Add UI.
 namespace IMMULIS
@@ -41,10 +43,21 @@ namespace IMMULIS
                try
                {
                     AppendToLog("Service starting.");
-                    var ports = new List<string>(Properties.Settings.Default.SerialPorts.Split(new char[] { ';' }));
-                    foreach (var port in ports)
+                    using (var reader = new StreamReader("Properties/config.yml"))
                     {
-                         commFacilitators.Add(new CommFacilitator(port));
+                         var yaml = new YamlStream();
+                         yaml.Load(reader);
+                         var yamlmap = (YamlMappingNode)yaml.Documents[0].RootNode;
+                         var interfaces = (YamlSequenceNode)yamlmap.Children[new YamlScalarNode("interfaces")];
+                         foreach (YamlMappingNode iface in interfaces)
+                         {
+                              string baud = $"{iface.Children[new YamlScalarNode("baud")]}";
+                              string dbits = $"{iface.Children[new YamlScalarNode("databits")]}";
+                              string sbits = $"{iface.Children[new YamlScalarNode("stopbits")]}";
+                              string hshake = $"{iface.Children[new YamlScalarNode("handshake")]}";
+                              string rec_id = $"{iface.Children[new YamlScalarNode("receiver_id")]}";
+                              commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id));
+                         }
                     }
                }
                catch (Exception ex)

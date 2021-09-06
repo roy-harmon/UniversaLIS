@@ -6,7 +6,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using static IMMULIS.ServiceMain;
-
+// TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 namespace IMMULIS
 {
      public class CommFacilitator
@@ -23,7 +23,7 @@ namespace IMMULIS
 
           public int CurrentFrameCounter;
 
-          public Message CurrentMessage = new Message();
+          public Message CurrentMessage;
 
           private string intermediateFrame;
 
@@ -37,7 +37,9 @@ namespace IMMULIS
 
           private readonly System.Timers.Timer idleTimer = new System.Timers.Timer(Properties.Settings.Default.AutoSendInterval);
 
-          public CommFacilitator(string portSettings)
+          internal string receiver_id;
+
+          public CommFacilitator(string portName, int baudRate, string parity, int databits, string stopbits, string handshake, string receiverID)
           {
                commState.comm = this;
                rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
@@ -45,18 +47,20 @@ namespace IMMULIS
                try
                {
                     // Set the serial port properties and try to open it.
-                    string[] pSettings = portSettings.Split(new char[] { ',' });
-                    ComPort = new CommPort(pSettings[0], int.Parse(pSettings[1]), (Parity)Enum.Parse(typeof(Parity), pSettings[2], true), int.Parse(pSettings[3]), (StopBits)Enum.Parse(typeof(StopBits), pSettings[4], true)) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
+                    //string[] pSettings = portSettings.Split(new char[] { ',' });
+                    receiver_id = receiverID;
+                    ComPort = new CommPort(portName, baudRate, (Parity)Enum.Parse(typeof(Parity), parity, true), databits, (StopBits)Enum.Parse(typeof(StopBits), stopbits, true)) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
                     {
-                         Handshake = (Handshake)Enum.Parse(typeof(Handshake), pSettings[5], true), // Properties.Settings.Default.SerialPortHandshake,
+                         Handshake = (Handshake)Enum.Parse(typeof(Handshake),handshake, true), // Properties.Settings.Default.SerialPortHandshake,
                          ReadTimeout = 20,
                          WriteTimeout = 20
                     };
+                    CurrentMessage = new Message(this);
                     ComPort.Encoding = Encoding.UTF8;
                     // Set the handler for the DataReceived event.
                     ComPort.DataReceived += ComPortDataReceived;
                     ComPort.Open();
-                    AppendToLog($"Port opened: {pSettings[0]}");
+                    AppendToLog($"Port opened: {portName}");
                     idleTimer.AutoReset = true;
                     idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
                     if (Properties.Settings.Default.AutoSendOrders == true) { idleTimer.Elapsed += WorklistTimedEvent; }
@@ -98,7 +102,7 @@ namespace IMMULIS
                          }
                     }
                     ComPort.Close();
-                    AppendToLog("Port closed.");
+                    AppendToLog($"Port closed: {ComPort.PortName}");
                }
                catch (Exception ex)
                {
@@ -259,7 +263,7 @@ namespace IMMULIS
 
                     return;
                }
-               else if (headerFields[4] == Properties.Settings.Default.ReceiverID)
+               else if (headerFields[4] == receiver_id)
                {
                     // Message is incoming. Add the contents to the appropriate database tables.
                     /* For our purposes, there are two primary incoming message types
@@ -509,7 +513,7 @@ namespace IMMULIS
                          {
                               // Reply with a "no information available from last query" message (terminator = "I")
                               ServiceMain.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
-                              Message messageBody = new Message
+                              Message messageBody = new Message(this)
                               {
                                    Terminator = 'I'
                               };
@@ -518,7 +522,7 @@ namespace IMMULIS
                          // Exit function.
                          return orderCount;
                     }
-                    Message responseMessage = new Message();
+                    Message responseMessage = new Message(this);
                     int patientCount;
                     using (SqlCommand sqlCommand = conn.CreateCommand())
                     { // Check to see how many patients are associated with the sample.

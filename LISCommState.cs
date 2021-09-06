@@ -157,10 +157,10 @@ namespace IMMULIS
                          if (comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
                          {
                               comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
-                              comm.CurrentMessage = new Message();
+                              comm.CurrentMessage = new Message(comm);
                          }
                     }
-                    comm.CurrentMessage = new Message();
+                    comm.CurrentMessage = new Message(comm);
                     comm.CurrentFrameCounter = 0;
                     ChangeToIdleState();
                }
@@ -172,7 +172,7 @@ namespace IMMULIS
                     // Discard last incomplete message.
                     if (comm.CurrentMessage.Terminator < 'E')
                     {
-                         comm.CurrentMessage = new Message();
+                         comm.CurrentMessage = new Message(comm);
                     }
                     else
                     {

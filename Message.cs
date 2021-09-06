@@ -202,20 +202,63 @@ namespace IMMULIS
                
           }
 
-          public Message()
+          //public Message()
+          //{
+          //     string dateString;
+          //     DateTime dateTime = DateTime.Now;
+          //     dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
+          //     dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
+          //     string header = Constants.STX + $"1H|\\^&||{Properties.Settings.Default.LIS_Password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
+          //     header += $"||{Properties.Settings.Default.SenderPhone}|8N1|{Properties.Settings.Default.ReceiverID}||P|1|{dateString}";
+          //     MessageHeader = header;
+          //}
+
+          public Message(string messageHeader)
           {
+               MessageHeader = messageHeader;
+          }
+
+          public Message(CommFacilitator facilitator)
+          {
+               int stopbits;
+               switch (facilitator.ComPort.StopBits)
+               {
+                    case System.IO.Ports.StopBits.One:
+                         stopbits = 1;
+                         break;
+                    case System.IO.Ports.StopBits.Two:
+                         stopbits = 2;
+                         break;
+                    default:
+                         stopbits = 1;
+                         break;
+               }
+               string parity;
+               switch (facilitator.ComPort.Parity)
+               {
+                    case System.IO.Ports.Parity.Even:
+                         parity = "E";
+                         break;
+                    case System.IO.Ports.Parity.Odd:
+                         parity = "O";
+                         break;
+                    case System.IO.Ports.Parity.Mark:
+                         parity = "M";
+                         break;
+                    case System.IO.Ports.Parity.Space:
+                         parity = "S";
+                         break;
+                    default:
+                         parity = "N";
+                         break;
+               }
                string dateString;
                DateTime dateTime = DateTime.Now;
                dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
                string header = Constants.STX + $"1H|\\^&||{Properties.Settings.Default.LIS_Password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
-               header += $"||{Properties.Settings.Default.SenderPhone}|8N1|{Properties.Settings.Default.ReceiverID}||P|1|{dateString}";
+               header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.ComPort.DataBits}{parity}{stopbits}|{facilitator.receiver_id}||P|1|{dateString}";
                MessageHeader = header;
-          }
-
-          public Message(string messageHeader)
-          {
-               MessageHeader = messageHeader;
           }
      }
 }

@@ -38,7 +38,7 @@ namespace IMMULIS
                if (comm.CurrentMessage.FrameList.Count == comm.CurrentFrameCounter)
                {
                     comm.ComPort.Send(Constants.EOT);
-                    comm.CurrentMessage = new Message();
+                    comm.CurrentMessage = new Message(comm);
                }
                else
                {
@@ -93,7 +93,7 @@ namespace IMMULIS
                     // Maybe stick the message back in the queue to try again later?
                     comm.ComPort.Send(Constants.EOT);
                     comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
-                    comm.CurrentMessage = new Message();
+                    comm.CurrentMessage = new Message(comm);
                }
           }
 
