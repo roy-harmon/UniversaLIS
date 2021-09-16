@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Microsoft.Data.Sqlite;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -39,6 +40,9 @@ namespace IMMULIS
 
           internal string receiver_id;
 
+          // Update this string when setting up external database connection functions.
+          string connString = @"\internal.db";
+
           public CommFacilitator(string portName, int baudRate, string parity, int databits, string stopbits, string handshake, string receiverID)
           {
                commState.comm = this;
@@ -47,11 +51,10 @@ namespace IMMULIS
                try
                {
                     // Set the serial port properties and try to open it.
-                    //string[] pSettings = portSettings.Split(new char[] { ',' });
                     receiver_id = receiverID;
                     ComPort = new CommPort(portName, baudRate, (Parity)Enum.Parse(typeof(Parity), parity, true), databits, (StopBits)Enum.Parse(typeof(StopBits), stopbits, true)) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
                     {
-                         Handshake = (Handshake)Enum.Parse(typeof(Handshake),handshake, true), // Properties.Settings.Default.SerialPortHandshake,
+                         Handshake = (Handshake)Enum.Parse(typeof(Handshake),handshake, true), 
                          ReadTimeout = 20,
                          WriteTimeout = 20
                     };
@@ -287,6 +290,7 @@ namespace IMMULIS
                          ServiceMain.AppendToLog("Connecting to database.");
 #endif
                          // This is where we have to connect to the database.
+                         // TODO: Switch to SQLite
                          using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
                          {
                               conn.Open();
