@@ -13,3 +13,131 @@ interfaces:
     databits:   8
     stopbits:   One
     handshake:  None
+ 
+service_config:
+    use_external_db:    false
+    connection_string:  
+    db_poll_interval:
+    listen_hl7:     true
+    hl7_tcp_port:   1394
+
+table_field_mappings:
+    PatientRecord:
+        PAPID: 
+        LAPID: 
+        PID3: 
+        PName: 
+        MMName: 
+        DOB: 
+        PSex: 
+        PRace: 
+        PAddr: 
+        Reserved: 
+        PTelNo: 
+        Attending: 
+        Special1: 
+        Special2: 
+        PHeight: 
+        PWeight: 
+        PDiag: 
+        PMeds: 
+        PDiet: 
+        PF1: 
+        PF2: 
+        AdmDates: 
+        AdmStatus: 
+        PLocation: 
+        AltCodeNature: 
+        AltCode: 
+        PReligion: 
+        PMarStatus: 
+        PIsoStatus: 
+        PLanguage: 
+        HospService: 
+        HospInst: 
+        DoseCat: 
+    
+    OrderRecord:
+        PRID: 
+        SpecID: 
+        InSpecID: 
+        UTID: 
+        OrderDate: 
+        CollectDate: 
+        CollEndTime: 
+        CollVolume: 
+        Collector: 
+        ActCode: 
+        DangerCode: 
+        RelClinInfo: 
+        SpecRecd: 
+        SpecDesc: 
+        OrdPhys: 
+        PhysTelNo: 
+        UF1: 
+        UF2: 
+        LF1: 
+        LF2: 
+        LastReported: 
+        BillRef: 
+        InSectID: 
+        RepType: 
+        Reserved: 
+        SpecColLocation: 
+        NosInfFlag: 
+        SpecService: 
+        SpecInst: 
+    
+    ResultRecord:
+        ORID: 
+        UTID: 
+        Result: 
+        Unit: 
+        RefRange: 
+        Abnormal: 
+        AbNature: 
+        ResStatus: 
+        NormsChanged: 
+        OpID: 
+        TestStart: 
+        TestEnd: 
+        InstID: 
+    
+    CommentRecord:
+        Source: 
+        Text: 
+        Type: 
+    
+    QueryRecord:
+        StartRange: 
+        EndRange: 
+        UTID: 
+        ReqLimNature: 
+        ReqResBeginDT: 
+        ReqResEndDT: 
+        ReqPhysName: 
+        ReqPhysTelNo: 
+        UF1: 
+        UF2: 
+        ReqInfoStatus: 
+    
+    ScientificRecord:
+        AnalMeth: 
+        Instrument: 
+        Reagents: 
+        Units: 
+        QC: 
+        SpecDesc: 
+        Reserved: 
+        Container: 
+        SpecID: 
+        Analyte: 
+        Result: 
+        ResUnits: 
+        CollectDT: 
+        ResultDT: 
+        AnalPreSteps: 
+        PatDiag: 
+        PatDOB: 
+        PSex: 
+        PRace: 

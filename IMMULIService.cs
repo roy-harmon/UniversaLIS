@@ -14,8 +14,13 @@ namespace IMMULIS
 {
      public partial class ServiceMain : ServiceBase
      {
-          public static EventLog eventLog1 = new EventLog();
-          internal List<CommFacilitator> commFacilitators = new List<CommFacilitator>();
+          public static EventLog EventLog1 = new EventLog();
+          private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
+          public bool ListenHL7;
+          public int HL7Port;
+          public bool UseExtDB;
+          public string ExternalDbConnString;
+          public int DbPollInterval;
           public ServiceMain()
           {
                InitializeComponent();
@@ -24,8 +29,8 @@ namespace IMMULIS
                     EventLog.CreateEventSource(
                         "IMMULIS", "IMMULog");
                }
-               eventLog1.Source = "IMMULIS";
-               eventLog1.Log = "IMMULog";
+               EventLog1.Source = "IMMULIS";
+               EventLog1.Log = "IMMULog";
           }
 
           public static void HandleEx(Exception ex)
@@ -35,7 +40,7 @@ namespace IMMULIS
                     return;
                }
                string message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
-               eventLog1.WriteEntry(message);
+               EventLog1.WriteEntry(message);
           }
 
           protected override void OnStart(string[] args)
@@ -48,6 +53,24 @@ namespace IMMULIS
                          var yaml = new YamlStream();
                          yaml.Load(reader);
                          var yamlmap = (YamlMappingNode)yaml.Documents[0].RootNode;
+                         // Set up database connections, HL7 listener, and RS232 interfaces.
+                         var serviceConfig = (YamlMappingNode)yamlmap.Children[new YamlMappingNode("service_config")];
+                         var listenNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
+                         ListenHL7 = bool.Parse(listenNode.Value);
+                         var useExtDbNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("use_external_db")];
+                         UseExtDB = bool.Parse(useExtDbNode.Value);
+                         if (UseExtDB)
+                         {
+                              var extDbConnNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
+                              ExternalDbConnString = extDbConnNode.Value;
+                              // TODO: Map internal DB fields to external ones.
+                         }
+                         if (ListenHL7)
+                         {
+                              var listenPortNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
+                              HL7Port = int.Parse(listenPortNode.Value);
+                              // TODO: Actually set up the HL7 listener.
+                         }
                          var interfaces = (YamlSequenceNode)yamlmap.Children[new YamlScalarNode("interfaces")];
                          foreach (YamlMappingNode iface in interfaces)
                          {
@@ -56,7 +79,7 @@ namespace IMMULIS
                               string sbits = $"{iface.Children[new YamlScalarNode("stopbits")]}";
                               string hshake = $"{iface.Children[new YamlScalarNode("handshake")]}";
                               string rec_id = $"{iface.Children[new YamlScalarNode("receiver_id")]}";
-                              commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id));
+                              s_commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id));
                          }
                     }
                }
@@ -72,7 +95,7 @@ namespace IMMULIS
                try
                {
                     AppendToLog("Service stopping.");
-                    foreach (var comm in commFacilitators)
+                    foreach (var comm in s_commFacilitators)
                     {
                          comm.Close();
                     }
