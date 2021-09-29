@@ -1,9 +1,9 @@
-# IMMULIS
+# UniversaLIS
 An LIS system for Siemens IMMULITE, written in C#.
 
 ## Installation
 
-The project will eventually be updated to include an executable setup file. For now, IMMULIS (working title) can be installed by navigating to the IMMULIS.exe file using the command prompt and enter the following commands:
+The project will eventually be updated to include an executable setup file. For now, UniversaLIS (working title) can be installed by navigating to the IMMULIS.exe file using the command prompt and enter the following commands:
 
 ```bash
 installutil IMMULIS.exe
