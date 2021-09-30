@@ -1,4 +1,4 @@
-﻿namespace IMMULIS
+﻿namespace UniversaLIS
 {
      public interface ILISState
      {

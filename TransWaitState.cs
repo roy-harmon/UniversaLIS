@@ -1,7 +1,7 @@
 ﻿using System;
-using static IMMULIS.ServiceMain;
+using static UniversaLIS.ServiceMain;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      class TransWaitState : ILISState
      {

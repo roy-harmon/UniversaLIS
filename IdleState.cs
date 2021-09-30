@@ -1,6 +1,6 @@
-﻿using static IMMULIS.CommFacilitator;
+﻿using static UniversaLIS.CommFacilitator;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class IdleState : ILISState
      {

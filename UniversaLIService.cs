@@ -10,7 +10,7 @@ using System.ServiceProcess;
 using YamlDotNet.RepresentationModel;
 // TODO: Add internal database while keeping external database option.
 // TODO: Add UI.
-namespace IMMULIS
+namespace UniversaLIS
 {
      public partial class ServiceMain : ServiceBase
      {
@@ -24,12 +24,12 @@ namespace IMMULIS
           public ServiceMain()
           {
                InitializeComponent();
-               if (!EventLog.SourceExists("IMMULIS"))
+               if (!EventLog.SourceExists("UniversaLIS"))
                {
                     EventLog.CreateEventSource(
-                        "IMMULIS", "IMMULog");
+                        "UniversaLIS", "IMMULog");
                }
-               EventLog1.Source = "IMMULIS";
+               EventLog1.Source = "UniversaLIS";
                EventLog1.Log = "IMMULog";
           }
 

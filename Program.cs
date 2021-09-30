@@ -1,6 +1,6 @@
 ﻿using System.ServiceProcess;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      static class Program
      {

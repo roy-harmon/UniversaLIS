@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      /* Example of unidirectional message structure/hierarchy:
       * Header
@@ -139,16 +139,34 @@ namespace IMMULIS
                // Then process each patient and their orders, incrementing the frame number with each record.
                if (Patients.Count > 0)
                {
+                    int pCount = 0;
                     foreach (var patient in Patients)
                     {
+                         pCount += 1;
                          patient.Elements["FrameNumber"] = IncrementFrameCount().ToString();
+                         // Assign proper Sequence Number to each patient.
+                         patient.Elements["SequenceNumber"] = pCount.ToString();
                          // Add the patient message to the FrameList.
                          FrameMessage(patient.PatientMessage);
                          // Do the same for each order message.
+                         int oCount = 0;
                          foreach (var order in patient.Orders)
                          {
+                              oCount += 1;
                               order.Elements["FrameNumber"] = IncrementFrameCount().ToString();
+                              // Assign proper Sequence Number to each order.
+                              order.Elements["SequenceNumber"] = oCount.ToString();
                               FrameMessage(order.OrderMessage);
+                              // If there are any result messages for the order, prepare those, too.
+                              int rCount = 0;
+                              foreach (var result in order.Results)
+                              {
+                                   rCount += 1;
+                                   result.Elements["FrameNumber"] = IncrementFrameCount().ToString();
+                                   // Assign proper Sequence Number to each order.
+                                   result.Elements["SequenceNumber"] = rCount.ToString();
+                                   FrameMessage(result.ResultMessage);
+                              }
                          }
                     }
                }

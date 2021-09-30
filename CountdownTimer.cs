@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class CountdownTimer
      {

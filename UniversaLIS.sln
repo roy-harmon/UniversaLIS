@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IMMULIS", "IMMULIS.csproj", "{2804EF32-781C-434A-9443-A2DCFF9CB60C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversaLIS", "UniversaLIS.csproj", "{2804EF32-781C-434A-9443-A2DCFF9CB60C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LISUnitTests", "..\LISUnitTests\LISUnitTests.csproj", "{3413CCC0-1AD1-4984-B550-F91F34506B57}"
 EndProject

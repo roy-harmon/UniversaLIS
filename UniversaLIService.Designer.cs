@@ -1,5 +1,5 @@
 ﻿
-namespace IMMULIS
+namespace UniversaLIS
 {
      partial class ServiceMain
      {

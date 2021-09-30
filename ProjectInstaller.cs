@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Configuration.Install;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      [RunInstaller(true)]
      public partial class ProjectInstaller : System.Configuration.Install.Installer

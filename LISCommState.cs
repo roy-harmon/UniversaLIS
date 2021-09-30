@@ -1,6 +1,6 @@
-﻿using static IMMULIS.ServiceMain;
+﻿using static UniversaLIS.ServiceMain;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class LISCommState : ILISState
      {

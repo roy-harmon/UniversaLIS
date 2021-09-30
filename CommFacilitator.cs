@@ -6,9 +6,9 @@ using Microsoft.Data.Sqlite;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using static IMMULIS.ServiceMain;
+using static UniversaLIS.ServiceMain;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class CommFacilitator
      {

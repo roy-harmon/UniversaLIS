@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Threading;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class CommPort : SerialPort //ReliableSerialPort
      {
@@ -25,10 +25,10 @@ namespace IMMULIS
           {
                string publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
-               string txtFile = $"{publicFolder}\\IMMULIS\\Serial_Logs\\SerialLog_{date.Year}-{date.Month}-{date.Day}.txt";
-               if (Directory.Exists($"{publicFolder}\\IMMULIS\\Serial_Logs\\") == false)
+               string txtFile = $"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog_{date.Year}-{date.Month}-{date.Day}.txt";
+               if (Directory.Exists($"{publicFolder}\\UniversaLIS\\Serial_Logs\\") == false)
                {
-                    Directory.CreateDirectory($"{publicFolder}\\IMMULIS\\Serial_Logs\\");
+                    Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Serial_Logs\\");
                }
                string txtWrite = $"{date.ToLocalTime()} \t{txt}\r\n";
                _ = logOpen.WaitOne();
