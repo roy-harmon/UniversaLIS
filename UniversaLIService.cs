@@ -27,10 +27,10 @@ namespace UniversaLIS
                if (!EventLog.SourceExists("UniversaLIS"))
                {
                     EventLog.CreateEventSource(
-                        "UniversaLIS", "IMMULog");
+                        "UniversaLIS", "UniversaLog");
                }
                EventLog1.Source = "UniversaLIS";
-               EventLog1.Log = "IMMULog";
+               EventLog1.Log = "UniversaLog";
           }
 
           public static void HandleEx(Exception ex)
@@ -79,7 +79,18 @@ namespace UniversaLIS
                               string sbits = $"{iface.Children[new YamlScalarNode("stopbits")]}";
                               string hshake = $"{iface.Children[new YamlScalarNode("handshake")]}";
                               string rec_id = $"{iface.Children[new YamlScalarNode("receiver_id")]}";
-                              s_commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id));
+                              string pword = $"{iface.Children[new YamlScalarNode("password")]}";
+                              bool use_legacy_frameSize = bool.Parse($"{iface.Children[new YamlScalarNode("use_legacy_frame_size")]}");
+                              int frameSize;
+                              if (use_legacy_frameSize)
+                              {
+                                   frameSize = 240;
+                              }
+                              else
+                              {
+                                   frameSize = 63993;
+                              }
+                              s_commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id, frameSize, pword));
                          }
                     }
                }

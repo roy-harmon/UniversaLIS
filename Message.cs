@@ -32,6 +32,9 @@ namespace UniversaLIS
 
           private int FrameCounter { get; set; }
 
+          private int frameSize;
+          private string password;
+
           public string MessageHeader
           {
                get
@@ -61,10 +64,12 @@ namespace UniversaLIS
                *  in the next frame. 
                *  This procedure splits long frames into intermediate frames if necessary
                *  before appending the checksum and <CR><LF> and adding the frame to the message FrameList.
+               *  CLSI-LIS1-A increased this frame size to 64,000 including frame overhead.
+               *  The use_legacy_frame_size setting in config.yml is used to specify which size to use.
                */
-               if (InputString.Length > 243) // <STX> + FrameNumber + 240-character frame + <ETX> = 243
+               if (InputString.Length > frameSize + 3) // <STX> + FrameNumber + frame + <ETX>
                {
-                    string firstString = InputString.Substring(0, 242); // 242 to make room for the <ETB>
+                    string firstString = InputString.Substring(0, frameSize + 2); // +2 to make room for the <ETB>
                     int firstStringLength = firstString.Length;
                     int iLength = InputString.Length - firstStringLength;
                     firstString += Constants.ETB;
@@ -270,11 +275,13 @@ namespace UniversaLIS
                          parity = "N";
                          break;
                }
+               frameSize = facilitator.frameSize;
+               password = facilitator.password;
                string dateString;
                DateTime dateTime = DateTime.Now;
                dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
-               string header = Constants.STX + $"1H|\\^&||{Properties.Settings.Default.LIS_Password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
+               string header = Constants.STX + $"1H|\\^&||{password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
                header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.ComPort.DataBits}{parity}{stopbits}|{facilitator.receiver_id}||P|1|{dateString}";
                MessageHeader = header;
           }

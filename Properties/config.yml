@@ -1,18 +1,22 @@
 interfaces:
   - receiver_id:    IMMULITE
+    password:
     portname:   COM4
     baud:   9600
     parity: None
     databits:   8
     stopbits:   One
     handshake:  None
+    use_legacy_frame_size:  true
   - receiver_id:    CLINITEK
+    password:
     portname:   COM5
     baud:   19200
     parity: None
     databits:   8
     stopbits:   One
     handshake:  None
+    use_legacy_frame_size:  false
  
 service_config:
     use_external_db:    false

@@ -39,15 +39,19 @@ namespace UniversaLIS
           private readonly System.Timers.Timer idleTimer = new System.Timers.Timer(Properties.Settings.Default.AutoSendInterval);
 
           internal string receiver_id;
+          internal int frameSize;
+          internal string password;
 
-          // Update this string when setting up external database connection functions.
+          // TODO: Update this string when setting up external database connection functions.
           string connString = @"\internal.db";
 
-          public CommFacilitator(string portName, int baudRate, string parity, int databits, string stopbits, string handshake, string receiverID)
+          public CommFacilitator(string portName, int baudRate, string parity, int databits, string stopbits, string handshake, string receiverID, int frameLength, string passWord)
           {
                commState.comm = this;
                rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                transTimer = new CountdownTimer(-1, TransactionTimedOut);
+               frameSize = frameLength;
+               password = passWord;
                try
                {
                     // Set the serial port properties and try to open it.

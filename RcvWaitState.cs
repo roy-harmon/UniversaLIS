@@ -1,4 +1,5 @@
-﻿using static UniversaLIS.ServiceMain;
+﻿using System;
+using static UniversaLIS.ServiceMain;
 
 namespace UniversaLIS
 {
@@ -53,6 +54,11 @@ namespace UniversaLIS
                {
                     isFrameGood = CheckChecksum(InputString);
                }
+               // If it's a header message, check the password.
+               if (isFrameGood)
+               {
+                    isFrameGood = CheckPassword(InputString);
+               }
                // If the frame is good, act accordingly.
                if (isFrameGood)
                {
@@ -75,6 +81,20 @@ namespace UniversaLIS
 
           }
 
+          private bool CheckPassword(string inputString)
+          {
+               if (inputString.Substring(0, 3)==$"{Constants.STX}1H")
+               {
+                    // 1H|\\^&||{password}|
+                    String[] fieldArray = inputString.Split('|');
+                    if (fieldArray[3] != comm.password)
+                    {
+                         return false;
+                    }
+               };
+               return true;
+          }
+
           private bool CheckChecksum(string InputString)
           {
                string message = InputString;
@@ -83,6 +103,7 @@ namespace UniversaLIS
                int position = message.IndexOf(Constants.ETX);
                if (position < 0)
                {
+                    // If no <ETX>, maybe it's an intermediate frame. Check for <ETB>.
                     position = message.IndexOf(Constants.ETB);
                     if (position < 0)
                     {
