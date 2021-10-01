@@ -1,13 +1,13 @@
-# IMMULIS
-An LIS system for Siemens IMMULITE, written in C#.
+# UniversaLIS
+An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written in C#. Originally created for Siemens IMMULITE systems, but expanded to work with any system that complies with ASTM-1381/1394 or CLSI-LIS1-A/LIS2-A2 specifications.
 
 ## Installation
 
-The project will eventually be updated to include an executable setup file. For now, IMMULIS (working title) can be installed by navigating to the IMMULIS.exe file using the command prompt and enter the following commands:
+The project will eventually be updated to include an executable setup file. For now, UniversaLIS can be installed by navigating to the UniversaLIS.exe file using the command prompt and enter the following commands:
 
 ```bash
-installutil IMMULIS.exe
-net start IMMULIService
+installutil UniversaLIS.exe
+net start UniversaLIService
 ```
 
 Please note: The software also requires a database server in order to function properly. See the next section for details.
@@ -15,13 +15,13 @@ Please note: The software also requires a database server in order to function p
 ## Database
 
 This Windows service is designed to connect to a database of your choice. Currently, only Microsoft SQL Server is supported, but MySQL and ODBC connection driver support is planned. Due to the deprecation of the native Oracle client in recent versions of the .NET framework, Oracle databases are not currently supportable without a third-party ODBC driver.
-Whichever data source you use, just be sure to specify a valid connection string in the IMMULIS.exe.config file as discussed below.
+Whichever data source you use, just be sure to specify a valid connection string in the UniversaLIS.exe.config file as discussed below.
 
-While some parts of the database are fairly flexible, the IMMULIS service expects certain tables and fields to be present. To that end, several SQL "CREATE TABLE" scripts will be provided in an upcoming release.
+While some parts of the database are fairly flexible, the UniversaLIS service expects certain tables and fields to be present. To that end, several SQL "CREATE TABLE" scripts will be provided in an upcoming release.
 
 ## Configuration ##
 
-The "IMMULIS.exe.config" file contains several configuration items that should be changed according to your specific requirements. 
+The "UniversaLIS.exe.config" file contains several configuration items that should be changed according to your specific requirements. 
 Note: For settings marked with an asterisk (\*), ensure that the setting matches the analyzer's LIS Parameters configuration screen.
 
 ---
@@ -61,7 +61,7 @@ Please note that "Control" and "Verify" samples may be supported in the future, 
 
 ## User Interface
 
-A graphical user interface is not included at this time because most use cases will involve another application for management of patient information and test requests. Those applications (the good ones, anyway) are typically capable of interfacing with a SQL Server or MySQL database directly. Currently, the IMMULIS software only forms a bridge between the instrument and a database server; this database server can be accessed by third-party programs to automatically transmit test requests to the instrument and pull results into the reporting software.
+A graphical user interface is not included at this time because most use cases will involve another application for management of patient information and test requests. Those applications (the good ones, anyway) are typically capable of interfacing with a SQL Server or MySQL database directly. Currently, the UniversaLIS software only forms a bridge between the instrument and a database server; this database server can be accessed by third-party programs to automatically transmit test requests to the instrument and pull results into the reporting software.
 
 A simple GUI might be added in the future, but mostly for demonstration purposes. The real benefit of this software is in its ability to integrate with other systems, so while a GUI could be used, it would be less efficient in a production environment.
 
@@ -77,7 +77,7 @@ IMMULITE is a trademark of Siemens Healthcare Diagnostics.
 
 ## License
 
-IMMULIS is published under the [MIT](https://choosealicense.com/licenses/mit/) license.
+UniversaLIS is published under the [MIT](https://choosealicense.com/licenses/mit/) license.
 
 MIT License
 ---
