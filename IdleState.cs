@@ -4,8 +4,11 @@ namespace UniversaLIS
 {
      public class IdleState : ILISState
      {
-          
-          protected internal CommFacilitator comm;
+          public IdleState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+          private readonly CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)

@@ -6,7 +6,11 @@ namespace UniversaLIS
      class TransWaitState : ILISState
      {
 
-          protected internal CommFacilitator comm;
+          public TransWaitState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+          private readonly CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)

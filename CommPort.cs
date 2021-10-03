@@ -9,6 +9,15 @@ namespace UniversaLIS
      {
           public CommPort(string portName, int baudRate, Parity parity, int dataBits, StopBits stopBits) : base(portName, baudRate, parity, dataBits, stopBits)
           {
+               PortName = portName;
+               BaudRate = baudRate;
+               DataBits = dataBits;
+               Parity = parity;
+               StopBits = stopBits;
+               //Handshake = Handshake.None;
+               //DtrEnable = true;
+               //NewLine = Environment.NewLine;
+               ReceivedBytesThreshold = 1;
           }
 
           public void Send(string messageText)

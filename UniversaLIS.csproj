@@ -128,16 +128,15 @@
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="CountdownTimer.cs" />
+    <Compile Include="YamlSettings.cs" />
     <Compile Include="LISCommState.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="Patient.cs" />
     <Compile Include="Query.cs" />
     <Compile Include="RcvWaitState.cs" />
-    <Compile Include="ReliableSerialPort.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Result.cs" />
+    <Compile Include="TcpPort.cs" />
     <Compile Include="TransWaitState.cs" />
     <Compile Include="TransENQState.cs" />
     <Compile Include="IdleState.cs" />
@@ -171,7 +170,9 @@
     <None Include="App.config" />
     <None Include="ClassDiagram1.cd" />
     <None Include="internal.db" />
-    <None Include="Properties\config.yml" />
+    <None Include="Properties\config.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="IMMULIS_1_TemporaryKey.pfx" />
     <None Include="IMMULIS_TemporaryKey.pfx" />
     <None Include="packages.config" />

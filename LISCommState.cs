@@ -5,10 +5,11 @@ namespace UniversaLIS
      public class LISCommState : ILISState
      {
           public ILISState CommState { get; set; }
-          protected internal CommFacilitator comm;
-          public LISCommState()
+          public CommFacilitator comm;
+          public LISCommState(CommFacilitator comm)
           {
-               CommState = new IdleState();
+               this.comm = comm;
+               CommState = new IdleState(this.comm);
           }
           public void RcvInput(string InputString)
           {
@@ -117,7 +118,7 @@ namespace UniversaLIS
 
           public void ChangeToIdleState()
           {
-               CommState = new IdleState();
+               CommState = new IdleState(comm);
                comm.CurrentFrameCounter = 0;
                comm.transTimer.Reset(-1);
 #if DEBUG
@@ -126,21 +127,21 @@ namespace UniversaLIS
           }
           public void ChangeToTransENQState()
           {
-               CommState = new TransENQState();
+               CommState = new TransENQState(comm);
 #if DEBUG
                AppendToLog("CommState changed to TransENQState!");
 #endif
           }
           public void ChangeToTransWaitState()
           {
-               CommState = new TransWaitState();
+               CommState = new TransWaitState(comm);
 #if DEBUG
                AppendToLog("CommState changed to TransWaitState!");
 #endif
           }
           public void ChangeToRcvWaitState()
           {
-               CommState = new RcvWaitState();
+               CommState = new RcvWaitState(comm);
 #if DEBUG
                AppendToLog("CommState changed to RcvWaitState!");
 #endif
@@ -179,7 +180,7 @@ namespace UniversaLIS
                          comm.ProcessMessage(comm.CurrentMessage);
                     }
                     // Return to idle state.
-                    CommState = new IdleState();
+                    CommState = new IdleState(comm);
                }
           }
           public void IdleCheck()

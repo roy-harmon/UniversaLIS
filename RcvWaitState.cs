@@ -7,7 +7,11 @@ namespace UniversaLIS
      {
           // Track the current frame number to ensure that the received frame is correct.
           public int ExpectedFrame = 1;
-          protected internal CommFacilitator comm;
+          public RcvWaitState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+          private readonly CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)
@@ -59,7 +63,8 @@ namespace UniversaLIS
                {
                     isFrameGood = CheckPassword(InputString);
                }
-               // If the frame is good, act accordingly.
+               // If the frame is still good after all those checks,
+               // take appropriate action.
                if (isFrameGood)
                {
                     // Send ACK 

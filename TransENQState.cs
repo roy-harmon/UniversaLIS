@@ -5,7 +5,12 @@ namespace UniversaLIS
      class TransENQState : ILISState
      {
 
-          protected internal CommFacilitator comm;
+          private readonly CommFacilitator comm;
+          public TransENQState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+
           public void RcvInput(string InputString)
           {
                switch (InputString)

@@ -7,9 +7,13 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.ServiceProcess;
-using YamlDotNet.RepresentationModel;
+//using YamlDotNet.RepresentationModel;
+using YamlDotNet.Core;
+using YamlDotNet.Core.Events;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 // TODO: Add internal database while keeping external database option.
-// TODO: Add UI.
+// TODO: Add UI?
 namespace UniversaLIS
 {
      public partial class ServiceMain : ServiceBase
@@ -21,6 +25,7 @@ namespace UniversaLIS
           public bool UseExtDB;
           public string ExternalDbConnString;
           public int DbPollInterval;
+          public static YamlSettings yamlSettings;
           public ServiceMain()
           {
                InitializeComponent();
@@ -47,51 +52,34 @@ namespace UniversaLIS
           {
                try
                {
-                    AppendToLog("Service starting.");
+                    //AppendToLog("UniversaLIS Service starting.");
                     using (var reader = new StreamReader("Properties/config.yml"))
                     {
-                         var yaml = new YamlStream();
-                         yaml.Load(reader);
-                         var yamlmap = (YamlMappingNode)yaml.Documents[0].RootNode;
-                         // Set up database connections, HL7 listener, and RS232 interfaces.
-                         var serviceConfig = (YamlMappingNode)yamlmap.Children[new YamlMappingNode("service_config")];
-                         var listenNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
-                         ListenHL7 = bool.Parse(listenNode.Value);
-                         var useExtDbNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("use_external_db")];
-                         UseExtDB = bool.Parse(useExtDbNode.Value);
-                         if (UseExtDB)
+                         var yamlText = reader.ReadToEnd();
+                         var deserializer = new DeserializerBuilder()
+                              //.WithNamingConvention(UnderscoredNamingConvention.Instance)
+                              .Build();
+                              //.WithNamingConvention(CamelCaseNamingConvention.Instance)
+                              
+                         yamlSettings = deserializer.Deserialize<YamlSettings>(yamlText);
+                         if (yamlSettings.ServiceConfig.ListenHl7)
                          {
-                              var extDbConnNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
-                              ExternalDbConnString = extDbConnNode.Value;
-                              // TODO: Map internal DB fields to external ones.
-                         }
-                         if (ListenHL7)
-                         {
-                              var listenPortNode = (YamlScalarNode)serviceConfig.Children[new YamlScalarNode("listen_hl7")];
-                              HL7Port = int.Parse(listenPortNode.Value);
                               // TODO: Actually set up the HL7 listener.
                          }
-                         var interfaces = (YamlSequenceNode)yamlmap.Children[new YamlScalarNode("interfaces")];
-                         foreach (YamlMappingNode iface in interfaces)
+                         if (yamlSettings.ServiceConfig.UseExternalDb)
                          {
-                              string baud = $"{iface.Children[new YamlScalarNode("baud")]}";
-                              string dbits = $"{iface.Children[new YamlScalarNode("databits")]}";
-                              string sbits = $"{iface.Children[new YamlScalarNode("stopbits")]}";
-                              string hshake = $"{iface.Children[new YamlScalarNode("handshake")]}";
-                              string rec_id = $"{iface.Children[new YamlScalarNode("receiver_id")]}";
-                              string pword = $"{iface.Children[new YamlScalarNode("password")]}";
-                              bool use_legacy_frameSize = bool.Parse($"{iface.Children[new YamlScalarNode("use_legacy_frame_size")]}");
-                              int frameSize;
-                              if (use_legacy_frameSize)
-                              {
-                                   frameSize = 240;
-                              }
-                              else
-                              {
-                                   frameSize = 63993;
-                              }
-                              s_commFacilitators.Add(new CommFacilitator((string)iface.Children[new YamlScalarNode("portname")], int.Parse(baud), (string)iface.Children[new YamlScalarNode("parity")], int.Parse(dbits), sbits, hshake, rec_id, frameSize, pword));
+                              UseExtDB = true;
+                              ExternalDbConnString = yamlSettings.ServiceConfig.ConnectionString;
                          }
+                         else
+                         {
+                              UseExtDB = false;
+                         }
+                         foreach (var serialPort in yamlSettings.Interfaces.Serial)
+                         {
+                              s_commFacilitators.Add(new CommFacilitator(serialPort));
+                         }
+
                     }
                }
                catch (Exception ex)

@@ -16,7 +16,7 @@ namespace UniversaLIS
 
           public CountdownTimer BusyTimer = new CountdownTimer(-1);
 
-          public LISCommState commState = new LISCommState();
+          public LISCommState commState;
 
           public CommPort ComPort;
 
@@ -36,41 +36,102 @@ namespace UniversaLIS
 
           public CountdownTimer transTimer;
 
-          private readonly System.Timers.Timer idleTimer = new System.Timers.Timer(Properties.Settings.Default.AutoSendInterval);
+          private readonly System.Timers.Timer idleTimer = new System.Timers.Timer();
 
           internal string receiver_id;
           internal int frameSize;
           internal string password;
 
           // TODO: Update this string when setting up external database connection functions.
-          string connString = @"\internal.db";
+          //string connString = @"\internal.db";
 
-          public CommFacilitator(string portName, int baudRate, string parity, int databits, string stopbits, string handshake, string receiverID, int frameLength, string passWord)
+          public CommFacilitator(Serial serialSettings)
+          {
+               if (serialSettings.UseLegacyFrameSize)
+               {
+                    frameSize = 240;
+               } else
+               {
+                    frameSize = 63993;
+               }
+               password = serialSettings.Password;
+               try
+               {
+                    // Set the serial port properties and try to open it.
+                    receiver_id = serialSettings.ReceiverId;
+                    ComPort = new CommPort(serialSettings.Portname, serialSettings.Baud, serialSettings.Parity, serialSettings.Databits, serialSettings.Stopbits) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
+                    {
+                         Handshake = serialSettings.Handshake,
+                         ReadTimeout = 20,
+                         WriteTimeout = 20
+                    };
+                    ComPort.Encoding = Encoding.UTF8;
+                    commState = new LISCommState(this);
+                    //commState.comm = this;
+                    rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
+                    transTimer = new CountdownTimer(-1, TransactionTimedOut);
+                    CurrentMessage = new Message(this);
+                    // Set the handler for the DataReceived event.
+                    ComPort.DataReceived += ComPortDataReceived;
+                    ComPort.Open();
+                    AppendToLog($"Port opened: {serialSettings.Portname}");
+                    idleTimer.AutoReset = true;
+                    idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
+                    if (serialSettings.AutoSendOrders > 0) { 
+                         idleTimer.Elapsed += WorklistTimedEvent;
+                         idleTimer.Interval = serialSettings.AutoSendOrders;
+                    }
+                    else
+                    {
+                         idleTimer.Interval = 10000;
+                    }
+                    idleTimer.Start();
+               }
+               catch (Exception ex)
+               {
+                    HandleEx(ex);
+                    throw;
+               }
+          }
+
+          // TODO: Find a way to combine functionality of serial ports and TCP sockets into a single interface.
+          public CommFacilitator(Tcp tcpSettings)
           {
                commState.comm = this;
                rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                transTimer = new CountdownTimer(-1, TransactionTimedOut);
-               frameSize = frameLength;
-               password = passWord;
+               if (tcpSettings.UseLegacyFrameSize)
+               {
+                    frameSize = 240;
+               }
+               else
+               {
+                    frameSize = 63993;
+               }
+               password = tcpSettings.Password;
                try
                {
                     // Set the serial port properties and try to open it.
-                    receiver_id = receiverID;
-                    ComPort = new CommPort(portName, baudRate, (Parity)Enum.Parse(typeof(Parity), parity, true), databits, (StopBits)Enum.Parse(typeof(StopBits), stopbits, true)) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
-                    {
-                         Handshake = (Handshake)Enum.Parse(typeof(Handshake),handshake, true), 
-                         ReadTimeout = 20,
-                         WriteTimeout = 20
-                    };
+                    receiver_id = tcpSettings.ReceiverId;
+                    
+                    //ComPort = new CommPort(serialSettings.Portname, serialSettings.Baud, serialSettings.Parity, serialSettings.Databits, serialSettings.Stopbits) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
+                    //{
+                    //     Handshake = serialSettings.Handshake,
+                    //     ReadTimeout = 20,
+                    //     WriteTimeout = 20
+                    //};
                     CurrentMessage = new Message(this);
                     ComPort.Encoding = Encoding.UTF8;
                     // Set the handler for the DataReceived event.
                     ComPort.DataReceived += ComPortDataReceived;
                     ComPort.Open();
-                    AppendToLog($"Port opened: {portName}");
+                    AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
                     idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
-                    if (Properties.Settings.Default.AutoSendOrders == true) { idleTimer.Elapsed += WorklistTimedEvent; }
+                    if (tcpSettings.AutoSendOrders > 0)
+                    {
+                         idleTimer.Elapsed += WorklistTimedEvent;
+                    }
                     idleTimer.Start();
                }
                catch (Exception ex)
