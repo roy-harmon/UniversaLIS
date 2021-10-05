@@ -128,6 +128,7 @@
     </Compile>
     <Compile Include="Constants.cs" />
     <Compile Include="CountdownTimer.cs" />
+    <Compile Include="IComPort.cs" />
     <Compile Include="YamlSettings.cs" />
     <Compile Include="LISCommState.cs" />
     <Compile Include="Message.cs" />
