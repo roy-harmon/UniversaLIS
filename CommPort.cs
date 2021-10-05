@@ -19,7 +19,15 @@ namespace UniversaLIS
                //NewLine = Environment.NewLine;
                ReceivedBytesThreshold = 1;
           }
-
+          public CommPort(Serial serial)
+          {
+               PortName = serial.Portname;
+               BaudRate = serial.Baud;
+               DataBits = serial.Databits;
+               Parity = serial.Parity;
+               StopBits = serial.Stopbits;
+               Handshake = serial.Handshake;
+          }
           public void Send(string messageText)
           {
                AppendToLog($"Out: \t{messageText}");
