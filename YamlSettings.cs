@@ -19,15 +19,22 @@ namespace UniversaLIS
                               
           }
      }
-     public class Tcp
+     public interface IPortSettings
+     {
+          public string ReceiverId { get; set; }
+          public string Password { get; set; }
+          public bool UseLegacyFrameSize { get; set; }
+          public int AutoSendOrders { get; set; }
+     }
+     public class Tcp : IPortSettings
      {
           public string ReceiverId { get; set; }
           public string Password { get; set; }
           public bool UseLegacyFrameSize { get; set; }
           public int Socket { get; set; }
-          public int AutoSendOrders;
+          public int AutoSendOrders { get; set; }
      }
-     public class Serial
+     public class Serial : IPortSettings
      {
           public string ReceiverId { get; set; }
           public string Password { get; set; }
@@ -38,7 +45,7 @@ namespace UniversaLIS
           public System.IO.Ports.StopBits Stopbits { get; set; }
           public System.IO.Ports.Handshake Handshake { get; set; }
           public bool UseLegacyFrameSize { get; set; }
-          public int AutoSendOrders;
+          public int AutoSendOrders { get; set; }
           //(Parity)Enum.Parse(typeof(Parity), parity, true), databits, (StopBits)Enum.Parse(typeof(StopBits), stopbits, true)
      }
      public class TableMappings
