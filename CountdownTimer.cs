@@ -40,7 +40,7 @@ namespace UniversaLIS
           private int duration;
           public int remainingDuration;
           private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
-          public event EventHandler Timeout;
+          public event EventHandler? Timeout;
           public void OnTimeout()
           {
                Timeout?.Invoke(this, EventArgs.Empty);

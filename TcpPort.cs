@@ -5,19 +5,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using System.IO;
 
 namespace UniversaLIS
 {
-     partial class TcpPort : IComPort
+     partial class TcpPort : IPortAdapter
      {
           // TODO: Use this class to implement TCP/IP connections, possibly in the same way CommPort is used for serial connections.
           // This shouldn't be hard if each connection uses a different port, though that feels a little lazy.
-          TcpListener server = null;
-          Socket client = null;
-          NetworkStream stream = null;
+          TcpListener server;
+          Socket client;
+          NetworkStream? stream;
           bool isActive;
           byte[] bytes = new byte[64000];
-          string data = null;
+          string? data = null;
+          private string portName;
           public TcpPort(Tcp tcpSettings)
           {
                try
@@ -25,17 +27,36 @@ namespace UniversaLIS
                     int port = tcpSettings.Socket;
                     IPAddress localAddr = IPAddress.Parse("127.0.0.1");
                     server = new TcpListener(localAddr, port);
+                    portName = ((IPEndPoint)server.LocalEndpoint).Port.ToString();
                     server.Start(1); // Only one instrument connection per port, for simplicity.
                     isActive = true;
+                    while (true)
+                    {
+                         client = server.AcceptSocket();
+                         AppendToLog("Connected!");
+                         data = null;
+                         //stream = client.GetStream();
+                         while (true)
+                         {
+
+                         }
+                    }
                }
                catch (Exception)
                {
-                    
+
                     throw;
                }
           }
 
-          void IComPort.Close()
+          string IPortAdapter.PortName
+          {
+               get => portName;
+          }
+
+          public event EventHandler PortDataReceived;
+
+          void IPortAdapter.Close()
           {
                if (!(client is null))
                {
@@ -45,7 +66,7 @@ namespace UniversaLIS
                isActive = false;
           }
 
-          void IComPort.Open()
+          void IPortAdapter.Open()
           {
                if (!(server is null))
                {
@@ -67,7 +88,7 @@ namespace UniversaLIS
                     {
 
                          int i;
-                         while ((i = client.Receive(bytes))!=0)
+                         while ((i = client.Receive(bytes)) != 0)
                          {
                               data = Encoding.UTF8.GetString(bytes, 0, i);
                          }
@@ -75,21 +96,27 @@ namespace UniversaLIS
                }
           }
 
-          // Send/Receive asynchronously? Use two threads?
+          string IPortAdapter.PortType()
+          {
+               return "tcp";
+          }
 
-          //int IComPort.Read(byte[] buffer, int offset, int count)
-          //{
-          //     throw new NotImplementedException();
-          //}
+          public void AppendToLog(string txt)
+          {
+               string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
+               var date = DateTime.Now;
+               string txtFile = $"{publicFolder}\\UniversaLIS\\Tcp_Logs\\TcpLog-{portName}_{date.Year}-{date.Month}-{date.Day}.txt";
+               if (Directory.Exists($"{publicFolder}\\UniversaLIS\\Tcp_Logs\\") == false)
+               {
+                    Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Tcp_Logs\\");
+               }
+               string txtWrite = $"{date.ToLocalTime()} \t{txt}\r\n";
+               File.AppendAllText(txtFile, txtWrite);
+          }
 
-          void IComPort.Send()
+          void IPortAdapter.Send(string messageText)
           {
                throw new NotImplementedException();
           }
-
-          //void IComPort.Write(byte[] buffer, int offset, int count)
-          //{
-          //     throw new NotImplementedException();
-          //}
      }
 }

@@ -33,7 +33,7 @@ namespace UniversaLIS
           private int FrameCounter { get; set; }
 
           private int frameSize;
-          private string password;
+          private string? password;
 
           public string MessageHeader
           {
@@ -47,7 +47,7 @@ namespace UniversaLIS
                }
           }
 
-          public string TerminationMessage
+          public string? TerminationMessage
           {
                get; set;
           }
@@ -243,38 +243,6 @@ namespace UniversaLIS
 
           public Message(CommFacilitator facilitator)
           {
-               int stopbits;
-               switch (facilitator.ComPort.StopBits)
-               {
-                    case System.IO.Ports.StopBits.One:
-                         stopbits = 1;
-                         break;
-                    case System.IO.Ports.StopBits.Two:
-                         stopbits = 2;
-                         break;
-                    default:
-                         stopbits = 1;
-                         break;
-               }
-               string parity;
-               switch (facilitator.ComPort.Parity)
-               {
-                    case System.IO.Ports.Parity.Even:
-                         parity = "E";
-                         break;
-                    case System.IO.Ports.Parity.Odd:
-                         parity = "O";
-                         break;
-                    case System.IO.Ports.Parity.Mark:
-                         parity = "M";
-                         break;
-                    case System.IO.Ports.Parity.Space:
-                         parity = "S";
-                         break;
-                    default:
-                         parity = "N";
-                         break;
-               }
                frameSize = facilitator.frameSize;
                password = facilitator.password;
                string dateString;
@@ -282,8 +250,9 @@ namespace UniversaLIS
                dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
                string header = Constants.STX + $"1H|\\^&||{password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
-               header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.ComPort.DataBits}{parity}{stopbits}|{facilitator.receiver_id}||P|1|{dateString}";
+               header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.GetPortDetails()}|{facilitator.receiver_id}||P|1|{dateString}";
                MessageHeader = header;
           }
+
      }
 }

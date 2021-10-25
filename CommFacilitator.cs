@@ -17,8 +17,8 @@ namespace UniversaLIS
           public CountdownTimer BusyTimer = new CountdownTimer(-1);
 
           public LISCommState commState;
-
-          public CommPort ComPort;
+          private readonly IPortAdapter ComPort;
+          private readonly IPortSettings portSettings;
 
           public CountdownTimer ContentTimer = new CountdownTimer(-1);
 
@@ -26,7 +26,7 @@ namespace UniversaLIS
 
           public Message CurrentMessage;
 
-          private string intermediateFrame;
+          private string? intermediateFrame;
 
           public int numNAK = 0;
 
@@ -38,15 +38,24 @@ namespace UniversaLIS
 
           private readonly System.Timers.Timer idleTimer = new System.Timers.Timer();
 
-          internal string receiver_id;
+          internal string? receiver_id;
           internal int frameSize;
-          internal string password;
+          internal string? password;
+          internal string GetPortDetails()
+          {
+               return portSettings.GetPortDetails();
+          }
+          public void Send(string messageText)
+          {
+               ComPort.Send(messageText);
+          }
 
           // TODO: Update this string when setting up external database connection functions.
           //string connString = @"\internal.db";
 
           public CommFacilitator(Serial serialSettings)
           {
+               portSettings = serialSettings;
                if (serialSettings.UseLegacyFrameSize)
                {
                     frameSize = 240;
@@ -59,20 +68,15 @@ namespace UniversaLIS
                {
                     // Set the serial port properties and try to open it.
                     receiver_id = serialSettings.ReceiverId;
-                    ComPort = new CommPort(serialSettings.Portname, serialSettings.Baud, serialSettings.Parity, serialSettings.Databits, serialSettings.Stopbits) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
-                    {
-                         Handshake = serialSettings.Handshake,
-                         ReadTimeout = 20,
-                         WriteTimeout = 20
-                    };
-                    ComPort.Encoding = Encoding.UTF8;
+                    ComPort = new CommPort(serialSettings);
+                    //ComPort.Encoding = Encoding.UTF8;
                     commState = new LISCommState(this);
                     //commState.comm = this;
                     rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                     transTimer = new CountdownTimer(-1, TransactionTimedOut);
                     CurrentMessage = new Message(this);
                     // Set the handler for the DataReceived event.
-                    ComPort.DataReceived += ComPortDataReceived;
+                    ComPort.PortDataReceived += SerialPortDataReceived!;
                     ComPort.Open();
                     AppendToLog($"Port opened: {serialSettings.Portname}");
                     idleTimer.AutoReset = true;
@@ -97,9 +101,10 @@ namespace UniversaLIS
           // TODO: Find a way to combine functionality of serial ports and TCP sockets into a single interface.
           public CommFacilitator(Tcp tcpSettings)
           {
-               commState.comm = this;
+               commState = new LISCommState(this);
                rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                transTimer = new CountdownTimer(-1, TransactionTimedOut);
+               portSettings = tcpSettings;
                if (tcpSettings.UseLegacyFrameSize)
                {
                     frameSize = 240;
@@ -111,19 +116,12 @@ namespace UniversaLIS
                password = tcpSettings.Password;
                try
                {
-                    // Set the serial port properties and try to open it.
+                    // Set the port properties and try to open it.
                     receiver_id = tcpSettings.ReceiverId;
-                    
-                    //ComPort = new CommPort(serialSettings.Portname, serialSettings.Baud, serialSettings.Parity, serialSettings.Databits, serialSettings.Stopbits) //Properties.Settings.Default.SerialPorts, Properties.Settings.Default.SerialPortBaudRate, Properties.Settings.Default.SerialPortParity, Properties.Settings.Default.SerialPortDataBits, Properties.Settings.Default.SerialPortStopBits)
-                    //{
-                    //     Handshake = serialSettings.Handshake,
-                    //     ReadTimeout = 20,
-                    //     WriteTimeout = 20
-                    //};
+                    ComPort = new TcpPort(tcpSettings);
                     CurrentMessage = new Message(this);
-                    ComPort.Encoding = Encoding.UTF8;
                     // Set the handler for the DataReceived event.
-                    ComPort.DataReceived += ComPortDataReceived;
+                    ComPort.PortDataReceived += TcpPortDataReceived!;
                     ComPort.Open();
                     AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
@@ -178,7 +176,9 @@ namespace UniversaLIS
                     throw;
                }
           }
-          void ComPortDataReceived(object sender, SerialDataReceivedEventArgs e ) //DataReceivedArgs e)
+
+          
+          void SerialPortDataReceived(object sender, EventArgs e ) //DataReceivedArgs e)
           {
                /* When new data is received, 
                 * parse the message line-by-line.
@@ -199,7 +199,7 @@ namespace UniversaLIS
                     { // Read one char at a time until the ReadChar times out.
                          try
                          {
-                              buffer += (char)sp.ReadChar();
+                              buffer += sp.ReadChar();
                          }
                          catch (Exception)
                          {
@@ -221,6 +221,11 @@ namespace UniversaLIS
                     ServiceMain.HandleEx(ex);
                     throw;
                }
+          }
+
+          void TcpPortDataReceived(object sender, EventArgs e)
+          {
+               // TODO: Process whatever data comes through here.
           }
 
           private void IdleTime(object o, System.Timers.ElapsedEventArgs elapsedEvent)
@@ -246,7 +251,7 @@ namespace UniversaLIS
                if (position >= 0)
                {
                     bInterFrame = true;
-                    if (intermediateFrame.Length > 2)
+                    if (intermediateFrame?.Length > 2)
                     {
                          intermediateFrame += messageLine.Substring(2, position);
                     }
@@ -420,7 +425,7 @@ namespace UniversaLIS
                                         };
                                         _ = command.Parameters.Add(sqlOutParameter);
                                         _ = command.ExecuteNonQuery();
-                                        pID = int.Parse(command.Parameters["@ID"].Value.ToString());
+                                        pID = int.Parse(command.Parameters["@ID"].Value.ToString() ?? "0");
                                    }
                                    foreach (var order in patient.Orders)
                                    {
@@ -476,7 +481,7 @@ namespace UniversaLIS
                                              };
                                              _ = command.Parameters.Add(sqlOutParameter);
                                              _ = command.ExecuteNonQuery();
-                                             oID = int.Parse(command.Parameters["@ID"].Value.ToString());
+                                             oID = int.Parse(command.Parameters["@ID"].Value.ToString() ?? "0");
                                         }
                                         // Use the row ID from each of those order records to add
                                         // result records to the IMM_Results table for each Patient.Order.Result in the message.
@@ -546,7 +551,7 @@ namespace UniversaLIS
                _ = SendPatientOrders(SampleNumber, testID);
           }
 
-          public void ReceiptTimedOut(object sender, EventArgs e)
+          public void ReceiptTimedOut(object? sender, EventArgs e)
           {
                commState.RcvTimeout();
           }
@@ -630,7 +635,7 @@ namespace UniversaLIS
                     }
                     foreach (var patient in responseMessage.Patients)
                     {
-                         string requestID = "";
+                         string? requestID = "";
                          using (SqlCommand orderCommand = conn.CreateCommand())
                          {
                               orderCommand.CommandText = sqlMainQuery;
@@ -670,7 +675,7 @@ namespace UniversaLIS
                }
           }
 
-          public void TransactionTimedOut(object sender, EventArgs e)
+          public void TransactionTimedOut(object? sender, EventArgs e)
           {
                commState.TransTimeout();
           }

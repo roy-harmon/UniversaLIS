@@ -152,7 +152,7 @@ namespace UniversaLIS
                if (CommState is TransENQState || CommState is TransWaitState)
                {
                     // Send EOT and return to idle state.
-                    comm.ComPort.Send(Constants.EOT);
+                    comm.Send(Constants.EOT);
                     if (CommState is TransWaitState)
                     {
                          if (comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)

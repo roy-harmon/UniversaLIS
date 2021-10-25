@@ -23,9 +23,10 @@ namespace UniversaLIS
           public bool ListenHL7;
           public int HL7Port;
           public bool UseExtDB;
-          public string ExternalDbConnString;
+          public string? ExternalDbConnString;
           public int DbPollInterval;
-          public static YamlSettings yamlSettings;
+          public static YamlSettings? yamlSettings;
+          
           public ServiceMain()
           {
                InitializeComponent();
@@ -44,7 +45,7 @@ namespace UniversaLIS
                {
                     return;
                }
-               string message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
+               string? message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
                EventLog1.WriteEntry(message);
           }
 
@@ -62,11 +63,11 @@ namespace UniversaLIS
                               //.WithNamingConvention(CamelCaseNamingConvention.Instance)
                               
                          yamlSettings = deserializer.Deserialize<YamlSettings>(yamlText);
-                         if (yamlSettings.ServiceConfig.ListenHl7)
+                         if (yamlSettings.ServiceConfig?.ListenHl7 == true)
                          {
                               // TODO: Actually set up the HL7 listener.
                          }
-                         if (yamlSettings.ServiceConfig.UseExternalDb)
+                         if (yamlSettings.ServiceConfig?.UseExternalDb == true)
                          {
                               UseExtDB = true;
                               ExternalDbConnString = yamlSettings.ServiceConfig.ConnectionString;
@@ -75,11 +76,14 @@ namespace UniversaLIS
                          {
                               UseExtDB = false;
                          }
-                         foreach (var serialPort in yamlSettings.Interfaces.Serial)
+                         foreach (var serialPort in yamlSettings?.Interfaces?.Serial!)
                          {
                               s_commFacilitators.Add(new CommFacilitator(serialPort));
                          }
-
+                         foreach (var tcpPort in yamlSettings?.Interfaces?.Tcp!)
+                         {
+                              s_commFacilitators.Add(new CommFacilitator(tcpPort));
+                         }
                     }
                }
                catch (Exception ex)
@@ -107,8 +111,16 @@ namespace UniversaLIS
           }
 
           public static void AppendToLog(string txt)
-          {    // To avoid write conflicts, let the CommPort handle the actual data logging.
-               CommPort.AppendToLog(txt);
+          {
+               string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
+               var date = DateTime.Now;
+               string txtFile = $"{publicFolder}\\UniversaLIS\\Service_Logs\\Log_{date.Year}-{date.Month}-{date.Day}.txt";
+               if (Directory.Exists($"{publicFolder}\\UniversaLIS\\Service_Logs\\") == false)
+               {
+                    Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Service_Logs\\");
+               }
+               string txtWrite = $"{date.ToLocalTime()} \t{txt}\r\n";
+               File.AppendAllText(txtFile, txtWrite);
           }
 
 
@@ -120,7 +132,7 @@ namespace UniversaLIS
                // converted into two printable ASCII Hex characters ranging from 00 to FF, which are then inserted into
                // the data stream. Hex alpha characters are always uppercase.
 
-               string checkSum;
+               string? checkSum;
                int ascSum, modVal;
                ascSum = 0;
                foreach (char c in message)
