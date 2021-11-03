@@ -7,7 +7,6 @@ using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using System.ServiceProcess;
-//using YamlDotNet.RepresentationModel;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
@@ -18,15 +17,16 @@ namespace UniversaLIS
 {
      public partial class ServiceMain : ServiceBase
      {
-          public static EventLog EventLog1 = new EventLog();
+          public static EventLog EventLog1 { get; set; } = new EventLog();
           private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
-          public bool ListenHL7;
-          public int HL7Port;
-          public bool UseExtDB;
-          public string? ExternalDbConnString;
-          public int DbPollInterval;
-          public static YamlSettings? yamlSettings;
-          
+
+          public bool ListenHL7 { get; set; }
+          public int HL7Port { get; set; }
+          public string? ExternalDbConnString { get; set; }
+          public bool UseExtDB { get; set; }
+          public int DbPollInterval { get; set; }
+          public YamlSettings? YamlSettings { get; set; }
+
           public ServiceMain()
           {
                InitializeComponent();
@@ -53,34 +53,31 @@ namespace UniversaLIS
           {
                try
                {
-                    //AppendToLog("UniversaLIS Service starting.");
                     using (var reader = new StreamReader("Properties/config.yml"))
                     {
                          var yamlText = reader.ReadToEnd();
                          var deserializer = new DeserializerBuilder()
-                              //.WithNamingConvention(UnderscoredNamingConvention.Instance)
                               .Build();
-                              //.WithNamingConvention(CamelCaseNamingConvention.Instance)
                               
-                         yamlSettings = deserializer.Deserialize<YamlSettings>(yamlText);
-                         if (yamlSettings.ServiceConfig?.ListenHl7 == true)
+                         YamlSettings = deserializer.Deserialize<YamlSettings>(yamlText);
+                         if (YamlSettings.ServiceConfig?.ListenHl7 == true)
                          {
                               // TODO: Actually set up the HL7 listener.
                          }
-                         if (yamlSettings.ServiceConfig?.UseExternalDb == true)
+                         if (YamlSettings.ServiceConfig?.UseExternalDb == true)
                          {
                               UseExtDB = true;
-                              ExternalDbConnString = yamlSettings.ServiceConfig.ConnectionString;
+                              ExternalDbConnString = YamlSettings.ServiceConfig.ConnectionString;
                          }
                          else
                          {
                               UseExtDB = false;
                          }
-                         foreach (var serialPort in yamlSettings?.Interfaces?.Serial!)
+                         foreach (var serialPort in YamlSettings?.Interfaces?.Serial!)
                          {
                               s_commFacilitators.Add(new CommFacilitator(serialPort));
                          }
-                         foreach (var tcpPort in yamlSettings?.Interfaces?.Tcp!)
+                         foreach (var tcpPort in YamlSettings?.Interfaces?.Tcp!)
                          {
                               s_commFacilitators.Add(new CommFacilitator(tcpPort));
                          }
@@ -115,7 +112,7 @@ namespace UniversaLIS
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
                string txtFile = $"{publicFolder}\\UniversaLIS\\Service_Logs\\Log_{date.Year}-{date.Month}-{date.Day}.txt";
-               if (Directory.Exists($"{publicFolder}\\UniversaLIS\\Service_Logs\\") == false)
+               if (!Directory.Exists($"{publicFolder}\\UniversaLIS\\Service_Logs\\"))
                {
                     Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Service_Logs\\");
                }

@@ -13,34 +13,34 @@ namespace UniversaLIS
      public class CommFacilitator
      {
           private bool bInterFrame = false;
-
-          public CountdownTimer BusyTimer = new CountdownTimer(-1);
-
-          public LISCommState commState;
           private readonly IPortAdapter ComPort;
           private readonly IPortSettings portSettings;
 
-          public CountdownTimer ContentTimer = new CountdownTimer(-1);
+          public CountdownTimer ContentTimer { get; set; } = new CountdownTimer(-1);
 
-          public int CurrentFrameCounter;
+          public int CurrentFrameCounter { get; set; }
 
-          public Message CurrentMessage;
+          public Message CurrentMessage { get; set; }
 
           private string? intermediateFrame;
 
-          public int numNAK = 0;
+          public int numNAK { get; set; } = 0;
 
-          public Queue<Message> OutboundMessageQueue = new Queue<Message>();
+          public Queue<Message> OutboundMessageQueue { get; set; } = new Queue<Message>();
 
-          public CountdownTimer rcvTimer;
+          public CountdownTimer rcvTimer { get; set; }
 
-          public CountdownTimer transTimer;
+          public CountdownTimer transTimer { get; set; }
 
           private readonly System.Timers.Timer idleTimer = new System.Timers.Timer();
 
           internal string? receiver_id;
           internal int frameSize;
           internal string? password;
+
+          public CountdownTimer BusyTimer { get; set; } = new CountdownTimer(-1);
+          public LisCommState CommState { get; set; }
+
           internal string GetPortDetails()
           {
                return portSettings.GetPortDetails();
@@ -69,9 +69,7 @@ namespace UniversaLIS
                     // Set the serial port properties and try to open it.
                     receiver_id = serialSettings.ReceiverId;
                     ComPort = new CommPort(serialSettings);
-                    //ComPort.Encoding = Encoding.UTF8;
-                    commState = new LISCommState(this);
-                    //commState.comm = this;
+                    CommState = new LisCommState(this);
                     rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                     transTimer = new CountdownTimer(-1, TransactionTimedOut);
                     CurrentMessage = new Message(this);
@@ -101,7 +99,7 @@ namespace UniversaLIS
           // TODO: Find a way to combine functionality of serial ports and TCP sockets into a single interface.
           public CommFacilitator(Tcp tcpSettings)
           {
-               commState = new LISCommState(this);
+               CommState = new LisCommState(this);
                rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                transTimer = new CountdownTimer(-1, TransactionTimedOut);
                portSettings = tcpSettings;
@@ -119,9 +117,9 @@ namespace UniversaLIS
                     // Set the port properties and try to open it.
                     receiver_id = tcpSettings.ReceiverId;
                     ComPort = new TcpPort(tcpSettings);
-                    CurrentMessage = new Message(this);
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += TcpPortDataReceived!;
+                    CurrentMessage = new Message(this);
                     ComPort.Open();
                     AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
@@ -184,7 +182,7 @@ namespace UniversaLIS
                 * parse the message line-by-line.
                 */
                CommPort sp = (CommPort)sender;
-               string buffer = ""; // = System.Text.Encoding.Default.GetString(e.Data);
+               StringBuilder buffer = new StringBuilder();
                bool timedOut = false;
                try
                {
@@ -199,7 +197,7 @@ namespace UniversaLIS
                     { // Read one char at a time until the ReadChar times out.
                          try
                          {
-                              buffer += sp.ReadChar();
+                              buffer.Append(sp.ReadChar());
                          }
                          catch (Exception)
                          {
@@ -208,12 +206,12 @@ namespace UniversaLIS
                               stopwatch.Stop();
 #endif
                          }
-                    } while (timedOut == false);
+                    } while (!timedOut);
 #if DEBUG
                     ServiceMain.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
 #endif
-                    ServiceMain.AppendToLog($"In: \t{buffer}");
-                    commState.RcvInput(buffer);
+                    ServiceMain.AppendToLog($"In: \t{buffer.ToString()}");
+                    CommState.RcvInput(buffer.ToString());
                     idleTimer.Start();
                }
                catch (Exception ex)
@@ -231,7 +229,7 @@ namespace UniversaLIS
           private void IdleTime(object o, System.Timers.ElapsedEventArgs elapsedEvent)
           {
                idleTimer.Stop();
-               commState.IdleCheck();
+               CommState.IdleCheck();
                idleTimer.Start();
           }
 
@@ -282,7 +280,7 @@ namespace UniversaLIS
                          break;
 
                     case "O": // Order record.
-                         CurrentMessage.Patients[CurrentMessage.Patients.Count() - 1].Orders.Add(new Order(messageLine));
+                         CurrentMessage.Patients[CurrentMessage.Patients.Count - 1].Orders.Add(new Order(messageLine));
                          break;
 
                     case "R": // Result record.
@@ -296,7 +294,7 @@ namespace UniversaLIS
                          }
                          else
                          {
-                              CurrentMessage.Terminator = messageLine.ToCharArray()[5];
+                              CurrentMessage.Terminator = messageLine[5];
                          }
                          break;
 
@@ -333,8 +331,6 @@ namespace UniversaLIS
                     ServiceMain.AppendToLog("Outgoing message, adding to queue...");
 #endif
                     OutboundMessageQueue.Enqueue(message);
-
-                    return;
                }
                else if (headerFields[4] == receiver_id)
                {
@@ -553,7 +549,7 @@ namespace UniversaLIS
 
           public void ReceiptTimedOut(object? sender, EventArgs e)
           {
-               commState.RcvTimeout();
+               CommState.RcvTimeout();
           }
 
           private int SendPatientOrders(string SampleNumber, string testID)
@@ -572,7 +568,6 @@ namespace UniversaLIS
                using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
                {
                     conn.Open();
-                    //AppendToLog("Database connection open.");
                     int orderCount;
                     using (SqlCommand sqlCommand = conn.CreateCommand())
                     { // Check to see how many orders are pending for the sample.
@@ -583,7 +578,7 @@ namespace UniversaLIS
 
                     if (orderCount == 0)
                     {    // No pending orders. 
-                         if (isQuery == true)
+                         if (isQuery)
                          {
                               // Reply with a "no information available from last query" message (terminator = "I")
                               ServiceMain.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
@@ -619,7 +614,7 @@ namespace UniversaLIS
                          }
                          command.Parameters.AddWithValue("@Test_ID", testID);
                          SqlDataReader patientReader = command.ExecuteReader();
-                         if (patientReader.HasRows == false)
+                         if (!patientReader.HasRows)
                          {
                               return 0;
                          }
@@ -662,7 +657,7 @@ namespace UniversaLIS
                          }
                     }
 
-                    if (isQuery == true)
+                    if (isQuery)
                     {
                          responseMessage.Terminator = 'F';
                     }
@@ -677,7 +672,7 @@ namespace UniversaLIS
 
           public void TransactionTimedOut(object? sender, EventArgs e)
           {
-               commState.TransTimeout();
+               CommState.TransTimeout();
           }
 
           public void WorklistTimedEvent(object source, System.Timers.ElapsedEventArgs e)

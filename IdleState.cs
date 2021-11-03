@@ -46,7 +46,7 @@ namespace UniversaLIS
 
           public void RcvENQ()
           {
-               comm.ComPort.Send(Constants.ACK);
+               comm.Send(Constants.ACK);
           }
 
           public void RcvEOT()
@@ -67,7 +67,7 @@ namespace UniversaLIS
                if (comm.ContentTimer.remainingDuration <= 0 && comm.BusyTimer.remainingDuration <= 0)
                {
                     // Send ENQ
-                    comm.ComPort.Send(Constants.ENQ);
+                    comm.Send(Constants.ENQ);
                     // Set transTimer = 15
                     comm.transTimer.Reset(15);
 #if DEBUG

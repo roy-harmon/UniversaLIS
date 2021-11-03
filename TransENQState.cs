@@ -37,7 +37,7 @@ namespace UniversaLIS
                // Send next frame.
                comm.CurrentMessage = comm.OutboundMessageQueue.Dequeue();
                comm.CurrentMessage.PrepareToSend();
-               comm.ComPort.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
+               comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
                comm.CurrentFrameCounter++;
                // Reset the NAK count to 0.
                comm.numNAK = 0;

@@ -20,20 +20,19 @@ namespace UniversaLIS
      public class Message
      {
           
-          public Dictionary<string, string> Elements = new Dictionary<string, string>();
+          public Dictionary<string, string> Elements { get; set; } = new Dictionary<string, string>();
 
-          public List<string> FrameList = new List<string>();
+          public List<string> FrameList { get; set; } = new List<string>();
 
           private bool isReady = false;
 
-          public List<Patient> Patients = new List<Patient>();
+          public List<Patient> Patients { get; set; } = new List<Patient>();
 
-          public List<Query> Queries = new List<Query>();
+          public List<Query> Queries { get; set; } = new List<Query>();
 
           private int FrameCounter { get; set; }
 
-          private int frameSize;
-          private string? password;
+          private readonly int frameSize;
 
           public string MessageHeader
           {
@@ -137,7 +136,7 @@ namespace UniversaLIS
                // The header fields should already have been set to define the MessageHeader string.
                if (MessageHeader.Length == 0)
                {
-                    throw new Exception("Missing header record string.");
+                    throw new InvalidOperationException("Missing MessageHeader string.");
                }
                FrameList.Clear();
                FrameMessage(MessageHeader);
@@ -191,7 +190,7 @@ namespace UniversaLIS
                if (inArray.Length < 14)
                {
                     // Invalid number of elements.
-                    throw new Exception($"Invalid number of elements in header record string. Expected: 14 \tFound: {inArray.Length} \tString: \n{input}");
+                    throw new ArgumentException($"Invalid number of elements in header record string. Expected: 14 \tFound: {inArray.Length} \tString: \n{input}");
                }
                FrameCounter = 1;
                Elements["FrameNumber"] = "1";
@@ -220,21 +219,10 @@ namespace UniversaLIS
                else
                {
                     // Invalid datetime format.
-                    throw new Exception($"Invalid datetime in header record string. Expected: 14 \tFound: {inArray[13]} \tString: \n{input}");
+                    throw new ArgumentOutOfRangeException($"Invalid datetime in header record string. Expected: YYYYMMDDHHMMSS or YYYYMMDD \tFound: {inArray[13]} \tString: \n{input}");
                }
                
           }
-
-          //public Message()
-          //{
-          //     string dateString;
-          //     DateTime dateTime = DateTime.Now;
-          //     dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
-          //     dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
-          //     string header = Constants.STX + $"1H|\\^&||{Properties.Settings.Default.LIS_Password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
-          //     header += $"||{Properties.Settings.Default.SenderPhone}|8N1|{Properties.Settings.Default.ReceiverID}||P|1|{dateString}";
-          //     MessageHeader = header;
-          //}
 
           public Message(string messageHeader)
           {
@@ -244,12 +232,11 @@ namespace UniversaLIS
           public Message(CommFacilitator facilitator)
           {
                frameSize = facilitator.frameSize;
-               password = facilitator.password;
                string dateString;
                DateTime dateTime = DateTime.Now;
                dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
-               string header = Constants.STX + $"1H|\\^&||{password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
+               string header = Constants.STX + $"1H|\\^&||{facilitator.password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
                header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.GetPortDetails()}|{facilitator.receiver_id}||P|1|{dateString}";
                MessageHeader = header;
           }

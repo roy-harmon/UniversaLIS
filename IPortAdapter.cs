@@ -24,7 +24,5 @@ namespace UniversaLIS
                     PortDataReceived -= value;
                }
           }
-          //public void Write(byte[] buffer, int offset, int count);
-          //public int Read(byte[] buffer, int offset, int count);
      }
 }

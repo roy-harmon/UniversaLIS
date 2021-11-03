@@ -38,7 +38,7 @@ namespace UniversaLIS
                remainingDuration = duration;
           }
           private int duration;
-          public int remainingDuration;
+          public int remainingDuration { get; set; }
           private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
           public event EventHandler? Timeout;
           public void OnTimeout()

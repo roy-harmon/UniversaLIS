@@ -68,7 +68,7 @@ namespace UniversaLIS
                if (isFrameGood)
                {
                     // Send ACK 
-                    comm.ComPort.Send(Constants.ACK);
+                    comm.Send(Constants.ACK);
                     // Reset rcvTimer to 30 seconds.
                     comm.rcvTimer.Reset(30);
                     // Increment frame number.
@@ -79,7 +79,7 @@ namespace UniversaLIS
                else
                {
                     // Send NAK
-                    comm.ComPort.Send(Constants.NAK);
+                    comm.Send(Constants.NAK);
                     // Reset rcvTimer to 30 seconds.
                     comm.rcvTimer.Reset(30);
                }

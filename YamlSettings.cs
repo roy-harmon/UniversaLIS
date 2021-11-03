@@ -9,9 +9,9 @@ namespace UniversaLIS
      public class YamlSettings
      {
           
-          public InterfaceSettings? Interfaces;
-          public ServiceConfig? ServiceConfig;
-          public TableMappings? TableFieldMappings;
+          public InterfaceSettings? Interfaces { get; set; }
+          public ServiceConfig? ServiceConfig { get; set; }
+          public TableMappings? TableFieldMappings { get; set; }
           public class InterfaceSettings
           {
                public List<Serial>? Serial { get; set; }
@@ -86,162 +86,161 @@ namespace UniversaLIS
      }
      public class TableMappings
      {
-          // TODO: Add methods somewhere for mapping internal database fields to external database fields.
-          public PatientRecordSet? PatientRecord;
-          public OrderRecordSet? OrderRecord;
-          public ResultRecordSet? ResultRecord;
-          public QueryRecordSet? QueryRecord;
-          public CommentRecordSet? CommentRecord;
-          public ScientificRecordSet? ScientificRecord;
-
+          public PatientRecordSet? PatientRecord { get; set; }
+          public OrderRecordSet? OrderRecord { get; set; }
+          public ResultRecordSet? ResultRecord { get; set; }
+          public QueryRecordSet? QueryRecord { get; set; }
+          public CommentRecordSet? CommentRecord { get; set; }
+          public ScientificRecordSet? ScientificRecord { get; set; }
 
           public class PatientRecordSet
           {
-               public string? PAPID;
-               public string? LAPID;
-               public string? PID3;
-               public string? PName;
-               public string? MMName;
-               public string? DOB;
-               public string? PSex;
-               public string? PRace;
-               public string? PAddr;
-               public string? Reserved;
-               public string? PTelNo;
-               public string? Attending;
-               public string? Special1;
-               public string? Special2;
-               public string? PHeight;
-               public string? PWeight;
-               public string? PDiag;
-               public string? PMeds;
-               public string? PDiet;
-               public string? PF1;
-               public string? PF2;
-               public string? AdmDates;
-               public string? AdmStatus;
-               public string? PLocation;
-               public string? AltCodeNature;
-               public string? AltCode;
-               public string? PReligion;
-               public string? PMarStatus;
-               public string? PIsoStatus;
-               public string? PLanguage;
-               public string? HospService;
-               public string? HospInst;
-               public string? DoseCat;
+               public string? PAPID { get; set; }
+               public string? LAPID { get; set; }
+               public string? PID3 { get; set; }
+               public string? PName { get; set; }
+               public string? MMName { get; set; }
+               public string? DOB { get; set; }
+               public string? PSex { get; set; }
+               public string? PRace { get; set; }
+               public string? PAddr { get; set; }
+               public string? Reserved { get; set; }
+               public string? PTelNo { get; set; }
+               public string? Attending { get; set; }
+               public string? Special1 { get; set; }
+               public string? Special2 { get; set; }
+               public string? PHeight { get; set; }
+               public string? PWeight { get; set; }
+               public string? PDiag { get; set; }
+               public string? PMeds { get; set; }
+               public string? PDiet { get; set; }
+               public string? PF1 { get; set; }
+               public string? PF2 { get; set; }
+               public string? AdmDates { get; set; }
+               public string? AdmStatus { get; set; }
+               public string? PLocation { get; set; }
+               public string? AltCodeNature { get; set; }
+               public string? AltCode { get; set; }
+               public string? PReligion { get; set; }
+               public string? PMarStatus { get; set; }
+               public string? PIsoStatus { get; set; }
+               public string? PLanguage { get; set; }
+               public string? HospService { get; set; }
+               public string? HospInst { get; set; }
+               public string? DoseCat { get; set; }
+
           }
 
           public class OrderRecordSet
           {
-               public string? PRID;
-               public string? SpecID;
-               public string? InSpecID;
-               public string? UTID;
-               public string? OrderDate;
-               public string? CollectDate;
-               public string? CollEndTime;
-               public string? CollVolume;
-               public string? Collector;
-               public string? ActCode;
-               public string? DangerCode;
-               public string? RelClinInfo;
-               public string? SpecRecd;
-               public string? SpecDesc;
-               public string? OrdPhys;
-               public string? PhysTelNo;
-               public string? UF1;
-               public string? UF2;
-               public string? LF1;
-               public string? LF2;
-               public string? LastReported;
-               public string? BillRef;
-               public string? InSectID;
-               public string? RepType;
-               public string? Reserved;
-               public string? SpecColLocation;
-               public string? NosInfFlag;
-               public string? SpecService;
-               public string? SpecInst;
+               public string? PRID { get; set; }
+               public string? SpecID { get; set; }
+               public string? InSpecID { get; set; }
+               public string? UTID { get; set; }
+               public string? OrderDate { get; set; }
+               public string? CollectDate { get; set; }
+               public string? CollEndTime { get; set; }
+               public string? CollVolume { get; set; }
+               public string? Collector { get; set; }
+               public string? ActCode { get; set; }
+               public string? DangerCode { get; set; }
+               public string? RelClinInfo { get; set; }
+               public string? SpecRecd { get; set; }
+               public string? SpecDesc { get; set; }
+               public string? OrdPhys { get; set; }
+               public string? PhysTelNo { get; set; }
+               public string? UF1 { get; set; }
+               public string? UF2 { get; set; }
+               public string? LF1 { get; set; }
+               public string? LF2 { get; set; }
+               public string? LastReported { get; set; }
+               public string? BillRef { get; set; }
+               public string? InSectID { get; set; }
+               public string? RepType { get; set; }
+               public string? Reserved { get; set; }
+               public string? SpecColLocation { get; set; }
+               public string? NosInfFlag { get; set; }
+               public string? SpecService { get; set; }
+               public string? SpecInst { get; set; }
 
           }
 
           public class ResultRecordSet
           {
-               public string? ORID;
-               public string? UTID;
-               public string? Result;
-               public string? Unit;
-               public string? RefRange;
-               public string? Abnormal;
-               public string? AbNature;
-               public string? ResStatus;
-               public string? NormsChanged;
-               public string? OpID;
-               public string? TestStart;
-               public string? TestEnd;
-               public string? InstID;
+               public string? ORID { get; set; }
+               public string? UTID { get; set; }
+               public string? Result { get; set; }
+               public string? Unit { get; set; }
+               public string? RefRange { get; set; }
+               public string? Abnormal { get; set; }
+               public string? AbNature { get; set; }
+               public string? ResStatus { get; set; }
+               public string? NormsChanged { get; set; }
+               public string? OpID { get; set; }
+               public string? TestStart { get; set; }
+               public string? TestEnd { get; set; }
+               public string? InstID { get; set; }
 
           }
 
           public class QueryRecordSet
           {
-               public string? StartRange;
-               public string? EndRange;
-               public string? UTID;
-               public string? ReqLimNature;
-               public string? ReqResBeginDT;
-               public string? ReqResEndDT;
-               public string? ReqPhysName;
-               public string? ReqPhysTelNo;
-               public string? UF1;
-               public string? UF2;
-               public string? ReqInfoStatus;
+               public string? StartRange { get; set; }
+               public string? EndRange { get; set; }
+               public string? UTID { get; set; }
+               public string? ReqLimNature { get; set; }
+               public string? ReqResBeginDT { get; set; }
+               public string? ReqResEndDT { get; set; }
+               public string? ReqPhysName { get; set; }
+               public string? ReqPhysTelNo { get; set; }
+               public string? UF1 { get; set; }
+               public string? UF2 { get; set; }
+               public string? ReqInfoStatus { get; set; }
 
           }
 
           public class CommentRecordSet
           {
-               public string? Source;
-               public string? Text;
-               public string? Type;
+               public string? Source { get; set; }
+               public string? Text { get; set; }
+               public string? Type { get; set; }
 
           }
 
           public class ScientificRecordSet
           {
-               public string? AnalMeth;
-               public string? Instrument;
-               public string? Reagents;
-               public string? Units;
-               public string? QC;
-               public string? SpecDesc;
-               public string? Reserved;
-               public string? Container;
-               public string? SpecID;
-               public string? Analyte;
-               public string? Result;
-               public string? ResUnits;
-               public string? CollectDT;
-               public string? ResultDT;
-               public string? AnalPreSteps;
-               public string? PatDiag;
-               public string? PatDOB;
-               public string? PSex;
-               public string? PRace;
+               public string? AnalMeth { get; set; }
+               public string? Instrument { get; set; }
+               public string? Reagents { get; set; }
+               public string? Units { get; set; }
+               public string? QC { get; set; }
+               public string? SpecDesc { get; set; }
+               public string? Reserved { get; set; }
+               public string? Container { get; set; }
+               public string? SpecID { get; set; }
+               public string? Analyte { get; set; }
+               public string? Result { get; set; }
+               public string? ResUnits { get; set; }
+               public string? CollectDT { get; set; }
+               public string? ResultDT { get; set; }
+               public string? AnalPreSteps { get; set; }
+               public string? PatDiag { get; set; }
+               public string? PatDOB { get; set; }
+               public string? PSex { get; set; }
+               public string? PRace { get; set; }
           }
      }
 
      public class ServiceConfig
      {
-          public bool UseExternalDb;
-          public string? ConnectionString;
-          public int DbPollInterval;
-          public bool ListenHl7;
-          public int Hl7TcpPort;
-          public string? LisId;
-          public string? Address;
-          public string? Phone;
+          public bool UseExternalDb { get; set; }
+          public string? ConnectionString { get; set; }
+          public int DbPollInterval { get; set; }
+          public bool ListenHl7 { get; set; }
+          public int Hl7TcpPort { get; set; }
+          public string? LisId { get; set; }
+          public string? Address { get; set; }
+          public string? Phone { get; set; }
      }
 
 

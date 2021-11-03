@@ -2,11 +2,11 @@
 
 namespace UniversaLIS
 {
-     public class LISCommState : ILISState
+     public class LisCommState : ILISState
      {
           public ILISState CommState { get; set; }
-          public CommFacilitator comm;
-          public LISCommState(CommFacilitator comm)
+          public CommFacilitator comm { get; set; }
+          public LisCommState(CommFacilitator comm)
           {
                this.comm = comm;
                CommState = new IdleState(this.comm);
@@ -153,13 +153,10 @@ namespace UniversaLIS
                {
                     // Send EOT and return to idle state.
                     comm.Send(Constants.EOT);
-                    if (CommState is TransWaitState)
+                    if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
                     {
-                         if (comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
-                         {
-                              comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
-                              comm.CurrentMessage = new Message(comm);
-                         }
+                         comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
+                         comm.CurrentMessage = new Message(comm);
                     }
                     comm.CurrentMessage = new Message(comm);
                     comm.CurrentFrameCounter = 0;
@@ -185,12 +182,9 @@ namespace UniversaLIS
           }
           public void IdleCheck()
           {
-               if (CommState is IdleState)
+               if (CommState is IdleState && comm.OutboundMessageQueue.Count > 0)
                {
-                    if (comm.OutboundMessageQueue.Count > 0)
-                    {
-                         HaveData();
-                    }
+                    HaveData();
                }
           }
      }

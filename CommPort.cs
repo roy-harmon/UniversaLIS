@@ -7,7 +7,7 @@ namespace UniversaLIS
 {
      public class CommPort :  IPortAdapter //ReliableSerialPort
      {
-          private SerialPort serialPort = new SerialPort();
+          private readonly SerialPort serialPort = new SerialPort();
           public CommPort(Serial serial)
           {
                serialPort.PortName = serial.Portname;
@@ -41,7 +41,7 @@ namespace UniversaLIS
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
                string txtFile = $"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog-{serialPort.PortName}_{date.Year}-{date.Month}-{date.Day}.txt";
-               if (Directory.Exists($"{publicFolder}\\UniversaLIS\\Serial_Logs\\") == false)
+               if (!Directory.Exists($"{publicFolder}\\UniversaLIS\\Serial_Logs\\"))
                {
                     Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Serial_Logs\\");
                }
@@ -79,16 +79,5 @@ namespace UniversaLIS
           {
                return "serial";
           }
-          //object objectLock = new Object();
-          //event EventHandler IPortAdapter.DataReceived
-          //{
-          //     add
-          //     {
-          //          lock (objectLock)
-          //          {
-
-          //          }
-          //     }
-          //}
      }
 }
