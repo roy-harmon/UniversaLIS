@@ -53,7 +53,6 @@ namespace UniversaLIS
 
           public event EventHandler? PortDataReceived;
 
-          //delegate void SerialDataReceivedEventHandler(object sender, SerialDataReceivedEventArgs e);
           protected void OnSerialDataReceived(object sender, SerialDataReceivedEventArgs eventArgs)
           {
                EventHandler? handler = PortDataReceived;
