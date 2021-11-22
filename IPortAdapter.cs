@@ -13,6 +13,7 @@ namespace UniversaLIS
           public void Send(string messageText);
           public void Open();
           public void Close();
+          internal string ReadChars();
           public virtual event EventHandler PortDataReceived 
           {
                add

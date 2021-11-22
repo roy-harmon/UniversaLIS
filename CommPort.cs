@@ -69,9 +69,10 @@ namespace UniversaLIS
                serialPort.Close();
           }
 
-          internal char ReadChar()
+          string IPortAdapter.ReadChars()
           {
-               return (char)serialPort.ReadChar();
+               char readChar = (char)serialPort.ReadChar();
+               return $"{readChar}";
           }
 
           string IPortAdapter.PortType()

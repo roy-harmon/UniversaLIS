@@ -74,7 +74,7 @@ namespace UniversaLIS
                     transTimer = new CountdownTimer(-1, TransactionTimedOut);
                     CurrentMessage = new Message(this);
                     // Set the handler for the DataReceived event.
-                    ComPort.PortDataReceived += SerialPortDataReceived!;
+                    ComPort.PortDataReceived += CommPortDataReceived!;
                     ComPort.Open();
                     AppendToLog($"Port opened: {serialSettings.Portname}");
                     idleTimer.AutoReset = true;
@@ -118,7 +118,7 @@ namespace UniversaLIS
                     receiver_id = tcpSettings.ReceiverId;
                     ComPort = new TcpPort(tcpSettings);
                     // Set the handler for the DataReceived event.
-                    ComPort.PortDataReceived += TcpPortDataReceived!;
+                    ComPort.PortDataReceived += CommPortDataReceived!;
                     CurrentMessage = new Message(this);
                     ComPort.Open();
                     AppendToLog($"Socket opened: {tcpSettings.Socket}");
@@ -174,14 +174,13 @@ namespace UniversaLIS
                     throw;
                }
           }
-
           
-          void SerialPortDataReceived(object sender, EventArgs e ) //DataReceivedArgs e)
+          void CommPortDataReceived(object sender, EventArgs e)
           {
                /* When new data is received, 
                 * parse the message line-by-line.
                 */
-               CommPort sp = (CommPort)sender;
+               IPortAdapter port = (IPortAdapter)sender;
                StringBuilder buffer = new StringBuilder();
                bool timedOut = false;
                try
@@ -197,7 +196,7 @@ namespace UniversaLIS
                     { // Read one char at a time until the ReadChar times out.
                          try
                          {
-                              buffer.Append(sp.ReadChar());
+                              buffer.Append(port.ReadChars());
                          }
                          catch (Exception)
                          {
@@ -219,11 +218,6 @@ namespace UniversaLIS
                     ServiceMain.HandleEx(ex);
                     throw;
                }
-          }
-
-          void TcpPortDataReceived(object sender, EventArgs e)
-          {
-               // TODO: Process whatever data comes through here.
           }
 
           private void IdleTime(object o, System.Timers.ElapsedEventArgs elapsedEvent)
@@ -533,8 +527,8 @@ namespace UniversaLIS
                else
                {
                     // This message is invalid!
-                    ServiceMain.AppendToLog($"Invalid message received! {message.MessageHeader}");
-                    throw new ArgumentException();
+                    ServiceMain.AppendToLog($"Invalid message header! {message.MessageHeader}");
+                    throw new ArgumentException($"Invalid message header: {message.MessageHeader}");
                }
           }
 
