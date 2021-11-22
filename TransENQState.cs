@@ -2,11 +2,11 @@
 
 namespace UniversaLIS
 {
-     class TransENQState : ILISState
+     class TransEnqState : ILISState
      {
 
           private readonly CommFacilitator comm;
-          public TransENQState(CommFacilitator comm)
+          public TransEnqState(CommFacilitator comm)
           {
                this.comm = comm;
           }

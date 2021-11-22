@@ -35,7 +35,7 @@ namespace UniversaLIS
           public void RcvACK()
           {
                CommState.RcvACK();
-               if (CommState is TransENQState)
+               if (CommState is TransEnqState)
                {
                     // Transition to TransWaitState.
                     ChangeToTransWaitState();
@@ -69,7 +69,7 @@ namespace UniversaLIS
                {
                     ChangeToRcvWaitState();
                }
-               if (CommState is TransENQState)
+               if (CommState is TransEnqState)
                {
                     ChangeToIdleState();
                }
@@ -97,7 +97,7 @@ namespace UniversaLIS
                {
                     ChangeToIdleState();
                }
-               if (CommState is TransENQState)
+               if (CommState is TransEnqState)
                {
                     ChangeToIdleState();
                }
@@ -127,7 +127,7 @@ namespace UniversaLIS
           }
           public void ChangeToTransENQState()
           {
-               CommState = new TransENQState(comm);
+               CommState = new TransEnqState(comm);
 #if DEBUG
                AppendToLog("CommState changed to TransENQState!");
 #endif
@@ -149,7 +149,7 @@ namespace UniversaLIS
 
           public void TransTimeout()
           {
-               if (CommState is TransENQState || CommState is TransWaitState)
+               if (CommState is TransEnqState || CommState is TransWaitState)
                {
                     // Send EOT and return to idle state.
                     comm.Send(Constants.EOT);
