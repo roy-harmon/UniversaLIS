@@ -47,22 +47,31 @@
   <PropertyGroup>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System.Configuration.Install" />
     <Reference Include="System.ServiceProcess" />
   </ItemGroup>
   <ItemGroup>
     <Compile Update="CommPort.cs" />
-    <Compile Update="UniversaLIService.cs">
-      <SubType>Component</SubType>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Update="ProjectInstaller.cs">
+    <Compile Update="UniversaLIService.cs">
       <SubType>Component</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Update="Properties\config.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="IMMULIS_TemporaryKey.pfx" />
   </ItemGroup>
@@ -92,7 +101,12 @@
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="ProjectInstaller.cs" />
+    <Compile Remove="ProjectInstaller.Designer.cs" />
     <Compile Remove="ReliableSerialPort.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Remove="ProjectInstaller.resx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="appsettings.json" />

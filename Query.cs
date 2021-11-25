@@ -7,8 +7,6 @@ namespace UniversaLIS
 {
      public class Query
      {
-          public Dictionary<string, string> Elements = new Dictionary<string, string>();
-
           public string QueryMessage
           {
                get
@@ -20,6 +18,8 @@ namespace UniversaLIS
                     SetQueryString(value);
                }
           }
+
+          public Dictionary<string, string> Elements { get; set; } = new Dictionary<string, string>();
 
           private string GetQueryString()
           {    // This method shouldn't actually be used, since the LIS shouldn't be sending any queries.
@@ -55,7 +55,7 @@ namespace UniversaLIS
                if (inArray.Length < 13)
                {
                     // Invalid number of elements.
-                    throw new Exception($"Invalid number of elements in query record string. Expected: 13 \tFound: {inArray.Length} \tString: \n{input}");
+                    throw new ArgumentException($"Invalid number of elements in query record string. Expected: 13 \tFound: {inArray.Length} \tString: \n{input}");
                }
                Elements["FrameNumber"] = inArray[0];
                Elements["Sequence #"] = inArray[1];

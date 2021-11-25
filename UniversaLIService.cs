@@ -15,6 +15,7 @@ using YamlDotNet.Serialization.NamingConventions;
 // TODO: Add UI?
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public partial class ServiceMain : ServiceBase
      {
           public static EventLog EventLog1 { get; set; } = new EventLog();
@@ -73,11 +74,11 @@ namespace UniversaLIS
                          {
                               UseExtDB = false;
                          }
-                         foreach (var serialPort in YamlSettings?.Interfaces?.Serial!)
+                         foreach (var serialPort in YamlSettings?.Interfaces?.Serial ?? Enumerable.Empty<Serial>())
                          {
                               s_commFacilitators.Add(new CommFacilitator(serialPort));
                          }
-                         foreach (var tcpPort in YamlSettings?.Interfaces?.Tcp!)
+                         foreach (var tcpPort in YamlSettings?.Interfaces?.Tcp ?? Enumerable.Empty<Tcp>())
                          {
                               s_commFacilitators.Add(new CommFacilitator(tcpPort));
                          }
@@ -148,7 +149,11 @@ namespace UniversaLIS
           internal void DebuggingRoutine(string[] args)
           {
                OnStart(args);
-               Console.ReadLine();
+               while (Console.ReadLine() is null)
+               {
+                    // Not sure why it doesn't work without looping anymore. 
+                    Console.ReadLine();
+               }
                OnStop();
           }
      }

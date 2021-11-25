@@ -5,7 +5,8 @@ using System.Threading;
 
 namespace UniversaLIS
 {
-     public class CommPort :  IPortAdapter //ReliableSerialPort
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     public class CommPort :  IPortAdapter
      {
           private readonly SerialPort serialPort = new SerialPort();
           public CommPort(Serial serial)
@@ -17,6 +18,7 @@ namespace UniversaLIS
                serialPort.StopBits = serial.Stopbits;
                serialPort.Handshake = serial.Handshake;
                serialPort.DataReceived += OnSerialDataReceived;
+               serialPort.ReadTimeout = 50;
           }
           public void Send(string messageText)
           {
@@ -56,7 +58,7 @@ namespace UniversaLIS
           protected void OnSerialDataReceived(object sender, SerialDataReceivedEventArgs eventArgs)
           {
                EventHandler? handler = PortDataReceived;
-               handler?.Invoke(sender, eventArgs);
+               handler?.Invoke(this, eventArgs);
           }
 
           public void Open()
@@ -69,12 +71,40 @@ namespace UniversaLIS
                serialPort.Close();
           }
 
-          string IPortAdapter.ReadChars()
+          string GetCharString()
           {
                char readChar = (char)serialPort.ReadChar();
                return $"{readChar}";
           }
 
+          string IPortAdapter.ReadChars()
+          {
+               System.Text.StringBuilder buffer = new System.Text.StringBuilder();
+               bool timedOut = false;
+               try
+               {
+                    /* There are a few messages that won't end in a NewLine,
+                     * so we have to read one character at a time until we run out of them.
+                     */
+                    do
+                    { // Read one char at a time until the ReadChar times out.
+                         try
+                         {
+                              buffer.Append(GetCharString());
+                         }
+                         catch (Exception)
+                         {
+                              timedOut = true;
+                         }
+                    } while (!timedOut);
+               }
+               catch (Exception ex)
+               {
+                    ServiceMain.HandleEx(ex);
+                    throw;
+               }
+               return buffer.ToString();
+          }
           string IPortAdapter.PortType()
           {
                return "serial";

@@ -3,6 +3,7 @@ using static UniversaLIS.ServiceMain;
 
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      class TransWaitState : ILISState
      {
 

@@ -2,6 +2,7 @@
 
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      static class Program
      {
           /// <summary>

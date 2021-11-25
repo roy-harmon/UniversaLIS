@@ -17,6 +17,7 @@ namespace UniversaLIS
       *             Result
       * Terminator
       */
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class Message
      {
           

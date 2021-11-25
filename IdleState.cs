@@ -2,6 +2,7 @@
 
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class IdleState : ILISState
      {
           public IdleState(CommFacilitator comm)
@@ -64,7 +65,7 @@ namespace UniversaLIS
           public void HaveData()
           {
                // If there's data to send, check the timers before sending.
-               if (comm.ContentTimer.remainingDuration <= 0 && comm.BusyTimer.remainingDuration <= 0)
+               if (comm.ContentTimer.RemainingDuration <= 0 && comm.BusyTimer.RemainingDuration <= 0)
                {
                     // Send ENQ
                     comm.Send(Constants.ENQ);

@@ -10,6 +10,7 @@ using static UniversaLIS.ServiceMain;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class CommFacilitator
      {
           private bool bInterFrame = false;
@@ -182,7 +183,6 @@ namespace UniversaLIS
                 */
                IPortAdapter port = (IPortAdapter)sender;
                StringBuilder buffer = new StringBuilder();
-               bool timedOut = false;
                try
                {
                     idleTimer.Stop();
@@ -192,20 +192,17 @@ namespace UniversaLIS
                     /* There are a few messages that won't end in a NewLine,
                      * so we have to read one character at a time until we run out of them.
                      */
-                    do
-                    { // Read one char at a time until the ReadChar times out.
-                         try
-                         {
-                              buffer.Append(port.ReadChars());
-                         }
-                         catch (Exception)
-                         {
-                              timedOut = true;
+                    // Read one char at a time until the ReadChar times out.
+                    try
+                    {
+                         buffer.Append(port.ReadChars());
+                    }
+                    catch (Exception)
+                    {
 #if DEBUG
-                              stopwatch.Stop();
+                         stopwatch.Stop();
 #endif
-                         }
-                    } while (!timedOut);
+                    }
 #if DEBUG
                     ServiceMain.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
 #endif

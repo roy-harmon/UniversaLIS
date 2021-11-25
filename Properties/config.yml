@@ -37,18 +37,18 @@ Interfaces:
       #  AutoSendOrders:    false
 
     Tcp:
-      - ReceiverId:
-        Password:
-        UseLegacyFrameSize:
-        Socket:
-        AutoSendOrders:   0
+      - ReceiverId:         TESTING
+        Password:           
+        UseLegacyFrameSize: false
+        Socket:             5678
+        AutoSendOrders:     0
  
 ServiceConfig:
     UseExternalDb:    false
     ConnectionString:  
     DbPollInterval:
     ListenHl7:     true
-    Hl7TcpPort:   1394
+    Hl7TcpPort:   9876
     LisId: UniversaLIS
     Address:
     Phone:

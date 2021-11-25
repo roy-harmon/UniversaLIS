@@ -2,6 +2,7 @@
 
 namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      class TransEnqState : ILISState
      {
 
@@ -53,7 +54,7 @@ namespace UniversaLIS
 
           public void RcvENQ()
           {
-               // Set the contention timer to 20 seconds and return to idle state.
+               // Set the contention timer to 20 seconds before returning to idle state.
                comm.ContentTimer.Reset(20);
           }
 
