@@ -21,25 +21,10 @@ While some parts of the database are fairly flexible, the UniversaLIS service ex
 
 ## Configuration ##
 
-The "UniversaLIS.exe.config" file contains several configuration items that should be changed according to your specific requirements. 
+The "config.yml" file contains several configuration items that should be changed according to your specific requirements. The details of each setting are described in the comments of that file.
 Note: For settings marked with an asterisk (\*), ensure that the setting matches the analyzer's LIS Parameters configuration screen.
 
 ---
-### Serial Port Parameters ###
-*   SerialPortNum - Change this to the COM port of whichever serial port you intend to connect to the IMMULITE analyzer. Default = COM4.
-* \*SerialPortBaudRate - Valid parameters include 1200, 2400, 4800 and 9600. Default is 9600. 
-* \*SerialPortParity - None = 0 (default), Odd = 1, Even = 2.
-* \*SerialPortDataBits - 7 or 8 (default).
-* \*SerialPortStopBits - 1 (default) or 2.
-### Other Parameters ###
-* \*LIS_ID - LIS (default); match this field to the Receiver ID field on the analyzer's configuration screen.
-* \*LIS_Password - (Blank by default)
-*   ConnectionString - Database server connection string. Defaults to local SQLExpress instance with database "LISDB" and Windows authentication.
-*   SenderAddress - The address of the LIS manufacturer. Currently blank.
-*   SenderPhone - Yeah, like I want *more* robocalls.
-* \*ReceiverID - IMMULITE (default); match this field to the Sender ID field on the analyzer config screen.
-*   AutoSendOrders - True to automatically send all pending orders to the analyzer after a specified interval. Otherwise false (default).
-*   AutoSendInterval - Number of milliseconds to wait between polling the database for orders and sending them to the analyzer if AutoSendOrders is true.
 
 ## Usage
 

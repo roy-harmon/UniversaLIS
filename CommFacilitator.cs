@@ -51,8 +51,8 @@ namespace UniversaLIS
                ComPort.Send(messageText);
           }
 
-          // TODO: Update this string when setting up external database connection functions.
-          //string connString = @"\internal.db";
+          // Use this string when setting up internal database connection functions.
+          // readonly string connString = ServiceMain.YamlSettings?.ServiceConfig?.SqlitePath!;
 
           public CommFacilitator(Serial serialSettings)
           {
@@ -97,7 +97,6 @@ namespace UniversaLIS
                }
           }
 
-          // TODO: Find a way to combine functionality of serial ports and TCP sockets into a single interface.
           public CommFacilitator(Tcp tcpSettings)
           {
                CommState = new LisCommState(this);
@@ -150,7 +149,7 @@ namespace UniversaLIS
                     {
                          Message message = OutboundMessageQueue.Dequeue();
 
-                         using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+                         using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
                          {
                               foreach (Patient patientItem in message.Patients)
                               {
@@ -315,7 +314,7 @@ namespace UniversaLIS
                 * how to handle the rest of the message.
                 */
                string[] headerFields = message.MessageHeader.Split('|');
-               if (headerFields[4] == Properties.Settings.Default.LIS_ID)
+               if (headerFields[4] == ServiceMain.YamlSettings?.ServiceConfig?.LisId)
                {
                     // Message is outgoing. Queue it up to be sent to the IMMULITE.
 #if DEBUG
@@ -347,8 +346,8 @@ namespace UniversaLIS
                          ServiceMain.AppendToLog("Connecting to database.");
 #endif
                          // This is where we have to connect to the database.
-                         // TODO: Switch to SQLite
-                         using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+                         // TODO: Support internal database with SQLite
+                         using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
                          {
                               conn.Open();
 #if DEBUG 
@@ -556,7 +555,7 @@ namespace UniversaLIS
                     isQuery = false;
                }
                // Query the database for [P]atient and [O]rder records for the sample.
-               using (SqlConnection conn = new SqlConnection(Properties.Settings.Default.ConnectionString))
+               using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
                {
                     conn.Open();
                     int orderCount;

@@ -21,12 +21,12 @@ namespace UniversaLIS
           public static EventLog EventLog1 { get; set; } = new EventLog();
           private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
 
-          public bool ListenHL7 { get; set; }
-          public int HL7Port { get; set; }
-          public string? ExternalDbConnString { get; set; }
-          public bool UseExtDB { get; set; }
-          public int DbPollInterval { get; set; }
-          public YamlSettings? YamlSettings { get; set; }
+          public static bool ListenHL7 { get; set; }
+          public static int HL7Port { get; set; }
+          public static string? ExternalDbConnString { get; set; }
+          public static bool UseExtDB { get; set; }
+          public static int DbPollInterval { get; set; }
+          public static YamlSettings? YamlSettings { get; set; }
 
           public ServiceMain()
           {

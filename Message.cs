@@ -237,8 +237,8 @@ namespace UniversaLIS
                DateTime dateTime = DateTime.Now;
                dateString = dateTime.Year.ToString() + dateTime.Month.ToString("D2") + dateTime.Day.ToString("D2");
                dateString += dateTime.Hour.ToString("D2") + dateTime.Minute.ToString("D2") + dateTime.Second.ToString("D2");
-               string header = Constants.STX + $"1H|\\^&||{facilitator.password}|{Properties.Settings.Default.LIS_ID}|{Properties.Settings.Default.SenderAddress}";
-               header += $"||{Properties.Settings.Default.SenderPhone}|{facilitator.GetPortDetails()}|{facilitator.receiver_id}||P|1|{dateString}";
+               string header = Constants.STX + $"1H|\\^&||{facilitator.password}|{ServiceMain.YamlSettings?.ServiceConfig?.LisId}|{ServiceMain.YamlSettings?.ServiceConfig?.Address}";
+               header += $"||{ServiceMain.YamlSettings?.ServiceConfig?.Phone}|{facilitator.GetPortDetails()}|{facilitator.receiver_id}||P|1|{dateString}";
                MessageHeader = header;
           }
 
