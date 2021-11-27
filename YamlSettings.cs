@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace UniversaLIS
 {
      public class YamlSettings
      {
-          
+
           public InterfaceSettings? Interfaces { get; set; }
           public ServiceConfig? ServiceConfig { get; set; }
           public TableMappings? TableFieldMappings { get; set; }
@@ -16,7 +12,7 @@ namespace UniversaLIS
           {
                public List<Serial>? Serial { get; set; }
                public List<Tcp>? Tcp { get; set; }
-                              
+
           }
      }
      public interface IPortSettings

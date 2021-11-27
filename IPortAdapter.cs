@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UniversaLIS
 {
@@ -14,7 +10,7 @@ namespace UniversaLIS
           public void Open();
           public void Close();
           internal string ReadChars();
-          public virtual event EventHandler PortDataReceived 
+          public virtual event EventHandler PortDataReceived
           {
                add
                {

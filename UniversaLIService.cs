@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Ports;
 using System.Linq;
 using System.ServiceProcess;
-using YamlDotNet.Core;
-using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 // TODO: Add internal database while keeping external database option.
 // TODO: Add UI?
 namespace UniversaLIS
@@ -59,7 +53,7 @@ namespace UniversaLIS
                          var yamlText = reader.ReadToEnd();
                          var deserializer = new DeserializerBuilder()
                               .Build();
-                              
+
                          YamlSettings = deserializer.Deserialize<YamlSettings>(yamlText);
                          if (YamlSettings.ServiceConfig?.ListenHl7 == true)
                          {
@@ -92,7 +86,7 @@ namespace UniversaLIS
           }
           protected override void OnStop()
           {
-               
+
                try
                {
                     AppendToLog("Service stopping.");

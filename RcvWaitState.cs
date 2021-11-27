@@ -89,7 +89,7 @@ namespace UniversaLIS
 
           private bool CheckPassword(string inputString)
           {
-               if (inputString.Substring(0, 3)==$"{Constants.STX}1H")
+               if (inputString.Substring(0, 3) == $"{Constants.STX}1H")
                {
                     // 1H|\\^&||{password}|
                     String[] fieldArray = inputString.Split('|');

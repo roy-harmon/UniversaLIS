@@ -1,6 +1,4 @@
-﻿using static UniversaLIS.CommFacilitator;
-
-namespace UniversaLIS
+﻿namespace UniversaLIS
 {
      [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class IdleState : ILISState

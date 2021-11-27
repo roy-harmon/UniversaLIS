@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace UniversaLIS
 {
@@ -20,7 +18,7 @@ namespace UniversaLIS
      [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class Message
      {
-          
+
           public Dictionary<string, string> Elements { get; set; } = new Dictionary<string, string>();
 
           public List<string> FrameList { get; set; } = new List<string>();
@@ -212,7 +210,7 @@ namespace UniversaLIS
                     // Date only.
                     Elements["Message Date + Time"] = inArray[13].Substring(0, 8);
                }
-               else if (inArray[13].Length>=14)
+               else if (inArray[13].Length >= 14)
                {
                     // Date and time.
                     Elements["Message Date + Time"] = inArray[13].Substring(0, 14);
@@ -222,7 +220,7 @@ namespace UniversaLIS
                     // Invalid datetime format.
                     throw new ArgumentOutOfRangeException($"Invalid datetime in header record string. Expected: YYYYMMDDHHMMSS or YYYYMMDD \tFound: {inArray[13]} \tString: \n{input}");
                }
-               
+
           }
 
           public Message(string messageHeader)

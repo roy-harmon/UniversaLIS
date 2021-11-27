@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Microsoft.Data.Sqlite;
-using System.IO.Ports;
-using System.Linq;
 using System.Text;
 using static UniversaLIS.ServiceMain;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
@@ -60,7 +57,8 @@ namespace UniversaLIS
                if (serialSettings.UseLegacyFrameSize)
                {
                     frameSize = 240;
-               } else
+               }
+               else
                {
                     frameSize = 63993;
                }
@@ -80,7 +78,8 @@ namespace UniversaLIS
                     AppendToLog($"Port opened: {serialSettings.Portname}");
                     idleTimer.AutoReset = true;
                     idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
-                    if (serialSettings.AutoSendOrders > 0) { 
+                    if (serialSettings.AutoSendOrders > 0)
+                    {
                          idleTimer.Elapsed += WorklistTimedEvent;
                          idleTimer.Interval = serialSettings.AutoSendOrders;
                     }
@@ -174,7 +173,7 @@ namespace UniversaLIS
                     throw;
                }
           }
-          
+
           void CommPortDataReceived(object sender, EventArgs e)
           {
                /* When new data is received, 
@@ -205,7 +204,7 @@ namespace UniversaLIS
 #if DEBUG
                     ServiceMain.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
 #endif
-                    ServiceMain.AppendToLog($"In: \t{buffer.ToString()}");
+                    ServiceMain.AppendToLog($"In: \t{buffer}");
                     CommState.RcvInput(buffer.ToString());
                     idleTimer.Start();
                }
@@ -270,11 +269,11 @@ namespace UniversaLIS
                          break;
 
                     case "O": // Order record.
-                         CurrentMessage.Patients[CurrentMessage.Patients.Count - 1].Orders.Add(new Order(messageLine));
+                         CurrentMessage.Patients[^1].Orders.Add(new Order(messageLine));
                          break;
 
                     case "R": // Result record.
-                         CurrentMessage.Patients[CurrentMessage.Patients.Count - 1].Orders[CurrentMessage.Patients[CurrentMessage.Patients.Count - 1].Orders.Count - 1].Results.Add(new Result(messageLine));
+                         CurrentMessage.Patients[^1].Orders[^1].Results.Add(new Result(messageLine));
                          break;
 
                     case "L": // Terminator record.

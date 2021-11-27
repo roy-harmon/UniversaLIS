@@ -6,12 +6,12 @@ using System.Threading;
 namespace UniversaLIS
 {
      [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-     public class CommPort :  IPortAdapter
+     public class CommPort : IPortAdapter
      {
           private readonly SerialPort serialPort = new SerialPort();
           public CommPort(Serial serial)
           {
-               serialPort.PortName = serial.Portname;
+               serialPort.PortName = serial.Portname!;
                serialPort.BaudRate = serial.Baud;
                serialPort.DataBits = serial.Databits;
                serialPort.Parity = serial.Parity;
@@ -31,7 +31,8 @@ namespace UniversaLIS
           }
           public static readonly EventWaitHandle logOpen = new EventWaitHandle(true, EventResetMode.AutoReset);
 
-          string IPortAdapter.PortName {
+          string IPortAdapter.PortName
+          {
                get
                {
                     return serialPort.PortName;

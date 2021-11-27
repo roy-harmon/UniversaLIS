@@ -1,5 +1,4 @@
-﻿using System;
-using static UniversaLIS.ServiceMain;
+﻿using static UniversaLIS.ServiceMain;
 
 namespace UniversaLIS
 {

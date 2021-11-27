@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Sockets;
-using System.Net;
 using System.IO;
-using System.Threading;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace UniversaLIS
 {
@@ -70,7 +66,7 @@ namespace UniversaLIS
                          handler?.Invoke(this, eventArgs);
                     }
                }
-               
+
           }
           private void CheckDataReceived(Object source, System.Timers.ElapsedEventArgs e)
           {

@@ -17,9 +17,9 @@
     <MapFileExtensions>true</MapFileExtensions>
     <SupportUrl>https://github.com/ScienceBoyRoy/IMMULIS</SupportUrl>
     <TargetCulture>en</TargetCulture>
-    <ProductName>IMMULIS</ProductName>
+    <ProductName>UniversaLIS</ProductName>
     <PublisherName>Roy Harmon</PublisherName>
-    <SuiteName>LISiemens</SuiteName>
+    <SuiteName>UniversaLIS</SuiteName>
     <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
@@ -50,10 +50,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System.Configuration.Install" />
-    <Reference Include="System.ServiceProcess" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Update="CommPort.cs" />
     <Compile Update="Properties\Settings.Designer.cs">
@@ -89,11 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0" />
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.0.7" />
-    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.0.7" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.0">
+      <TreatAsUsed>true</TreatAsUsed>
+    </PackageReference>
     <PackageReference Include="System.Memory" Version="4.5.4" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="YamlDotNet" Version="11.2.1" />
     <PackageReference Include="Microsoft.DotNet.UpgradeAssistant.Extensions.Default.Analyzers" Version="0.3.256001">
       <PrivateAssets>all</PrivateAssets>
