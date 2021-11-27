@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Text;
 using static UniversaLIS.ServiceMain;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
+// TODO: Consider field mappings when constructing SQL commands.
 namespace UniversaLIS
 {
      [System.Runtime.Versioning.SupportedOSPlatform("windows")]
