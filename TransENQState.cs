@@ -1,9 +1,17 @@
-﻿using static IMMULIS.IMMULIService;
+﻿using static UniversaLIS.ServiceMain;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
-     class TransENQState : ILISState
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     class TransEnqState : ILISState
      {
+
+          private readonly CommFacilitator comm;
+          public TransEnqState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+
           public void RcvInput(string InputString)
           {
                switch (InputString)
@@ -28,14 +36,14 @@ namespace IMMULIS
           public void RcvACK()
           {
                // Send next frame.
-               CurrentMessage = OutboundMessageQueue.Dequeue();
-               CurrentMessage.PrepareToSend();
-               ComPort.Send(CurrentMessage.FrameList[CurrentFrameCounter]);
-               CurrentFrameCounter++;
+               comm.CurrentMessage = comm.OutboundMessageQueue.Dequeue();
+               comm.CurrentMessage.PrepareToSend();
+               comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
+               comm.CurrentFrameCounter++;
                // Reset the NAK count to 0.
-               numNAK = 0;
+               comm.numNAK = 0;
                // Reset the transaction timer to 15 seconds.
-               transTimer.Reset(15);
+               comm.transTimer.Reset(15);
           }
 
           public void RcvData(string InputString)
@@ -46,8 +54,8 @@ namespace IMMULIS
 
           public void RcvENQ()
           {
-               // Set the contention timer to 20 seconds and return to idle state.
-               ContentTimer.Reset(20);
+               // Set the contention timer to 20 seconds before returning to idle state.
+               comm.ContentTimer.Reset(20);
           }
 
           public void RcvEOT()
@@ -66,7 +74,7 @@ namespace IMMULIS
           public void RcvNAK()
           {
                // If the instrument responds to our ENQ with NAK, it's busy. Back to Idle for 10 seconds.
-               BusyTimer.Reset(10);
+               comm.BusyTimer.Reset(10);
           }
 
           void ILISState.HaveData()

@@ -1,7 +1,8 @@
 ﻿using System.ServiceProcess;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      static class Program
      {
           /// <summary>
@@ -11,7 +12,7 @@ namespace IMMULIS
           {
                if (System.Environment.UserInteractive)
                {    // Execute the program as a console app for debugging purposes.
-                    IMMULIService service1 = new IMMULIService();
+                    ServiceMain service1 = new ServiceMain();
                     service1.DebuggingRoutine(args);
                }
                else
@@ -20,7 +21,7 @@ namespace IMMULIS
                     ServiceBase[] ServicesToRun;
                     ServicesToRun = new ServiceBase[]
                     {
-                     new IMMULIService()
+                     new ServiceMain()
                     };
                     ServiceBase.Run(ServicesToRun);
                }

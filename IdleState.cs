@@ -1,9 +1,13 @@
-﻿using static IMMULIS.IMMULIService;
-
-namespace IMMULIS
+﻿namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      public class IdleState : ILISState
      {
+          public IdleState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+          private readonly CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)
@@ -30,43 +34,43 @@ namespace IMMULIS
           {
                // Bask in the praise of the instrument? It's acknowledging us for no reason!
                // Seriously though, maybe we should add inappropriate incoming transmissions to the log file.
-               AppendToLog("ACK received in idle state...?");
+               ServiceMain.AppendToLog("ACK received in idle state...?");
           }
 
           public void RcvData(string InputString)
           {
                // Ignore... Possibly log the input for later reference?
-               AppendToLog("Data received in idle state: " + InputString);
+               ServiceMain.AppendToLog("Data received in idle state: " + InputString);
           }
 
           public void RcvENQ()
           {
-               ComPort.Send(Constants.ACK);
+               comm.Send(Constants.ACK);
           }
 
           public void RcvEOT()
           {
                // Ignore, but log it.
-               AppendToLog("EOT received in idle state.");
+               ServiceMain.AppendToLog("EOT received in idle state.");
           }
 
           public void RcvNAK()
           {
                // Ignore. It's just trying to get a rise out of you.
-               AppendToLog("NAK received in idle state.");
+               ServiceMain.AppendToLog("NAK received in idle state.");
           }
 
           public void HaveData()
           {
                // If there's data to send, check the timers before sending.
-               if (ContentTimer.remainingDuration <= 0 && BusyTimer.remainingDuration <= 0)
+               if (comm.ContentTimer.RemainingDuration <= 0 && comm.BusyTimer.RemainingDuration <= 0)
                {
                     // Send ENQ
-                    ComPort.Send(Constants.ENQ);
+                    comm.Send(Constants.ENQ);
                     // Set transTimer = 15
-                    transTimer.Reset(15);
+                    comm.transTimer.Reset(15);
 #if DEBUG
-                    AppendToLog("Transaction timer reset: 15.");
+                    ServiceMain.AppendToLog("Transaction timer reset: 15.");
 #endif
                }
           }

@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      public class CountdownTimer
      {
           public CountdownTimer(int Duration)
           {
                duration = Duration;
-               remainingDuration = duration;
+               RemainingDuration = duration;
                timer.AutoReset = true;
                timer.Elapsed += new System.Timers.ElapsedEventHandler(Count_down);
                timer.Start();
@@ -16,7 +16,7 @@ namespace IMMULIS
           public CountdownTimer(int Duration, EventHandler handler)
           {
                duration = Duration;
-               remainingDuration = duration;
+               RemainingDuration = duration;
                timer.AutoReset = true;
                timer.Elapsed += new System.Timers.ElapsedEventHandler(Count_down);
                timer.Start();
@@ -29,18 +29,18 @@ namespace IMMULIS
           public void Reset()
           {
                timer.Stop();
-               remainingDuration = duration;
+               RemainingDuration = duration;
                timer.Start();
           }
           public void Reset(int NewDuration)
           {
                duration = NewDuration;
-               remainingDuration = duration;
+               RemainingDuration = duration;
           }
           private int duration;
-          public int remainingDuration;
+          public int RemainingDuration { get; set; }
           private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
-          public event EventHandler Timeout;
+          public event EventHandler? Timeout;
           public void OnTimeout()
           {
                Timeout?.Invoke(this, EventArgs.Empty);
@@ -54,14 +54,14 @@ namespace IMMULIS
                *  That means we can use the Reset function whenever we want
                *  to set the timer without having to worry about starting it again.
                */
-               if (remainingDuration == 0)
+               if (RemainingDuration == 0)
                {
-                    remainingDuration--;
+                    RemainingDuration--;
                     OnTimeout();
                }
-               else if (remainingDuration > 0)
+               else if (RemainingDuration > 0)
                {
-                    remainingDuration--;
+                    RemainingDuration--;
                }
           }
      }

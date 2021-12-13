@@ -1,11 +1,18 @@
-﻿using static IMMULIS.IMMULIService;
+﻿using System;
+using static UniversaLIS.ServiceMain;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
+     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
      class RcvWaitState : ILISState
      {
           // Track the current frame number to ensure that the received frame is correct.
           public int ExpectedFrame = 1;
+          public RcvWaitState(CommFacilitator comm)
+          {
+               this.comm = comm;
+          }
+          private readonly CommFacilitator comm;
           public void RcvInput(string InputString)
           {
                switch (InputString)
@@ -52,26 +59,46 @@ namespace IMMULIS
                {
                     isFrameGood = CheckChecksum(InputString);
                }
-               // If the frame is good, act accordingly.
+               // If it's a header message, check the password.
+               if (isFrameGood)
+               {
+                    isFrameGood = CheckPassword(InputString);
+               }
+               // If the frame is still good after all those checks,
+               // take appropriate action.
                if (isFrameGood)
                {
                     // Send ACK 
-                    ComPort.Send(Constants.ACK);
+                    comm.Send(Constants.ACK);
                     // Reset rcvTimer to 30 seconds.
-                    rcvTimer.Reset(30);
+                    comm.rcvTimer.Reset(30);
                     // Increment frame number.
                     ExpectedFrame = ++ExpectedFrame % 8;
                     // Actually handle the frame.
-                    ParseMessageLine(InputString);
+                    comm.ParseMessageLine(InputString);
                }
                else
                {
                     // Send NAK
-                    ComPort.Send(Constants.NAK);
+                    comm.Send(Constants.NAK);
                     // Reset rcvTimer to 30 seconds.
-                    rcvTimer.Reset(30);
+                    comm.rcvTimer.Reset(30);
                }
 
+          }
+
+          private bool CheckPassword(string inputString)
+          {
+               if (inputString.Substring(0, 3) == $"{Constants.STX}1H")
+               {
+                    // 1H|\\^&||{password}|
+                    String[] fieldArray = inputString.Split('|');
+                    if (fieldArray[3] != comm.password)
+                    {
+                         return false;
+                    }
+               }
+               return true;
           }
 
           private bool CheckChecksum(string InputString)
@@ -82,6 +109,7 @@ namespace IMMULIS
                int position = message.IndexOf(Constants.ETX);
                if (position < 0)
                {
+                    // If no <ETX>, maybe it's an intermediate frame. Check for <ETB>.
                     position = message.IndexOf(Constants.ETB);
                     if (position < 0)
                     {
@@ -112,13 +140,13 @@ namespace IMMULIS
           public void RcvEOT()
           {
                // Discard last incomplete message (if applicable).
-               if (CurrentMessage.Terminator < 'E')
+               if (comm.CurrentMessage.Terminator < 'E')
                {
-                    CurrentMessage = new MessageBody();
+                    comm.CurrentMessage = new Message(comm);
                }
                else
                {
-                    ProcessMessage(CurrentMessage);
+                    comm.ProcessMessage(comm.CurrentMessage);
                }
           }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 
-namespace IMMULIS
+namespace UniversaLIS
 {
      /* 
       *   Code adapted from example by Valentin Gies found at https://www.vgies.com/a-reliable-serial-port-in-c/,
