@@ -4,12 +4,7 @@ An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written i
 
 ## Installation
 
-The project will eventually be updated to include an executable setup file. For now, UniversaLIS can be installed by navigating to the UniversaLIS.exe file using the command prompt and enter the following commands:
-
-```bash
-installutil UniversaLIS.exe
-net start UniversaLIService
-```
+The project will eventually be updated to include an executable setup file. It was originally registered as a Windows service using InstallUtil, but migration from .NET Framework 4.8 to .NET 5.0 removed service installers. Restoring this functionality is top priority, but until I figure out the new cross-platform way to do this, the program can be executed using the Visual Studio debugger.
 
 Please note: The software also requires a database server in order to function properly. See the next section for details.
 
