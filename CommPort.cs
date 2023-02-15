@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      public class CommPort : IPortAdapter
      {
           private readonly SerialPort serialPort = new SerialPort();
@@ -101,7 +101,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    ServiceMain.HandleEx(ex);
+                    UniversaLIService.HandleEx(ex);
                     throw;
                }
                return buffer.ToString();

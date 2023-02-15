@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
-using static UniversaLIS.ServiceMain;
+using static UniversaLIS.UniversaLIService;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 // TODO: Consider field mappings when constructing SQL commands.
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      public class CommFacilitator
      {
           private bool bInterFrame = false;
@@ -50,7 +50,7 @@ namespace UniversaLIS
           }
 
           // Use this string when setting up internal database connection functions.
-          // readonly string connString = ServiceMain.YamlSettings?.ServiceConfig?.SqlitePath!;
+          // readonly string connString = UniversaLIService.YamlSettings?.ServiceConfig?.SqlitePath!;
 
           public CommFacilitator(Serial serialSettings)
           {
@@ -149,7 +149,7 @@ namespace UniversaLIS
                     {
                          Message message = OutboundMessageQueue.Dequeue();
 
-                         using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
+                         using (SqlConnection conn = new SqlConnection(UniversaLIService.YamlSettings?.ServiceConfig?.ConnectionString))
                          {
                               foreach (Patient patientItem in message.Patients)
                               {
@@ -203,15 +203,15 @@ namespace UniversaLIS
 #endif
                     }
 #if DEBUG
-                    ServiceMain.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
+                    UniversaLIService.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
 #endif
-                    ServiceMain.AppendToLog($"In: \t{buffer}");
+                    UniversaLIService.AppendToLog($"In: \t{buffer}");
                     CommState.RcvInput(buffer.ToString());
                     idleTimer.Start();
                }
                catch (Exception ex)
                {
-                    ServiceMain.HandleEx(ex);
+                    UniversaLIService.HandleEx(ex);
                     throw;
                }
           }
@@ -232,7 +232,7 @@ namespace UniversaLIS
                // The message will be processed by the CommPortDataReceived method when the EOT signal is received.
                if (messageLine.Length < 5)
                {
-                    ServiceMain.AppendToLog($"Invalid message: {messageLine}");
+                    UniversaLIService.AppendToLog($"Invalid message: {messageLine}");
                     return;
                }
                int position = messageLine.IndexOf(Constants.ETB);
@@ -301,11 +301,11 @@ namespace UniversaLIS
           {
                /* The message is complete. Deal with it. */
 #if DEBUG
-               ServiceMain.AppendToLog("Processing message.");
+               UniversaLIService.AppendToLog("Processing message.");
 #endif
                if (message == null)
                {
-                    ServiceMain.AppendToLog("MessageBody is null!");
+                    UniversaLIService.AppendToLog("MessageBody is null!");
                     return;
                }
                /* First, check to see whether the LIS is sending or receiving the message.
@@ -314,11 +314,11 @@ namespace UniversaLIS
                 * how to handle the rest of the message.
                 */
                string[] headerFields = message.MessageHeader.Split('|');
-               if (headerFields[4] == ServiceMain.YamlSettings?.ServiceConfig?.LisId)
+               if (headerFields[4] == UniversaLIService.YamlSettings?.ServiceConfig?.LisId)
                {
                     // Message is outgoing. Queue it up to be sent to the IMMULITE.
 #if DEBUG
-                    ServiceMain.AppendToLog("Outgoing message, adding to queue...");
+                    UniversaLIService.AppendToLog("Outgoing message, adding to queue...");
 #endif
                     OutboundMessageQueue.Enqueue(message);
                }
@@ -334,7 +334,7 @@ namespace UniversaLIS
                     {
                          foreach (var query in message.Queries)
                          {
-                              ServiceMain.AppendToLog("Processing query.");
+                              UniversaLIService.AppendToLog("Processing query.");
                               ProcessQuery(query);
                          }
                     }
@@ -343,15 +343,15 @@ namespace UniversaLIS
                          int pID;
                          int oID;
 #if DEBUG 
-                         ServiceMain.AppendToLog("Connecting to database.");
+                         UniversaLIService.AppendToLog("Connecting to database.");
 #endif
                          // This is where we have to connect to the database.
                          // TODO: Support internal database with SQLite
-                         using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
+                         using (SqlConnection conn = new SqlConnection(UniversaLIService.YamlSettings?.ServiceConfig?.ConnectionString))
                          {
                               conn.Open();
 #if DEBUG 
-                              ServiceMain.AppendToLog("Database connection open.");
+                              UniversaLIService.AppendToLog("Database connection open.");
 #endif
                               foreach (var patient in message.Patients)
                               {
@@ -394,7 +394,7 @@ namespace UniversaLIS
                                     *33 Hospital Institution  =/=
                                     *34 Dosage Category  =/=
                                     */
-                                   ServiceMain.AppendToLog("Adding patient.");
+                                   UniversaLIService.AppendToLog("Adding patient.");
                                    // Transmit a patient record to the IMM_Patients table,
                                    // grab the row ID, and use it to add order records to the IMM_Orders table.
                                    using (SqlCommand command = new SqlCommand("spIMMPatient", conn))
@@ -451,7 +451,7 @@ namespace UniversaLIS
                                         *	29	Specimen Service
                                         *	30	Specimen Institution
                                          */
-                                        ServiceMain.AppendToLog("Adding order.");
+                                        UniversaLIService.AppendToLog("Adding order.");
                                         using (SqlCommand command = new SqlCommand("spIMMOrder", conn))
                                         {
                                              command.CommandType = CommandType.StoredProcedure;
@@ -491,7 +491,7 @@ namespace UniversaLIS
                                              *	12	Date\Time Test Completed
                                              *	13	Instrument ID
                                               */
-                                             ServiceMain.AppendToLog("Adding result.");
+                                             UniversaLIService.AppendToLog("Adding result.");
                                              using (SqlCommand command = new SqlCommand("spIMMResult", conn))
                                              {
                                                   command.CommandType = CommandType.StoredProcedure;
@@ -523,7 +523,7 @@ namespace UniversaLIS
                else
                {
                     // This message is invalid!
-                    ServiceMain.AppendToLog($"Invalid message header! {message.MessageHeader}");
+                    UniversaLIService.AppendToLog($"Invalid message header! {message.MessageHeader}");
                     throw new ArgumentException($"Invalid message header: {message.MessageHeader}");
                }
           }
@@ -555,7 +555,7 @@ namespace UniversaLIS
                     isQuery = false;
                }
                // Query the database for [P]atient and [O]rder records for the sample.
-               using (SqlConnection conn = new SqlConnection(ServiceMain.YamlSettings?.ServiceConfig?.ConnectionString))
+               using (SqlConnection conn = new SqlConnection(UniversaLIService.YamlSettings?.ServiceConfig?.ConnectionString))
                {
                     conn.Open();
                     int orderCount;
@@ -571,7 +571,7 @@ namespace UniversaLIS
                          if (isQuery)
                          {
                               // Reply with a "no information available from last query" message (terminator = "I")
-                              ServiceMain.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
+                              UniversaLIService.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
                               Message messageBody = new Message(this)
                               {
                                    Terminator = 'I'

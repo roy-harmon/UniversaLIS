@@ -1,6 +1,6 @@
 ﻿namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      public class IdleState : ILISState
      {
           public IdleState(CommFacilitator comm)
@@ -34,13 +34,13 @@
           {
                // Bask in the praise of the instrument? It's acknowledging us for no reason!
                // Seriously though, maybe we should add inappropriate incoming transmissions to the log file.
-               ServiceMain.AppendToLog("ACK received in idle state...?");
+               UniversaLIService.AppendToLog("ACK received in idle state...?");
           }
 
           public void RcvData(string InputString)
           {
                // Ignore... Possibly log the input for later reference?
-               ServiceMain.AppendToLog("Data received in idle state: " + InputString);
+               UniversaLIService.AppendToLog("Data received in idle state: " + InputString);
           }
 
           public void RcvENQ()
@@ -51,13 +51,13 @@
           public void RcvEOT()
           {
                // Ignore, but log it.
-               ServiceMain.AppendToLog("EOT received in idle state.");
+               UniversaLIService.AppendToLog("EOT received in idle state.");
           }
 
           public void RcvNAK()
           {
                // Ignore. It's just trying to get a rise out of you.
-               ServiceMain.AppendToLog("NAK received in idle state.");
+               UniversaLIService.AppendToLog("NAK received in idle state.");
           }
 
           public void HaveData()
@@ -70,7 +70,7 @@
                     // Set transTimer = 15
                     comm.transTimer.Reset(15);
 #if DEBUG
-                    ServiceMain.AppendToLog("Transaction timer reset: 15.");
+                    UniversaLIService.AppendToLog("Transaction timer reset: 15.");
 #endif
                }
           }

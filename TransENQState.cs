@@ -1,8 +1,8 @@
-﻿using static UniversaLIS.ServiceMain;
+﻿using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      class TransEnqState : ILISState
      {
 

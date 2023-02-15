@@ -1,9 +1,9 @@
 ﻿using System;
-using static UniversaLIS.ServiceMain;
+using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      class RcvWaitState : ILISState
      {
           // Track the current frame number to ensure that the received frame is correct.
