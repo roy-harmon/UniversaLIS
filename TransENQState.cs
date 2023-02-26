@@ -41,9 +41,9 @@ namespace UniversaLIS
                comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
                comm.CurrentFrameCounter++;
                // Reset the NAK count to 0.
-               comm.numNAK = 0;
+               comm.NumNAK = 0;
                // Reset the transaction timer to 15 seconds.
-               comm.transTimer.Reset(15);
+               comm.TransTimer.Reset(15);
           }
 
           public void RcvData(string InputString)

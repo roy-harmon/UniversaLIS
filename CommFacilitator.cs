@@ -14,7 +14,7 @@ namespace UniversaLIS
           private bool bInterFrame = false;
           private readonly IPortAdapter ComPort;
           private readonly IPortSettings portSettings;
-
+          internal UniversaLIService service;
           public CountdownTimer ContentTimer { get; set; } = new CountdownTimer(-1);
 
           public int CurrentFrameCounter { get; set; }
@@ -23,13 +23,13 @@ namespace UniversaLIS
 
           private string? intermediateFrame;
 
-          public int numNAK { get; set; } = 0;
+          public int NumNAK { get; set; } = 0;
 
           public Queue<Message> OutboundMessageQueue { get; set; } = new Queue<Message>();
 
-          public CountdownTimer rcvTimer { get; set; }
+          public CountdownTimer RcvTimer { get; set; }
 
-          public CountdownTimer transTimer { get; set; }
+          public CountdownTimer TransTimer { get; set; }
 
           private readonly System.Timers.Timer idleTimer = new System.Timers.Timer();
 
@@ -52,8 +52,9 @@ namespace UniversaLIS
           // Use this string when setting up internal database connection functions.
           // readonly string connString = UniversaLIService.YamlSettings?.ServiceConfig?.SqlitePath!;
 
-          public CommFacilitator(Serial serialSettings)
+          public CommFacilitator(Serial serialSettings, UniversaLIService LIService)
           {
+               service = LIService;
                portSettings = serialSettings;
                if (serialSettings.UseLegacyFrameSize)
                {
@@ -68,10 +69,10 @@ namespace UniversaLIS
                {
                     // Set the serial port properties and try to open it.
                     receiver_id = serialSettings.ReceiverId;
-                    ComPort = new CommPort(serialSettings);
+                    ComPort = new CommPort(serialSettings, this);
                     CommState = new LisCommState(this);
-                    rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
-                    transTimer = new CountdownTimer(-1, TransactionTimedOut);
+                    RcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
+                    TransTimer = new CountdownTimer(-1, TransactionTimedOut);
                     CurrentMessage = new Message(this);
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += CommPortDataReceived!;
@@ -92,16 +93,17 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    HandleEx(ex);
+                    service.HandleEx(ex);
                     throw;
                }
           }
 
-          public CommFacilitator(Tcp tcpSettings)
+          public CommFacilitator(Tcp tcpSettings, UniversaLIService LIService)
           {
+               service = LIService;
                CommState = new LisCommState(this);
-               rcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
-               transTimer = new CountdownTimer(-1, TransactionTimedOut);
+               RcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
+               TransTimer = new CountdownTimer(-1, TransactionTimedOut);
                portSettings = tcpSettings;
                if (tcpSettings.UseLegacyFrameSize)
                {
@@ -132,7 +134,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    HandleEx(ex);
+                    service.HandleEx(ex);
                     throw;
                }
           }
@@ -170,7 +172,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    HandleEx(ex);
+                    service.HandleEx(ex);
                     throw;
                }
           }
@@ -211,12 +213,12 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    UniversaLIService.HandleEx(ex);
+                    service.HandleEx(ex);
                     throw;
                }
           }
 
-          private void IdleTime(object o, System.Timers.ElapsedEventArgs elapsedEvent)
+          private void IdleTime(object? o, System.Timers.ElapsedEventArgs elapsedEvent)
           {
                idleTimer.Stop();
                CommState.IdleCheck();
@@ -665,7 +667,7 @@ namespace UniversaLIS
                CommState.TransTimeout();
           }
 
-          public void WorklistTimedEvent(object source, System.Timers.ElapsedEventArgs e)
+          public void WorklistTimedEvent(object? source, System.Timers.ElapsedEventArgs e)
           {
                /* If the outStringQueue is empty, SendPatientOrders for all pending orders
                 * and their respective patient records to send them all to the IMMULITE.

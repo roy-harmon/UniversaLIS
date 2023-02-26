@@ -2,6 +2,9 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.Configuration;
 using Microsoft.Extensions.Logging.EventLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 using IHost host = Host.CreateDefaultBuilder(args)
     .UseWindowsService(options =>
@@ -10,11 +13,12 @@ using IHost host = Host.CreateDefaultBuilder(args)
     })
     .ConfigureServices(services =>
     {
-         LoggerProviderOptions.RegisterProviderOptions<
-             EventLogSettings, EventLogLoggerProvider>(services);
+         if (OperatingSystem.IsWindows())
+         {
+              LoggerProviderOptions.RegisterProviderOptions<EventLogSettings, EventLogLoggerProvider>(services);
+         }
 
-         services.Add<UniversaLIService>();
-         services.AddHostedService<WindowsBackgroundService>();
+         services.AddHostedService<UniversaLIService>();
     })
     .ConfigureLogging((context, logging) =>
     {
@@ -22,34 +26,7 @@ using IHost host = Host.CreateDefaultBuilder(args)
          logging.AddConfiguration(
              context.Configuration.GetSection("Logging"));
     })
+    .UseWindowsService()
     .Build();
 
 await host.RunAsync();
-
-/*
-namespace UniversaLIS
-{
-     static class Program
-     {
-          /// <summary>
-          /// The main entry point for the application.
-          /// </summary>
-          static void Main(string[] args)
-          {
-               if (System.Environment.UserInteractive)
-               {    // Execute the program as a console app for debugging purposes.
-                    UniversaLIService service1 = new UniversaLIService();
-                    service1.DebuggingRoutine(args);
-               }
-               else
-               {
-                    // Run the service normally.  
-                    ServiceBase[] ServicesToRun = new ServiceBase[]
-                    {
-                     new UniversaLIService()
-                    };
-                    ServiceBase.Run(ServicesToRun);
-               }
-          }
-     }*/
-}

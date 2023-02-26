@@ -50,9 +50,9 @@ namespace UniversaLIS
                     comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
                     comm.CurrentFrameCounter++;
                     // Reset the NAK count to 0.
-                    comm.numNAK = 0;
+                    comm.NumNAK = 0;
                     // Reset the transaction timer to 15 seconds.
-                    comm.transTimer.Reset(15);
+                    comm.TransTimer.Reset(15);
                }
           }
 
@@ -90,8 +90,8 @@ namespace UniversaLIS
                // Send old frame.
                comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter - 1]);
                // Increment NAK count.
-               comm.numNAK++;
-               if (comm.numNAK == 6)
+               comm.NumNAK++;
+               if (comm.NumNAK == 6)
                {
                     // Too many NAKs. Something's wrong. Send an EOT and go back to Idle.
                     // Maybe stick the message back in the queue to try again later?

@@ -94,7 +94,7 @@ namespace UniversaLIS
           public void RcvNAK()
           {
                CommState.RcvNAK();
-               if (CommState is TransWaitState && comm.numNAK == 6)
+               if (CommState is TransWaitState && comm.NumNAK == 6)
                {
                     ChangeToIdleState();
                }
@@ -121,7 +121,7 @@ namespace UniversaLIS
           {
                CommState = new IdleState(comm);
                comm.CurrentFrameCounter = 0;
-               comm.transTimer.Reset(-1);
+               comm.TransTimer.Reset(-1);
 #if DEBUG
                AppendToLog("CommState changed to IdleState!");
 #endif

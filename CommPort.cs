@@ -9,7 +9,8 @@ namespace UniversaLIS
      public class CommPort : IPortAdapter
      {
           private readonly SerialPort serialPort = new SerialPort();
-          public CommPort(Serial serial)
+          private readonly CommFacilitator facilitator;
+          public CommPort(Serial serial, CommFacilitator facilitator)
           {
                serialPort.PortName = serial.Portname!;
                serialPort.BaudRate = serial.Baud;
@@ -19,6 +20,7 @@ namespace UniversaLIS
                serialPort.Handshake = serial.Handshake;
                serialPort.DataReceived += OnSerialDataReceived;
                serialPort.ReadTimeout = 50;
+               this.facilitator = facilitator;
           }
           public void Send(string messageText)
           {
@@ -101,7 +103,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    UniversaLIService.HandleEx(ex);
+                    facilitator.service.HandleEx(ex);
                     throw;
                }
                return buffer.ToString();

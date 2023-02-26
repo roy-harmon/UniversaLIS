@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
@@ -13,9 +11,9 @@ using YamlDotNet.Serialization;
 // TODO: Add UI?
 namespace UniversaLIS
 {
-    public partial class UniversaLIService : BackgroundService
+     public partial class UniversaLIService : BackgroundService
     {
-        public readonly ILogger<UniversaLIService> EventLog1;
+        public readonly ILogger<UniversaLIService> EventLogger;
         private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
 
         public static bool ListenHL7 { get; set; }
@@ -25,24 +23,31 @@ namespace UniversaLIS
         public static int DbPollInterval { get; set; }
         public static YamlSettings? YamlSettings { get; set; }
 
-        public UniversaLIService();
+        public UniversaLIService(ILogger<UniversaLIService> logger)
+          {
+               EventLogger = logger;
+          }
 
-        public static void HandleEx(Exception ex)
+        public void HandleEx(Exception ex)
         {
             if (ex is null)
             {
                 return;
             }
             string? message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
-            EventLog1.WriteEntry(message);
+            EventLogger.LogError(message);
         }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            throw new NotImplementedException();
+               OnStart();
+               while (!stoppingToken.IsCancellationRequested) {
+                    await Task.Delay(1000, stoppingToken);
+               }
+               OnStop();
         }
 
-        protected override void OnStart(string[] args)
+        protected void OnStart()
         {
             try
             {
@@ -68,11 +73,11 @@ namespace UniversaLIS
                     }
                     foreach (var serialPort in YamlSettings?.Interfaces?.Serial ?? Enumerable.Empty<Serial>())
                     {
-                        s_commFacilitators.Add(new CommFacilitator(serialPort));
+                        s_commFacilitators.Add(new CommFacilitator(serialPort, this));
                     }
                     foreach (var tcpPort in YamlSettings?.Interfaces?.Tcp ?? Enumerable.Empty<Tcp>())
                     {
-                        s_commFacilitators.Add(new CommFacilitator(tcpPort));
+                        s_commFacilitators.Add(new CommFacilitator(tcpPort, this));
                     }
                 }
             }
@@ -82,7 +87,7 @@ namespace UniversaLIS
                 throw;
             }
         }
-        protected override void OnStop()
+        protected void OnStop()
         {
 
             try
@@ -138,9 +143,9 @@ namespace UniversaLIS
         }
 
         // <summary>Method invoked when service is started from a debugging console.</summary>
-        internal void DebuggingRoutine(string[] args)
+        internal void DebuggingRoutine()
         {
-            OnStart(args);
+            OnStart();
             while (Console.ReadLine() is null)
             {
                 // Not sure why it doesn't work without looping anymore. 
