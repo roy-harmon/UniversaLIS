@@ -96,7 +96,7 @@ namespace UniversaLIS
                     // Too many NAKs. Something's wrong. Send an EOT and go back to Idle.
                     // Maybe stick the message back in the queue to try again later?
                     comm.Send(Constants.EOT);
-                    comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
+                    comm.OutboundInstrumentMessageQueue.Enqueue(comm.CurrentMessage);
                     comm.CurrentMessage = new Message(comm);
                }
           }

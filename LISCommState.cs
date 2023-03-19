@@ -83,7 +83,7 @@ namespace UniversaLIS
                {
                     // Return to Idle.
                     ChangeToIdleState();
-                    if (comm.OutboundMessageQueue.Count > 0)
+                    if (comm.OutboundInstrumentMessageQueue.Count > 0)
                     {
                          // Don't make the operator wait for the timer tick.
                          IdleCheck();
@@ -156,7 +156,7 @@ namespace UniversaLIS
                     comm.Send(Constants.EOT);
                     if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
                     {
-                         comm.OutboundMessageQueue.Enqueue(comm.CurrentMessage);
+                         comm.OutboundInstrumentMessageQueue.Enqueue(comm.CurrentMessage);
                          comm.CurrentMessage = new Message(comm);
                     }
                     comm.CurrentMessage = new Message(comm);
@@ -183,7 +183,7 @@ namespace UniversaLIS
           }
           public void IdleCheck()
           {
-               if (CommState is IdleState && comm.OutboundMessageQueue.Count > 0)
+               if (CommState is IdleState && comm.OutboundInstrumentMessageQueue.Count > 0)
                {
                     HaveData();
                }

@@ -36,7 +36,7 @@ namespace UniversaLIS
           public void RcvACK()
           {
                // Send next frame.
-               comm.CurrentMessage = comm.OutboundMessageQueue.Dequeue();
+               comm.CurrentMessage = comm.OutboundInstrumentMessageQueue.Dequeue();
                comm.CurrentMessage.PrepareToSend();
                comm.Send(comm.CurrentMessage.FrameList[comm.CurrentFrameCounter]);
                comm.CurrentFrameCounter++;

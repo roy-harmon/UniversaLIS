@@ -27,7 +27,7 @@ Interfaces:
         # A value of 0 disables automatically sending orders, and they will only be sent in response to a query message from the instrument.
         AutoSendOrders:   0
 
-      ## Uncomment the following lines to add additional instruments with serial port connections.
+      ## Uncomment (and copy if necessary) the following lines to add additional instruments with serial port connections.
       #- ReceiverId:    INSTRUMENT_NAME
       #  password:
       #  portname:   COM#
@@ -63,19 +63,16 @@ Interfaces:
 ServiceConfig:
     # If records are to be stored in/retrieved from an external database, set to true; if using only internal SQLite database, set to false.
     # CURRENTLY UNSUPPORTED
-    UseExternalDb:    true
-    # The connection string used to connect to the database.
-    ConnectionString:  Data Source=127.0.0.1\SQLExpress;Initial Catalog=LISDB;Integrated Security=True
-    # The file path to the SQLite database file.
-    # CURRENTLY UNSUPPORTED
-    SqlitePath: 
+    UseExternalDb:  false
+    # The connection string used to connect to the external database.
+    ConnectionString:  Data Source=external.db # Data Source=127.0.0.1\SQLExpress;Initial Catalog=LISDB;Integrated Security=True
     # When using both internal (SQLite) and external (MySQL, SQL Server, etc.) databases, 
     # DbPollInterval defines the interval in milliseconds for checking the two for differences and updating them accordingly.
     # CURRENTLY UNSUPPORTED
-    DbPollInterval:
+    DbPollInterval: 5000
     # ListenHl7 determines whether to listen for HL7-type messages from other programs.
     # CURRENTLY UNSUPPORTED
-    ListenHl7:     true
+    ListenHl7:  false
     # Hl7TcpPort is the port number on which to listen for HL7 messages if ListenHl7 is true.
     # CURRENTLY UNSUPPORTED
     Hl7TcpPort:   9876
@@ -85,128 +82,5 @@ ServiceConfig:
     # OPTIONAL: The street address of the sender, which may contain street address, city, state, ZIP/postal code, and country code,
     # separated by delimiters ( ^ ). This is unlikely to ever be used by an instrument but is included here for standards compliance.
     Address:
-    # OPTIONAL: A telephone number for voice communication with the sender. Again, unlikely to be useful in practice.
+    # OPTIONAL: A telephone number for voice communication with the sender. As with Address, this seems unlikely to be useful in practice.
     Phone:
-
-# The following settings are used to map the various message fields to their respective fields in database tables.
-# CURRENTLY UNSUPPORTED
-TableFieldMappings:
-    PatientRecord:
-        PAPID: 
-        LAPID: 
-        PID3: 
-        PName: 
-        MMName: 
-        DOB: 
-        PSex: 
-        PRace: 
-        PAddr: 
-        Reserved: 
-        PTelNo: 
-        Attending: 
-        Special1: 
-        Special2: 
-        PHeight: 
-        PWeight: 
-        PDiag: 
-        PMeds: 
-        PDiet: 
-        PF1: 
-        PF2: 
-        AdmDates: 
-        AdmStatus: 
-        PLocation: 
-        AltCodeNature: 
-        AltCode: 
-        PReligion: 
-        PMarStatus: 
-        PIsoStatus: 
-        PLanguage: 
-        HospService: 
-        HospInst: 
-        DoseCat: 
-    
-    OrderRecord:
-        PRID: 
-        SpecID: 
-        InSpecID: 
-        UTID: 
-        OrderDate: 
-        CollectDate: 
-        CollEndTime: 
-        CollVolume: 
-        Collector: 
-        ActCode: 
-        DangerCode: 
-        RelClinInfo: 
-        SpecRecd: 
-        SpecDesc: 
-        OrdPhys: 
-        PhysTelNo: 
-        UF1: 
-        UF2: 
-        LF1: 
-        LF2: 
-        LastReported: 
-        BillRef: 
-        InSectID: 
-        RepType: 
-        Reserved: 
-        SpecColLocation: 
-        NosInfFlag: 
-        SpecService: 
-        SpecInst: 
-    
-    ResultRecord:
-        ORID: 
-        UTID: 
-        Result: 
-        Unit: 
-        RefRange: 
-        Abnormal: 
-        AbNature: 
-        ResStatus: 
-        NormsChanged: 
-        OpID: 
-        TestStart: 
-        TestEnd: 
-        InstID: 
-    
-    CommentRecord:
-        Source: 
-        Text: 
-        Type: 
-    
-    QueryRecord:
-        StartRange: 
-        EndRange: 
-        UTID: 
-        ReqLimNature: 
-        ReqResBeginDT: 
-        ReqResEndDT: 
-        ReqPhysName: 
-        ReqPhysTelNo: 
-        UF1: 
-        UF2: 
-        ReqInfoStatus: 
-    
-    ScientificRecord:
-        AnalMeth: 
-        Instrument: 
-        Reagents: 
-        Units: 
-        QC: 
-        SpecDesc: 
-        Reserved: 
-        Container: 
-        SpecID: 
-        Analyte: 
-        Result: 
-        ResUnits: 
-        CollectDT: 
-        ResultDT: 
-        AnalPreSteps: 
-        PatDiag: 
-        PatDOB: 
-        PSex: 
-        PRace: 

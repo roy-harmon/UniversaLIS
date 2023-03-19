@@ -6,6 +6,7 @@ namespace UniversaLIS
      public class Patient
      {
           public Dictionary<string, string> Elements = new Dictionary<string, string>();
+          public int PatientID;
 
           public List<Order> Orders = new List<Order>();
 
@@ -20,7 +21,8 @@ namespace UniversaLIS
                     SetPatientString(value);
                }
           }
-
+          // It would probably be a good idea to make each of the various array elements into a property of the Patient class.
+          // Maybe consider that for a future update.
           private string GetPatientString()
           {
                // Anything missing should be added as an empty string.
