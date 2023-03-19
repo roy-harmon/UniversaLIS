@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Text;
+using System.Xml.Linq;
 using static UniversaLIS.UniversaLIService;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 // TODO: Consider field mappings when constructing SQL commands.
@@ -364,16 +365,25 @@ namespace UniversaLIS
                     UniversaLIService.AppendToLog("Connecting to database.");
 #endif
                     // This is where we have to connect to the database.
-                    // TODO: Support internal database with SQLite
                     using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
                     {
                          conn.Open();
 #if DEBUG
                          UniversaLIService.AppendToLog("Database connection open.");
 #endif
-                         const string NEW_PATIENT = "INSERT INTO PatientRecord (PracticePatientID, PatientName, DOB, Sex, AttendingPhysicianID) VALUES (@Patient_ID, @Patient_Name, @Patient_DOB, @Patient_Sex, @Physician_Name);";
-                         const string NEW_ORDER = "INSERT INTO OrderRecord (PatientRecordID, SpecimenID, UniversalTestID, Priority, OrderDate, CollectionDate) VALUES (@Patient_ID, @Sample_Number, @Test_Code, @Priority, @Order_DateTime, @Collection_DateTime);";
-                         const string NEW_RESULT = "INSERT INTO ResultRecord (OrderRecordID, UniversalTestID, Result, Unit, RefRange, Abnormal, AbNature, ResStatus, OperatorID) VALUES (@Order_ID, @Test_Code, @ResultValue, @ResultUnits, @RefRanges, @AbnormalFlags, @AbnormalityTesting, @ResultStatus, @Operator);";
+                         const string NEW_PATIENT = "INSERT INTO PatientRecord (PracticePatientID, LabPatientID, PatientID3, PatientName, MMName, DOB, Sex, Race, Address, Reserved, TelNo," +
+                              " AttendingPhysicianID, Special1, Special2, Height, Weight, Diagnosis, ActiveMeds, Diet, PF1, PF2, AdmDates, AdmStatus, Location, AltCodeNature, AltCode, Religion," +
+                              " MaritalStatus, IsolationStatus, Language, HospService, HospInstitution, DosageCategory) VALUES (@PracticePatientID, @LabPatientID, @PatientID3, @PatientName," +
+                              " @MMName, @DOB, @Sex, @Race, @Address, @Reserved, @TelNo, @AttendingPhysicianID, @Special1, @Special2, @Height, @Weight, @Diagnosis, @ActiveMeds, @Diet, @PF1, @PF2," +
+                              " @AdmDates, @AdmStatus, @Location, @AltCodeNature, @AltCode, @Religion, @MaritalStatus, @IsolationStatus, @Language, @HospService, @HospInstitution, @DosageCategory);";
+                         const string NEW_ORDER = "INSERT INTO OrderRecord (PatientRecordID, SpecimenID, InstrSpecID, UniversalTestID, Priority, OrderDate, CollectionDate, CollectionEndTime," +
+                              " CollectionVolume, CollectorID, ActionCode, DangerCode, RelevantClinicInfo, SpecimenRecvd, SpecimenDescriptor, OrderingPhysician, PhysicianTelNo, UF1, UF2, LF1, LF2," +
+                              " LastReported, BillRef, InstrSectionID, ReportType, Reserved, SpecCollectLocation, NosInfFlag, SpecService, SpecInstitution) VALUES (@Patient_ID, @SpecimenID," +
+                              " @InstrSpecID, @UniversalTestID, @Priority, @OrderDate, @CollectionDate, @CollectionEndTime, @CollectionVolume, @CollectorID, @ActionCode, @DangerCode, @RelevantClinicInfo," +
+                              " @SpecimenRecvd, @SpecimenDescriptor, @OrderingPhysician, @PhysicianTelNo, @UF1, @UF2, @LF1, @LF2, @LastReported, @BillRef, @InstrSectionID, @ReportType, @Reserved," +
+                              " @SpecCollectLocation, @NosInfFlag, @SpecService, @SpecInstitution);";
+                         const string NEW_RESULT = "INSERT INTO ResultRecord (OrderRecordID, UniversalTestID, Result, Unit, RefRange, Abnormal, AbNature, ResStatus, NormsChanged, OperatorID, TestStart," +
+                              " TestEnd, InstrumentID) VALUES (@Order_ID, @UniversalTestID, @Result, @Unit, @RefRange, @Abnormal, @AbNature, @ResStatus, @NormsChanged, @OperatorID, @TestStart, @TestEnd, @InstrumentID);";
 
                          foreach (var patient in message.Patients)
                          {
@@ -382,40 +392,40 @@ namespace UniversaLIS
                                *  These fields may or may not actually be functional (see the instrument's specification for details)
                                *  so initial development efforts will focus primarily on known supported fields.
                                * 0 Record Type
-                               * 1 Sequence # Definition
-                               * 2 Practice Assigned Patient ID
-                               * 3 Laboratory Assigned Patient ID  =/=
-                               * 4 Patient ID  =/=
-                               * 5 Patient Name
-                               * 6 Mother's Maiden Name  =/=
-                               * 7 Birthdate
+                               * 1 Sequence# Definition
+                               * 2 Practice Assigned PatientID3
+                               * 3 LabPatientID  =/=
+                               * 4 PatientID3  =/=
+                               * 5 PatientName
+                               * 6 MMName  =/=
+                               * 7 DOB *
                                * 8 Patient's Sex
-                               * 9 Patient Race-Ethnic Origin  =/=
+                               * 9 Race-Ethnic Origin  =/=
                                *10 Patient's Address  =/=
-                               *11 Reserved Field  =/=
+                               *11 Reserved  =/=
                                *12 Patient's Phone#  =/=
-                               *13 Attending Physician ID  =/=
-                               *14 Special Field 1  =/=
-                               *15 Special Field 2  =/=
-                               *16 Patient Height  =/=
-                               *17 Patient Weight  =/=
-                               *18 Patients Known or Suspected Diagnosis  =/=
-                               *19 Patient active medications  =/=
-                               *20 Patients Diet  =/=
-                               *21 Practice Field #1  =/=
-                               *22 Practice Field #2  =/=
-                               *23 Admission and Discharge Dates  =/=
-                               *24 Admission Status  =/=
+                               *13 AttendingPhysicianID  =/=
+                               *14 Special1  =/=
+                               *15 Special2  =/=
+                               *16 Height  =/=
+                               *17 Weight  =/=
+                               *18 Diagnosis  =/=
+                               *19 ActiveMeds  =/=
+                               *20 Diet  =/=
+                               *21 PF1  =/=
+                               *22 PF2  =/=
+                               *23 AdmDates  =/= *
+                               *24 AdmStatus  =/=
                                *25 Location  =/=
-                               *26 Nature of Alternative Diagnostic Code and Classification  =/=
-                               *27 Alternative Diagnostic Code and Classification  =/=
-                               *28 Patient Religion  =/=
-                               *29 Marital Status  =/=
-                               *30 Isolation Status  =/=
+                               *26 AltCodeNature  =/=
+                               *27 AltCode  =/=
+                               *28 Religion  =/=
+                               *29 MaritalStatus  =/=
+                               *30 IsolationStatus  =/=
                                *31 Language  =/=
-                               *32 Hospital Service  =/=
-                               *33 Hospital Institution  =/=
-                               *34 Dosage Category  =/=
+                               *32 HospService  =/=
+                               *33 HospInstitution  =/=
+                               *34 DosageCategory  =/=
                                */
                               UniversaLIService.AppendToLog("Adding patient.");
                               // Transmit a patient record to the PatientRecord table,
@@ -423,11 +433,22 @@ namespace UniversaLIS
                               using (DbCommand command = conn.CreateCommand())
                               {
                                    command.CommandText = NEW_PATIENT;
-                                   AddWithValue(command, "@Patient_ID", patient.Elements["Patient ID"]);
-                                   AddWithValue(command, "@Patient_Name", patient.Elements["Patient Name"]);
-                                   AddWithValue(command, "@Patient_DOB", patient.Elements["BirthDate"]);
-                                   AddWithValue(command, "@Patient_Sex", patient.Elements["Patient Sex"]);
-                                   AddWithValue(command, "@Physician_Name", patient.Elements["Attending Physician ID"]);
+                                   foreach(var element in patient.Elements)
+                                   {
+                                        switch (element.Key)
+                                        {
+                                             case "DOB":
+                                             case "AdmDates":
+                                                  AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                  break;
+                                             case "FrameNumber":
+                                             case "Sequence#":
+                                                  break;
+                                             default:
+                                                  AddWithValue(command, $"@{element.Key}", element.Value);
+                                                  break;
+                                        }
+                                   }
                                    command.ExecuteNonQuery();
                               }
                               using (DbCommand command = conn.CreateCommand())
@@ -443,46 +464,60 @@ namespace UniversaLIS
                                    *  These fields may or may not actually be functional.
                                    *	0	Record Type (O)
                                    *	1	Sequence#
-                                   *	2	Specimen ID (Accession#)
-                                   *	3	Instrument Specimen ID
-                                   *	4	Universal Test ID
+                                   *	2	SpecimenID
+                                   *	3	InstrSpecID
+                                   *	4	UniversalTestID
                                    *	5	Priority
-                                   *	6	Order Date/Time
-                                   *	7	Collection Date/Time
-                                   *	8	Collection End Time
-                                   *	9	Collection Volume
-                                   *	10	Collector ID
-                                   *	11	Action Code
-                                   *	12	Danger Code
-                                   *	13	Relevant Clinical Info
-                                   *	14	Date/Time Specimen Received
-                                   *	15	Specimen Descriptor,Specimen Type,Specimen Source
-                                   *	16	Ordering Physician
-                                   *	17	Physician's Telephone Number
-                                   *	18	User Field No.1
-                                   *	19	User Field No.2
-                                   *	20	Lab Field No.1
-                                   *	21	Lab Field No.2
-                                   *	22	Date/Time results reported or last modified
-                                   *	23	Instrument Charge to Computer System
-                                   *	24	Instrument Section ID
-                                   *	25	Report Types
-                                   *	26	Reserved Field
-                                   *	27	Location or ward of Specimen Collection
-                                   *	28	Nosocomial Infection Flag
-                                   *	29	Specimen Service
-                                   *	30	Specimen Institution
+                                   *	6	OrderDate*
+                                   *	7	CollectionDate*
+                                   *	8	CollectionEndTime*
+                                   *	9	CollectionVolume
+                                   *	10	CollectorID
+                                   *	11	ActionCode
+                                   *	12	DangerCode
+                                   *	13	RelevantClinicInfo
+                                   *	14	SpecimenRecvd*
+                                   *	15	SpecimenDescriptor,Specimen Type,Specimen Source
+                                   *	16	OrderingPhysician
+                                   *	17	PhysicianTelNo
+                                   *	18	UF1
+                                   *	19	UF2
+                                   *	20	LF1
+                                   *	21	LF2
+                                   *	22	LastReported*
+                                   *	23	BillRef
+                                   *	24	InstrSectionID
+                                   *	25	ReportType
+                                   *	26	Reserved
+                                   *	27	SpecCollectLocation
+                                   *	28	NosInfFlag
+                                   *	29	SpecService
+                                   *	30	SpecInstitution
                                     */
                                    UniversaLIService.AppendToLog("Adding order.");
                                    using (DbCommand command = conn.CreateCommand())
                                    {
                                         command.CommandText = NEW_ORDER;
                                         AddWithValue(command, "@Patient_ID", pID);
-                                        AddWithValue(command, "@Sample_Number", order.Elements["Specimen ID (Accession#)"]);
-                                        AddWithValue(command, "@Test_Code", order.Elements["Universal Test ID"]);
-                                        AddWithValue(command, "@Priority", order.Elements["Priority"]);
-                                        AddWithValue(command, "@Order_DateTime", order.Elements["Order Date/Time"]);
-                                        AddWithValue(command, "@Collection_DateTime", order.Elements["Collection Date/Time"]);
+                                        foreach (var element in order.Elements)
+                                        {
+                                             switch (element.Key)
+                                             {
+                                                  case "OrderDate":
+                                                  case "CollectionDate":
+                                                  case "CollectionEndTime":
+                                                  case "SpecimenRecvd":
+                                                  case "LastReported":
+                                                       AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                       break;
+                                                  case "FrameNumber":
+                                                  case "Sequence#":
+                                                       break;
+                                                  default:
+                                                       AddWithValue(command, $"@{element.Key}", element.Value);
+                                                       break;
+                                             }
+                                        }
                                         command.ExecuteNonQuery();
                                    }
                                    using (DbCommand command = conn.CreateCommand())
@@ -498,41 +533,45 @@ namespace UniversaLIS
                                         *  Note: Fields marked with "=/=" are listed in the Siemens interface specification as not officially supported.
                                         *  These fields may or may not actually be functional.
                                         *	0	Record Type (R)
-                                        *	1	Sequence #
-                                        *	2	Universal Test ID
-                                        *	3	Data (result)
-                                        *	4	Units
+                                        *	1	Sequence#
+                                        *	2	UniversalTestID
+                                        *	3	Result
+                                        *	4	Unit
                                         *	5	ReferenceRanges
-                                        *	6	Result abnormal flags
-                                        *	7	Nature of Abnormality Testing
-                                        *	8	Result Status
-                                        *	9	Date of change in instruments normal values or units
-                                        *	10	Operator ID
+                                        *	6	Abnormal
+                                        *	7	AbNature
+                                        *	8	ResStatus
+                                        *	9	NormsChanged
+                                        *	10	OperatorID
                                         *	11	Date\Time Test Started
                                         *	12	Date\Time Test Completed
-                                        *	13	Instrument ID
+                                        *	13	InstrumentID
                                          */
                                         UniversaLIService.AppendToLog("Adding result.");
                                         using (DbCommand command = conn.CreateCommand())
                                         {
                                              command.CommandText = NEW_RESULT;
                                              AddWithValue(command, "@Order_ID", oID);
-                                             AddWithValue(command, "@Test_Code", result.Elements["Universal Test ID"]);
-                                             AddWithValue(command, "@ResultValue", result.Elements["Data (result)"]);
-                                             AddWithValue(command, "@ResultUnits", result.Elements["Units"]);
-                                             AddWithValue(command, "@RefRanges", result.Elements["Reference Ranges"]);
-                                             AddWithValue(command, "@AbnormalFlags", result.Elements["Result abnormal flags"]);
-                                             AddWithValue(command, "@AbnormalityTesting", result.Elements["Nature of Abnormality Testing"]);
-                                             AddWithValue(command, "@ResultStatus", result.Elements["Result Status"]);
-                                             AddWithValue(command, "@Operator", result.Elements["Operator ID"]);
-                                             string dtStart = result.Elements["Date/Time Test Started"];
-                                             DateTime start = new DateTime(Convert.ToInt32(dtStart.Substring(0, 4)), Convert.ToInt32(dtStart.Substring(4, 2)), Convert.ToInt32(dtStart.Substring(6, 2)), Convert.ToInt32(dtStart.Substring(8, 2)), Convert.ToInt32(dtStart.Substring(10, 2)), Convert.ToInt32(dtStart.Substring(12, 2)));
-                                             AddWithValue(command, "@TestStarted", start);
-                                             string dtEnd = result.Elements["Date/Time Test Completed"];
-                                             DateTime end = new DateTime(Convert.ToInt32(dtEnd.Substring(0, 4)), Convert.ToInt32(dtEnd.Substring(4, 2)), Convert.ToInt32(dtEnd.Substring(6, 2)), Convert.ToInt32(dtEnd.Substring(8, 2)), Convert.ToInt32(dtEnd.Substring(10, 2)), Convert.ToInt32(dtEnd.Substring(12, 2)));
-                                             AddWithValue(command, "@TestCompleted", end);
-                                             char[] trimmings = { '\x03', '\x0D' };
-                                             AddWithValue(command, "@Instrument_ID", result.Elements["Instrument ID"].Trim(trimmings));
+                                             foreach (var element in order.Elements)
+                                             {
+                                                  switch (element.Key)
+                                                  {
+                                                       case "TestStart":
+                                                       case "TestEnd":
+                                                            AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                            break;
+                                                       case "InstrumentID":
+                                                            char[] trimmings = { '\x03', '\x0D' };
+                                                            AddWithValue(command, $"@{element.Key}", element.Value.Trim(trimmings));
+                                                            break;
+                                                       case "FrameNumber":
+                                                       case "Sequence#":
+                                                            break;
+                                                       default:
+                                                            AddWithValue(command, $"@{element.Key}", element.Value);
+                                                            break;
+                                                  }
+                                             }
                                              command.ExecuteNonQuery();
                                         }
                                    }
@@ -540,6 +579,20 @@ namespace UniversaLIS
                          }
                     }
                }
+          }
+
+          private static DateTime ParseLISDate(string dateString)
+          {
+               return new DateTime(Convert.ToInt32(dateString.Substring(0, 4)), Convert.ToInt32(dateString.Substring(4, 2)), Convert.ToInt32(dateString.Substring(6, 2)), Convert.ToInt32(dateString.Substring(8, 2)), Convert.ToInt32(dateString.Substring(10, 2)), Convert.ToInt32(dateString.Substring(12, 2)));
+          }
+
+          private static string GetDateString(DateTime dateTime)
+          {
+               if (dateTime.Date.Equals(dateTime))
+               {
+                    return String.Format("{0:yyyyMMdd}", dateTime);
+               }
+               return String.Format("{0:yyyyMMddHHmmss}", dateTime);
           }
 
           private static void AddWithValue(DbCommand command, string parameterName, object value)
@@ -610,9 +663,10 @@ namespace UniversaLIS
                          return orderCount;
                     }
                     Message responseMessage = new Message(this);
-                    string selectPatientsQuery = "SELECT PracticePatientID, PatientName, DOB, Sex FROM PatientRequest JOIN OrderRequest" +
-                         " WHERE (SpecimenID LIKE @Sample_Number) AND (UniversalTestID LIKE @Test_ID) AND PendingSending = 1 GROUP BY PracticePatientID, PatientName, DOB, Sex;";
-                    string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientRequestID LIKE @Patient_ID AND UniversalTestID LIKE @Test_ID AND SpecimenID LIKE @Sample_Number AND PendingSending = 1;";
+                    string selectPatientsQuery = "SELECT DISTINCT PatientRequest.* FROM PatientRequest JOIN OrderRequest" +
+                         " WHERE (SpecimenID LIKE @Sample_Number) AND (UniversalTestID LIKE @Test_ID) AND PendingSending = 1;";
+                    string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientRequestID LIKE @Patient_ID" +
+                         " AND UniversalTestID LIKE @Test_ID AND SpecimenID LIKE @Sample_Number AND PendingSending = 1;";
 
 
                     using (DbCommand command = conn.CreateCommand())
@@ -628,8 +682,26 @@ namespace UniversaLIS
                          else
                          {
                               while (patientReader.Read())
-                              {    //TODO: Implement all fields here, rather than just the basics.
-                                   Patient patient = new Patient($"|{responseMessage.Patients.Count + 1}|{patientReader["PracticePatientID"]}|||{patientReader["PatientName"]}||{patientReader["DOB"]}|{patientReader["Sex"]}||||||||||||||||||||||||||");
+                              {
+                                   Patient patient = new Patient();
+                                   patient.Elements["Sequence#"] = $"{responseMessage.Patients.Count + 1}"; 
+                                   for (int i = 0; i < patientReader.FieldCount; i++)
+                                   {
+                                        string fieldName = patientReader.GetName(i);
+                                        switch (fieldName)
+                                        {
+                                             case "DOB":
+                                             case "AdmDates":
+                                                  patient.Elements[fieldName] = GetDateString((DateTime)patientReader[fieldName]);
+                                                  break;
+                                             case "PatientRequestID":
+                                                  patient.PatientID = patientReader.GetInt32(i);
+                                                  break;
+                                             default:
+                                                  patient.Elements[fieldName] = $"{patientReader[fieldName]}";
+                                                  break;
+                                        }
+                                   }
                                    responseMessage.Patients.Add(patient);
                               }
                          }
@@ -647,7 +719,29 @@ namespace UniversaLIS
                               DbDataReader orderReader = orderCommand.ExecuteReader();
                               while (orderReader.Read())
                               {
-                                   patient.Orders.Add(new Order($"|{patient.Orders.Count + 1}|{orderReader["Sample_Number"]}||{orderReader["Test_ID"]}|{orderReader["Priority"]}|{orderReader["Order_DateTime"]}|{orderReader["Collection_DateTime"]}|||||||||||{orderReader["PatientRequestID"]}||||||||||||", (int)orderReader["OrderRequestID"]));
+                                   Order order = new Order();
+                                   order.Elements["Sequence#"] = $"{patient.Orders.Count + 1}";
+                                   for (int i = 0; i < orderReader.FieldCount; i++)
+                                   {
+                                        string fieldName = orderReader.GetName(i);
+                                        switch (fieldName)
+                                        {
+                                             case "SpecimenRecvd":
+                                             case "LastReported":
+                                                  order.Elements[fieldName] = GetDateString((DateTime)orderReader[fieldName]);
+                                                  break;
+                                             case "OrderRequestID":
+                                                  order.OrderID = Convert.ToInt32(orderReader[fieldName]);
+                                                  break;
+                                             case "PatientRequestID":
+                                             case "PendingSending":
+                                                  break;
+                                             default:
+                                                  order.Elements[fieldName] = $"{orderReader[fieldName]}";
+                                                  break;
+                                        }
+                                   }
+                                   patient.Orders.Add(order);
                               }
                               orderReader.Close();
                          }

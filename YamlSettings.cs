@@ -81,10 +81,7 @@ namespace UniversaLIS
 
      public class ServiceConfig
      {
-          public bool UseExternalDb { get; set; }
           public string? ConnectionString { get; set; }
-          public string? SqlitePath { get; set; }
-          public int DbPollInterval { get; set; }
           public bool ListenHl7 { get; set; }
           public int Hl7TcpPort { get; set; }
           public string? LisId { get; set; }

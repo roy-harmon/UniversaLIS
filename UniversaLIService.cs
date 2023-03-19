@@ -7,8 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
-// TODO: Add internal database while keeping external database option.
-// TODO: Add UI?
+
 namespace UniversaLIS
 {
      public partial class UniversaLIService : BackgroundService
@@ -19,7 +18,6 @@ namespace UniversaLIS
           public static bool ListenHL7 { get; set; }
           public static int HL7Port { get; set; }
           public static string? ExternalDbConnString { get; set; }
-          public static bool UseExtDB { get; set; }
           public static int DbPollInterval { get; set; }
 
           private static YamlSettings yamlSettings = GetSettings();
@@ -70,15 +68,6 @@ namespace UniversaLIS
                     if (GetYamlSettings().ServiceConfig?.ListenHl7 == true)
                     {
                          // TODO: Actually set up the HL7 listener.
-                    }
-                    if (GetYamlSettings().ServiceConfig?.UseExternalDb == true)
-                    {
-                         UseExtDB = true;
-                         ExternalDbConnString = GetYamlSettings().ServiceConfig?.ConnectionString;
-                    }
-                    else
-                    {
-                         UseExtDB = false;
                     }
                     foreach (var serialPort in GetYamlSettings()?.Interfaces?.Serial ?? Enumerable.Empty<Serial>())
                     {

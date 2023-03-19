@@ -61,15 +61,6 @@ Interfaces:
 # The following settings are used more generally by the program and are not instrument-specific. 
 # Some of these settings are currently unused but planned for a future release.
 ServiceConfig:
-    # If records are to be stored in/retrieved from an external database, set to true; if using only internal SQLite database, set to false.
-    # CURRENTLY UNSUPPORTED
-    UseExternalDb:  false
-    # The connection string used to connect to the external database.
-    ConnectionString:  Data Source=external.db # Data Source=127.0.0.1\SQLExpress;Initial Catalog=LISDB;Integrated Security=True
-    # When using both internal (SQLite) and external (MySQL, SQL Server, etc.) databases, 
-    # DbPollInterval defines the interval in milliseconds for checking the two for differences and updating them accordingly.
-    # CURRENTLY UNSUPPORTED
-    DbPollInterval: 5000
     # ListenHl7 determines whether to listen for HL7-type messages from other programs.
     # CURRENTLY UNSUPPORTED
     ListenHl7:  false
