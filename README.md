@@ -4,21 +4,28 @@ An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written i
 
 ## Installation
 
-The project will eventually be updated to include an executable setup file. It was originally registered as a Windows service using InstallUtil, but migration from .NET Framework 4.8 to .NET 5.0 removed service installers. Restoring this functionality is top priority, but until I figure out the new cross-platform way to do this, the program can be executed using the Visual Studio debugger.
+The project can be registered as a Windows service, but migration from .NET Framework to .NET Core removed service installers. This functionality should be restored, but until I test it more, I don't know the specifics of installation (presumably InstallUtil). The program can also be executed using the Visual Studio debugger.
 
-Please note: The software also requires a database server in order to function properly. See the next section for details.
+Please note: The software not longer requires a database server in order to function properly. 
 
 ## Database
 
-This Windows service is designed to connect to a database of your choice. Currently, only Microsoft SQL Server is supported, but MySQL and ODBC connection driver support is planned. Due to the deprecation of the native Oracle client in recent versions of the .NET framework, Oracle databases are not currently supportable without a third-party ODBC driver.
-Whichever data source you use, just be sure to specify a valid connection string in the UniversaLIS.exe.config file as discussed below.
+This Windows service has been restructured to use an internal SQLite database, so it is no longer dependent on an external database server. Instead, it accepts test requests and reports results via a REST API (working title: "REST-LIS").
 
-While some parts of the database are fairly flexible, the UniversaLIS service expects certain tables and fields to be present. To that end, several SQL "CREATE TABLE" scripts will be provided in an upcoming release.
-
-## Configuration ##
+## Configuration
 
 The "config.yml" file contains several configuration items that should be changed according to your specific requirements. The details of each setting are described in the comments of that file.
 Note: For settings marked with an asterisk (\*), ensure that the setting matches the analyzer's LIS Parameters configuration screen.
+
+## API
+The UniversaLIS software forms a bridge between clinical analyzers (via serial port or TCP socket) and a web API; that web API can be accessed by third-party programs to automatically transmit test requests to the instrument and pull results into the reporting software.
+
+This program was originally designed to connect clinical laboratory analyzers to databases, but it has been overhauled to replace the database server with a REST API. 
+Applications can interact with the LIS via REST API calls; for ease of integration with third-party programs, the OpenAPI specification can be used to easily generate code in your choice of programming language. 
+
+The OpenAPI specification will be provided along with more details as the various endpoints are fully implemented. This feature is currently in active development.
+
+Please note that the original functionality (monitoring external database tables for test requests and populating tables with test results) has been removed but may be recreated as a separate utility in the future.
 
 ---
 
@@ -26,10 +33,10 @@ Note: For settings marked with an asterisk (\*), ensure that the setting matches
 
 The program runs as a Windows service under a Local System account. After installation, the service should automatically start on boot. Or rather, "Automatic (Delayed Start)" since some RS-232 port drivers take a moment to initialize.
 
-This program will eventually support all modes of operation available on the IMMULITE. The active communication mode is determined by the "LIS Host Query Mode" setting in the analyzer's LIS Parameters configuration screen.
-* For "Unidirectional" mode: 
+This program supports the following modes of operation available on the IMMULITE (and presumably other analyzers). The active communication mode is determined by the "LIS Host Query Mode" setting in the IMMULITE's LIS Parameters configuration screen. Check the manufacturer's documentation for more information on your instrument's configuration.
+* For "Unidirectional" mode (sometimes called "Receive-Only"): 
   * Results are transmitted from the analyzer to the LIS and inserted into a database for storage and retrieval.
-* For "Bidirectional" mode: 
+* For "Bidirectional" mode (or "Send and Receive"): 
   * Pending test requests are pulled from a database (specified in the config file) and sent to the analyzer.
   * These test orders are stored in the analyzer's Worklist pending assignment to a sample cup.
   * When the operator enters data into the "Accession #" field on the analyzer's Worklist Entry screen, the relevant patient and test order information is populated automatically if the entered value matches a sample number in the list sent by the LIS.
@@ -42,7 +49,7 @@ Please note that "Control" and "Verify" samples may be supported in the future, 
 
 ## User Interface
 
-A graphical user interface is not included at this time because most use cases will involve another application for management of patient information and test requests. Those applications (the good ones, anyway) are typically capable of interfacing with a SQL Server or MySQL database directly. Currently, the UniversaLIS software only forms a bridge between the instrument and a database server; this database server can be accessed by third-party programs to automatically transmit test requests to the instrument and pull results into the reporting software.
+A graphical user interface is not included at this time because most use cases will involve another application for management of patient information and test requests. 
 
 A simple GUI might be added in the future, but mostly for demonstration purposes. The real benefit of this software is in its ability to integrate with other systems, so while a GUI could be used, it would be less efficient in a production environment.
 
@@ -52,8 +59,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Acknowledgements
 
-This software was written using information from the IMMULITE® Systems Interface Specification manual, downloaded from the [Siemens Healthineers Document Library](https://doclib.siemens-healthineers.com/document/592738). 
-Support for MySQL uses the Oracle MySQL team's MySQL Connector/.NET 8.0, used under the GPLv2 license as outlined [here](https://downloads.mysql.com/docs/licenses/connector-net-8.0-gpl-en.pdf).
+This software was written from scratch using information from the IMMULITE® Systems Interface Specification manual, downloaded from the [Siemens Healthineers Document Library](https://doclib.siemens-healthineers.com/document/592738). 
 IMMULITE is a trademark of Siemens Healthcare Diagnostics.
 
 ## License
@@ -63,7 +69,7 @@ UniversaLIS is published under the [MIT](https://choosealicense.com/licenses/mit
 MIT License
 ---
 
-Copyright (c) 2021 Roy Harmon
+Copyright (c) 2020-2023 Roy Harmon
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
