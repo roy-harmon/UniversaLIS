@@ -61,12 +61,6 @@ Interfaces:
 # The following settings are used more generally by the program and are not instrument-specific. 
 # Some of these settings are currently unused but planned for a future release.
 ServiceConfig:
-    # ListenHl7 determines whether to listen for HL7-type messages from other programs.
-    # CURRENTLY UNSUPPORTED
-    ListenHl7:  false
-    # Hl7TcpPort is the port number on which to listen for HL7 messages if ListenHl7 is true.
-    # CURRENTLY UNSUPPORTED
-    Hl7TcpPort:   9876
     # Designation of the LIS for message header purposes. 
     # This includes the "Receiver ID" field for incoming messages as well as the "Sender Name or ID" field for sent messages.
     LisId: UniversaLIS

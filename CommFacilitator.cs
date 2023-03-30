@@ -1,16 +1,19 @@
 ﻿using Microsoft.Data.Sqlite;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Text;
-using System.Xml.Linq;
+using UniversaLIS.Models;
+using UniversaLIS.States;
 using static UniversaLIS.UniversaLIService;
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
 // TODO: Consider field mappings when constructing SQL commands.
 namespace UniversaLIS
 {
 
-     public class CommFacilitator
+    public class CommFacilitator
      {
           private const string LAST_INSERTED = "select last_insert_rowid();";
           private bool bInterFrame = false;
@@ -53,7 +56,7 @@ namespace UniversaLIS
           }
 
           // Use this string when setting up internal database connection functions.
-          const string INTERNAL_CONNECTION_STRING = "Data Source=internal.db";
+          public const string INTERNAL_CONNECTION_STRING = "Data Source=internal.db";
 
           public CommFacilitator(Serial serialSettings, UniversaLIService LIService)
           {
@@ -68,15 +71,15 @@ namespace UniversaLIS
                     frameSize = 63993;
                }
                password = serialSettings.Password;
+               // Set the serial port properties and try to open it.
+               receiver_id = serialSettings.ReceiverId;
+               ComPort = new CommPort(serialSettings, this);
+               CommState = new LisCommState(this);
+               RcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
+               TransTimer = new CountdownTimer(-1, TransactionTimedOut);
+               CurrentMessage = new Message(this);
                try
                {
-                    // Set the serial port properties and try to open it.
-                    receiver_id = serialSettings.ReceiverId;
-                    ComPort = new CommPort(serialSettings, this);
-                    CommState = new LisCommState(this);
-                    RcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
-                    TransTimer = new CountdownTimer(-1, TransactionTimedOut);
-                    CurrentMessage = new Message(this);
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += CommPortDataReceived!;
                     ComPort.Open();
@@ -93,6 +96,11 @@ namespace UniversaLIS
                          idleTimer.Interval = 10000;
                     }
                     idleTimer.Start();
+               }
+               catch (FileNotFoundException ex)
+               {
+                    AppendToLog($"Error opening port: {serialSettings.Portname} Not Found!");
+                    service.HandleEx(ex);
                }
                catch (Exception ex)
                {
@@ -299,6 +307,7 @@ namespace UniversaLIS
                          CurrentMessage.Queries.Add(new Query(messageLine));
                          break;
 
+                    // TODO: Implement Comment and Scientific records.
                     default:
                          break;
                }
@@ -433,19 +442,19 @@ namespace UniversaLIS
                               using (DbCommand command = conn.CreateCommand())
                               {
                                    command.CommandText = NEW_PATIENT;
-                                   foreach(var element in patient.Elements)
+                                   foreach(DictionaryEntry element in patient.Elements)
                                    {
                                         switch (element.Key)
                                         {
                                              case "DOB":
                                              case "AdmDates":
-                                                  AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                  AddWithValue(command, $"@{element.Key}", ParseLISDate($"{element.Value}"));
                                                   break;
                                              case "FrameNumber":
                                              case "Sequence#":
                                                   break;
                                              default:
-                                                  AddWithValue(command, $"@{element.Key}", element.Value);
+                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}");
                                                   break;
                                         }
                                    }
@@ -499,22 +508,23 @@ namespace UniversaLIS
                                    {
                                         command.CommandText = NEW_ORDER;
                                         AddWithValue(command, "@Patient_ID", pID);
-                                        foreach (var element in order.Elements)
+                                        IDictionaryEnumerator enumerator = order.Elements.GetEnumerator();
+                                        while (enumerator.MoveNext())
                                         {
-                                             switch (element.Key)
+                                             switch (enumerator.Key)
                                              {
                                                   case "OrderDate":
                                                   case "CollectionDate":
                                                   case "CollectionEndTime":
                                                   case "SpecimenRecvd":
                                                   case "LastReported":
-                                                       AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                       AddWithValue(command, $"@{enumerator.Key}", ParseLISDate($"{enumerator.Value}"));
                                                        break;
                                                   case "FrameNumber":
                                                   case "Sequence#":
                                                        break;
                                                   default:
-                                                       AddWithValue(command, $"@{element.Key}", element.Value);
+                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}");
                                                        break;
                                              }
                                         }
@@ -552,23 +562,24 @@ namespace UniversaLIS
                                         {
                                              command.CommandText = NEW_RESULT;
                                              AddWithValue(command, "@Order_ID", oID);
-                                             foreach (var element in order.Elements)
+                                             IDictionaryEnumerator enumerator = order.Elements.GetEnumerator();
+                                             while (enumerator.MoveNext())
                                              {
-                                                  switch (element.Key)
+                                                  switch (enumerator.Key)
                                                   {
                                                        case "TestStart":
                                                        case "TestEnd":
-                                                            AddWithValue(command, $"@{element.Key}", ParseLISDate(element.Value));
+                                                            AddWithValue(command, $"@{enumerator.Key}", ParseLISDate($"{enumerator.Value}"));
                                                             break;
                                                        case "InstrumentID":
                                                             char[] trimmings = { '\x03', '\x0D' };
-                                                            AddWithValue(command, $"@{element.Key}", element.Value.Trim(trimmings));
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}".Trim(trimmings));
                                                             break;
                                                        case "FrameNumber":
                                                        case "Sequence#":
                                                             break;
                                                        default:
-                                                            AddWithValue(command, $"@{element.Key}", element.Value);
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}");
                                                             break;
                                                   }
                                              }

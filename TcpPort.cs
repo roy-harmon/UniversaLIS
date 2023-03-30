@@ -68,7 +68,7 @@ namespace UniversaLIS
                }
 
           }
-          private void CheckDataReceived(Object source, System.Timers.ElapsedEventArgs e)
+          private void CheckDataReceived(Object? source, System.Timers.ElapsedEventArgs e)
           {
                portTimer.Stop();
                CheckDataReceived();

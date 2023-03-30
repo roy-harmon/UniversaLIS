@@ -46,7 +46,7 @@ namespace UniversaLIS
                Timeout?.Invoke(this, EventArgs.Empty);
           }
 
-          private void Count_down(object sender, EventArgs e)
+          private void Count_down(object? sender, EventArgs e)
           {
                /* If the countdown hits 0, trigger the Timeout event.
                *  If the timer hasn't expired, decrement remaining duration.

@@ -65,10 +65,6 @@ namespace UniversaLIS
           {
                try
                {
-                    if (GetYamlSettings().ServiceConfig?.ListenHl7 == true)
-                    {
-                         // TODO: Actually set up the HL7 listener.
-                    }
                     foreach (var serialPort in GetYamlSettings()?.Interfaces?.Serial ?? Enumerable.Empty<Serial>())
                     {
                          s_commFacilitators.Add(new CommFacilitator(serialPort, this));

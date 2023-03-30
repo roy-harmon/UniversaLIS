@@ -5,7 +5,7 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversaLIS", "UniversaLIS.csproj", "{2804EF32-781C-434A-9443-A2DCFF9CB60C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniLisApi", "..\UniLisApi\UniLisApi.csproj", "{CA523A51-8D23-4629-9D45-421E14FDF550}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "REST-LIS", "..\REST-LIS\REST-LIS.csproj", "{2738C624-2103-4CEF-B76C-29BF5A48A1DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{2804EF32-781C-434A-9443-A2DCFF9CB60C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2804EF32-781C-434A-9443-A2DCFF9CB60C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2804EF32-781C-434A-9443-A2DCFF9CB60C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA523A51-8D23-4629-9D45-421E14FDF550}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA523A51-8D23-4629-9D45-421E14FDF550}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA523A51-8D23-4629-9D45-421E14FDF550}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA523A51-8D23-4629-9D45-421E14FDF550}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -82,8 +82,6 @@ namespace UniversaLIS
      public class ServiceConfig
      {
           public string? ConnectionString { get; set; }
-          public bool ListenHl7 { get; set; }
-          public int Hl7TcpPort { get; set; }
           public string? LisId { get; set; }
           public string? Address { get; set; }
           public string? Phone { get; set; }
