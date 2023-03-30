@@ -1,9 +1,9 @@
 ﻿using System;
-using static UniversaLIS.ServiceMain;
+using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      class RcvWaitState : ILISState
      {
           // Track the current frame number to ensure that the received frame is correct.
@@ -71,7 +71,7 @@ namespace UniversaLIS
                     // Send ACK 
                     comm.Send(Constants.ACK);
                     // Reset rcvTimer to 30 seconds.
-                    comm.rcvTimer.Reset(30);
+                    comm.RcvTimer.Reset(30);
                     // Increment frame number.
                     ExpectedFrame = ++ExpectedFrame % 8;
                     // Actually handle the frame.
@@ -82,7 +82,7 @@ namespace UniversaLIS
                     // Send NAK
                     comm.Send(Constants.NAK);
                     // Reset rcvTimer to 30 seconds.
-                    comm.rcvTimer.Reset(30);
+                    comm.RcvTimer.Reset(30);
                }
 
           }

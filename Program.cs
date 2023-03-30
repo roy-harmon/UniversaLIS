@@ -1,30 +1,32 @@
-﻿using System.ServiceProcess;
+﻿using UniversaLIS;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging.Configuration;
+using Microsoft.Extensions.Logging.EventLog;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
-namespace UniversaLIS
-{
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-     static class Program
-     {
-          /// <summary>
-          /// The main entry point for the application.
-          /// </summary>
-          static void Main(string[] args)
-          {
-               if (System.Environment.UserInteractive)
-               {    // Execute the program as a console app for debugging purposes.
-                    ServiceMain service1 = new ServiceMain();
-                    service1.DebuggingRoutine(args);
-               }
-               else
-               {
-                    // Run the service normally.  
-                    ServiceBase[] ServicesToRun;
-                    ServicesToRun = new ServiceBase[]
-                    {
-                     new ServiceMain()
-                    };
-                    ServiceBase.Run(ServicesToRun);
-               }
-          }
-     }
-}
+using IHost host = Host.CreateDefaultBuilder(args)
+    .UseWindowsService(options =>
+    {
+         options.ServiceName = "UniversaLIS";
+    })
+    .ConfigureServices(services =>
+    {
+         if (OperatingSystem.IsWindows())
+         {
+              LoggerProviderOptions.RegisterProviderOptions<EventLogSettings, EventLogLoggerProvider>(services);
+         }
+
+         services.AddHostedService<UniversaLIService>();
+    })
+    .ConfigureLogging((context, logging) =>
+    {
+         // See: https://github.com/dotnet/runtime/issues/47303
+         logging.AddConfiguration(
+             context.Configuration.GetSection("Logging"));
+    })
+    .UseWindowsService()
+    .Build();
+
+await host.RunAsync();

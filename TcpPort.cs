@@ -6,7 +6,7 @@ using System.Text;
 
 namespace UniversaLIS
 {
-     [System.Runtime.Versioning.SupportedOSPlatform("windows")]
+     
      partial class TcpPort : IPortAdapter
      {
           private const int BUFFER_SIZE = 64000;
