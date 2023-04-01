@@ -1,4 +1,5 @@
-﻿using static UniversaLIS.UniversaLIService;
+﻿using UniversaLIS.Models;
+using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS.States
 {

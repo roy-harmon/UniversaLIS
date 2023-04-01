@@ -18,19 +18,22 @@ namespace UniversaLIS.Models
 
           [Key]
           public int ResultID { get => resultID; set => resultID = value; }
+          [JsonIgnore]
+          [ForeignKey(nameof(OrderID))]
+          [InverseProperty("Results")]
           public int OrderID { get => orderID; set => orderID = value; }
-          public string? UniversalTestID { get => $"{Elements["UniversalTestID"]}"; set => Elements["UniversalTestID"] = value ?? ""; }
-          public string? ResultValue { get => $"{Elements["ResultValue"]}"; set => Elements["ResultValue"] = value ?? ""; }
-          public string? Unit { get => $"{Elements["Unit"]}"; set => Elements["Unit"] = value ?? ""; }
-          public string? RefRange { get => $"{Elements["RefRange"]}"; set => Elements["RefRange"] = value ?? ""; }
-          public string? Abnormal { get => $"{Elements["Abnormal"]}"; set => Elements["Abnormal"] = value ?? ""; }
-          public string? AbNature { get => $"{Elements["AbNature"]}"; set => Elements["AbNature"] = value ?? ""; }
-          public string? ResStatus { get => $"{Elements["ResStatus"]}"; set => Elements["ResStatus"] = value ?? ""; }
-          public string? NormsChanged { get => $"{Elements["NormsChanged"]}"; set => Elements["NormsChanged"] = value ?? ""; }
-          public string? OperatorID { get => $"{Elements["OperatorID"]}"; set => Elements["OperatorID"] = value ?? ""; }
-          public string? TestStart { get => $"{Elements["TestStart"]}"; set => Elements["TestStart"] = value ?? ""; }
-          public string? TestEnd { get => $"{Elements["TestEnd"]}"; set => Elements["TestEnd"] = value ?? ""; }
-          public string? InstrumentID { get => $"{Elements["InstrumentID"]}"; set => Elements["InstrumentID"] = value ?? ""; }
+          public string? UniversalTestID { get => (string?)Elements["UniversalTestID"]; set => Elements["UniversalTestID"] = value; }
+          public string? ResultValue { get => (string?)Elements["ResultValue"]; set => Elements["ResultValue"] = value; }
+          public string? Unit { get => (string?)Elements["Unit"]; set => Elements["Unit"] = value; }
+          public string? RefRange { get => (string?)Elements["RefRange"]; set => Elements["RefRange"] = value; }
+          public string? Abnormal { get => (string?)Elements["Abnormal"]; set => Elements["Abnormal"] = value; }
+          public string? AbNature { get => (string?)Elements["AbNature"]; set => Elements["AbNature"] = value; }
+          public string? ResStatus { get => (string?)Elements["ResStatus"]; set => Elements["ResStatus"] = value; }
+          public string? NormsChanged { get => (string?)Elements["NormsChanged"]; set => Elements["NormsChanged"] = value; }
+          public string? OperatorID { get => (string?)Elements["OperatorID"]; set => Elements["OperatorID"] = value; }
+          public string? TestStart { get => (string?)Elements["TestStart"]; set => Elements["TestStart"] = value; }
+          public string? TestEnd { get => (string?)Elements["TestEnd"]; set => Elements["TestEnd"] = value; }
+          public string? InstrumentID { get => (string?)Elements["InstrumentID"]; set => Elements["InstrumentID"] = value; }
 
           public string GetResultMessage()
           {

@@ -1,16 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using YamlDotNet.Core.Events;
 
-[assembly: InternalsVisibleTo("UniLisApi")]
+[assembly: InternalsVisibleTo("REST-LIS")]
 
 namespace UniversaLIS.Models
 {
@@ -38,39 +34,39 @@ namespace UniversaLIS.Models
           [JsonIgnore]
           public OrderedDictionary Elements { get => elements; set => elements = value; }
 
-          public string? PracticePatientID { get => $"{Elements["PracticePatientID"]}"; set => Elements["PracticePatientID"] = value ?? ""; }
-          public string? LabPatientID { get => $"{Elements["LabPatientID"]}"; set => Elements["LabPatientID"] = value ?? ""; }
-          public string? PatientID3 { get => $"{Elements["PatientID3"]}"; set => Elements["PatientID3"] = value ?? ""; }
-          public string? PatientName { get => $"{Elements["PatientName"]}"; set => Elements["PatientName"] = value ?? ""; }
-          public string? MMName { get => $"{Elements["MMName"]}"; set => Elements["MMName"] = value ?? ""; }
-          public string? DOB { get => $"{Elements["DOB"]}"; set => Elements["DOB"] = value ?? ""; }
-          public string? Sex { get => $"{Elements["Sex"]}"; set => Elements["Sex"] = value ?? ""; }
-          public string? Race { get => $"{Elements["Race"]}"; set => Elements["Race"] = value ?? ""; }
-          public string? Address { get => $"{Elements["Address"]}"; set => Elements["Address"] = value ?? ""; }
-          public string? Reserved { get => $"{Elements["Reserved"]}"; set => Elements["Reserved"] = value ?? ""; }
-          public string? TelNo { get => $"{Elements["TelNo"]}"; set => Elements["TelNo"] = value ?? ""; }
-          public string? AttendingPhysicianID { get => $"{Elements["AttendingPhysicianID"]}"; set => Elements["AttendingPhysicianID"] = value ?? ""; }
-          public string? Special1 { get => $"{Elements["Special1"]}"; set => Elements["Special1"] = value ?? ""; }
-          public string? Special2 { get => $"{Elements["Special2"]}"; set => Elements["Special2"] = value ?? ""; }
-          public string? Height { get => $"{Elements["Height"]}"; set => Elements["Height"] = value ?? ""; }
-          public string? Weight { get => $"{Elements["Weight"]}"; set => Elements["Weight"] = value ?? ""; }
-          public string? Diagnosis { get => $"{Elements["Diagnosis"]}"; set => Elements["Diagnosis"] = value ?? ""; }
-          public string? ActiveMeds { get => $"{Elements["ActiveMeds"]}"; set => Elements["ActiveMeds"] = value ?? ""; }
-          public string? Diet { get => $"{Elements["Diet"]}"; set => Elements["Diet"] = value ?? ""; }
-          public string? PF1 { get => $"{Elements["PF1"]}"; set => Elements["PF1"] = value ?? ""; }
-          public string? PF2 { get => $"{Elements["PF2"]}"; set => Elements["PF2"] = value ?? ""; }
-          public string? AdmDates { get => $"{Elements["AdmDates"]}"; set => Elements["AdmDates"] = value ?? ""; }
-          public string? AdmStatus { get => $"{Elements["AdmStatus"]}"; set => Elements["AdmStatus"] = value ?? ""; }
-          public string? Location { get => $"{Elements["Location"]}"; set => Elements["Location"] = value ?? ""; }
-          public string? AltCodeNature { get => $"{Elements["AltCodeNature"]}"; set => Elements["AltCodeNature"] = value ?? ""; }
-          public string? AltCode { get => $"{Elements["AltCode"]}"; set => Elements["AltCode"] = value ?? ""; }
-          public string? Religion { get => $"{Elements["Religion"]}"; set => Elements["Religion"] = value ?? ""; }
-          public string? MaritalStatus { get => $"{Elements["MaritalStatus"]}"; set => Elements["MaritalStatus"] = value ?? ""; }
-          public string? IsolationStatus { get => $"{Elements["IsolationStatus"]}"; set => Elements["IsolationStatus"] = value ?? ""; }
-          public string? Language { get => $"{Elements["Language"]}"; set => Elements["Language"] = value ?? ""; }
-          public string? HospService { get => $"{Elements["HospService"]}"; set => Elements["HospService"] = value ?? ""; }
-          public string? HospInstitution { get => $"{Elements["HospInstitution"]}"; set => Elements["HospInstitution"] = value ?? ""; }
-          public string? DosageCategory { get => $"{Elements["DosageCategory"]}"; set => Elements["DosageCategory"] = value ?? ""; }
+          public string? PracticePatientID { get => (string?)Elements["PracticePatientID"]; set => Elements["PracticePatientID"] = value; }
+          public string? LabPatientID { get => (string?)Elements["LabPatientID"]; set => Elements["LabPatientID"] = value; }
+          public string? PatientID3 { get => (string?)Elements["PatientID3"]; set => Elements["PatientID3"] = value; }
+          public string? PatientName { get => (string?)Elements["PatientName"]; set => Elements["PatientName"] = value; }
+          public string? MMName { get => (string?)Elements["MMName"]; set => Elements["MMName"] = value; }
+          public string? DOB { get => (string?)Elements["DOB"]; set => Elements["DOB"] = value; }
+          public string? Sex { get => (string?)Elements["Sex"]; set => Elements["Sex"] = value; }
+          public string? Race { get => (string?)Elements["Race"]; set => Elements["Race"] = value; }
+          public string? Address { get => (string?)Elements["Address"]; set => Elements["Address"] = value; }
+          public string? Reserved { get => (string?)Elements["Reserved"]; set => Elements["Reserved"] = value; }
+          public string? TelNo { get => (string?)Elements["TelNo"]; set => Elements["TelNo"] = value; }
+          public string? AttendingPhysicianID { get => (string?)Elements["AttendingPhysicianID"]; set => Elements["AttendingPhysicianID"] = value; }
+          public string? Special1 { get => (string?)Elements["Special1"]; set => Elements["Special1"] = value; }
+          public string? Special2 { get => (string?)Elements["Special2"]; set => Elements["Special2"] = value; }
+          public string? Height { get => (string?)Elements["Height"]; set => Elements["Height"] = value; }
+          public string? Weight { get => (string?)Elements["Weight"]; set => Elements["Weight"] = value; }
+          public string? Diagnosis { get => (string?)Elements["Diagnosis"]; set => Elements["Diagnosis"] = value; }
+          public string? ActiveMeds { get => (string?)Elements["ActiveMeds"]; set => Elements["ActiveMeds"] = value; }
+          public string? Diet { get => (string?)Elements["Diet"]; set => Elements["Diet"] = value; }
+          public string? PF1 { get => (string?)Elements["PF1"]; set => Elements["PF1"] = value; }
+          public string? PF2 { get => (string?)Elements["PF2"]; set => Elements["PF2"] = value; }
+          public string? AdmDates { get => (string?)Elements["AdmDates"]; set => Elements["AdmDates"] = value; }
+          public string? AdmStatus { get => (string?)Elements["AdmStatus"]; set => Elements["AdmStatus"] = value; }
+          public string? Location { get => (string?)Elements["Location"]; set => Elements["Location"] = value; }
+          public string? AltCodeNature { get => (string?)Elements["AltCodeNature"]; set => Elements["AltCodeNature"] = value; }
+          public string? AltCode { get => (string?)Elements["AltCode"]; set => Elements["AltCode"] = value; }
+          public string? Religion { get => (string?)Elements["Religion"]; set => Elements["Religion"] = value; }
+          public string? MaritalStatus { get => (string?)Elements["MaritalStatus"]; set => Elements["MaritalStatus"] = value; }
+          public string? IsolationStatus { get => (string?)Elements["IsolationStatus"]; set => Elements["IsolationStatus"] = value; }
+          public string? Language { get => (string?)Elements["Language"]; set => Elements["Language"] = value; }
+          public string? HospService { get => (string?)Elements["HospService"]; set => Elements["HospService"] = value; }
+          public string? HospInstitution { get => (string?)Elements["HospInstitution"]; set => Elements["HospInstitution"] = value; }
+          public string? DosageCategory { get => (string?)Elements["DosageCategory"]; set => Elements["DosageCategory"] = value; }
           public List<Order> Orders { get => orders; set => orders = value; }
           private string GetPatientString()
           {
@@ -177,35 +173,7 @@ namespace UniversaLIS.Models
           {
                SetPatientString("|1|||||||||||||||||||||||||||||||||");
           }
-          
-          public override string ToString()
-          {
-               return GetJsonString();
-          }
-          
-          public string GetJsonString()
-          {
-               string[] details = { "PracticePatientID", "LabPatientID", "PatientID3", "PatientName", "MMName", "DOB", "Sex", "Race", "Address", "Reserved",
-                    "TelNo", "AttendingPhysicianID", "Special1", "Special2", "Height", "Weight", "Diagnosis", "ActiveMeds", "Diet", "PF1", "PF2", "AdmDates",
-                    "AdmStatus", "Location", "AltCodeNature", "AltCode", "Religion", "MaritalStatus", "IsolationStatus", "Language", "HospService", "HospInstitution", "DosageCategory" };
-               OrderedDictionary fieldList = new OrderedDictionary();
-               IDictionaryEnumerator enumerator = elements.GetEnumerator();
-               while (enumerator.MoveNext())
-               {
-                    switch (enumerator.Key)
-                    {
-                         case "FrameNumber":
-                         case "Sequence#":
-                              break;
-                         default:
-                              fieldList[enumerator.Key] = enumerator.Value;
-                              break;
-                    }
-               }
-               fieldList.Add("Comments", comments);
-               fieldList.Add("Orders", orders);
-               return JsonSerializer.Serialize(fieldList);
-          }
+
      }
 
 }

@@ -45,7 +45,8 @@ namespace UniversaLIS
           {
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
-               string txtFile = $"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog-{serialPort.PortName}_{date.Year}-{date.Month}-{date.Day}.txt";
+               string txtFile = string.Format($"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog-{serialPort.PortName}_{0}-{1}-{2}.txt",
+                    date.Year, $"{date.Month}".PadLeft(2, '0'), date.Day);
                if (!Directory.Exists($"{publicFolder}\\UniversaLIS\\Serial_Logs\\"))
                {
                     Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Serial_Logs\\");
