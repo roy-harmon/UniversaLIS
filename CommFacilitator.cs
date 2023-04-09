@@ -262,11 +262,11 @@ namespace UniversaLIS
                     {
                          intermediateFrame += messageLine.Substring(0, position);
                     }
-                    return; // Don't process yet.
+                    return; // Don't process yet; this is an intermediate frame with more to come.
                }
                else
                {
-                    if (bInterFrame) // If it's an intermediate frame, trim off the frame number and concatenate with previous frame.
+                    if (bInterFrame) // For a continuation of an intermediate frame, trim the frame number and concatenate with previous frame.
                     {
                          intermediateFrame += messageLine.Substring(2, position);
                          messageLine = intermediateFrame;
@@ -285,7 +285,7 @@ namespace UniversaLIS
                          break;
 
                     case "O": // Order record.
-                         CurrentMessage.Patients[^1].Orders.Add(new Order(messageLine));
+                         CurrentMessage.Patients[^1].Orders.Add(new Order(messageLine, (Patient)CurrentMessage.Patients[^1]));
                          break;
 
                     case "R": // Result record.
@@ -324,13 +324,8 @@ namespace UniversaLIS
                     UniversaLIService.AppendToLog("MessageBody is null!");
                     return;
                }
-               /* First, check to see whether the LIS is sending or receiving the message.
-                * Do this by comparing the [Receiver ID] and [Sender ID] header fields.
-                * The one that matches the value defined in the Settings file will tell us
-                * how to handle the rest of the message.
-                */
-               string[] headerFields = message.MessageHeader.Split('|');
-               if (headerFields[4] == serviceConfig.LisId)
+               // First, check to see whether the LIS is sending or receiving the message.
+               if (message.Direction == Message.MessageDirection.Outbound)
                {
                     // Message is outgoing. Queue it up to be sent to the instrument.
 #if DEBUG
@@ -338,15 +333,15 @@ namespace UniversaLIS
 #endif
                     OutboundInstrumentMessageQueue.Enqueue(message);
                }
-               else if (headerFields[4] == receiver_id)
+               else if (message.Direction == Message.MessageDirection.Inbound)
                {
                     ReceiveIncomingMessage(message);
                }
                else
                {
                     // This message is invalid!
-                    UniversaLIService.AppendToLog($"Invalid message header! {message.MessageHeader}");
-                    throw new ArgumentException($"Invalid message header: {message.MessageHeader}");
+                    UniversaLIService.AppendToLog($"Invalid message direction! {message.MessageHeader}");
+                    throw new ArgumentException($"Invalid message direction. {message.MessageHeader}");
                }
           }
 
@@ -448,13 +443,13 @@ namespace UniversaLIS
                                         {
                                              case "DOB":
                                              case "AdmDates":
-                                                  AddWithValue(command, $"@{element.Key}", ParseLISDate($"{element.Value}"));
+                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? null : ParseLISDate($"{element.Value}"));
                                                   break;
                                              case "FrameNumber":
                                              case "Sequence#":
                                                   break;
                                              default:
-                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}");
+                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? null : $"{element.Value}");
                                                   break;
                                         }
                                    }
@@ -518,13 +513,13 @@ namespace UniversaLIS
                                                   case "CollectionEndTime":
                                                   case "SpecimenRecvd":
                                                   case "LastReported":
-                                                       AddWithValue(command, $"@{enumerator.Key}", ParseLISDate($"{enumerator.Value}"));
+                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : ParseLISDate($"{enumerator.Value}"));
                                                        break;
                                                   case "FrameNumber":
                                                   case "Sequence#":
                                                        break;
                                                   default:
-                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}");
+                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}");
                                                        break;
                                              }
                                         }
@@ -569,17 +564,17 @@ namespace UniversaLIS
                                                   {
                                                        case "TestStart":
                                                        case "TestEnd":
-                                                            AddWithValue(command, $"@{enumerator.Key}", ParseLISDate($"{enumerator.Value}"));
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : ParseLISDate($"{enumerator.Value}"));
                                                             break;
                                                        case "InstrumentID":
                                                             char[] trimmings = { '\x03', '\x0D' };
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}".Trim(trimmings));
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}".Trim(trimmings));
                                                             break;
                                                        case "FrameNumber":
                                                        case "Sequence#":
                                                             break;
                                                        default:
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}");
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}");
                                                             break;
                                                   }
                                              }
@@ -606,7 +601,7 @@ namespace UniversaLIS
                return String.Format("{0:yyyyMMddHHmmss}", dateTime);
           }
 
-          private static void AddWithValue(DbCommand command, string parameterName, object value)
+          private static void AddWithValue(DbCommand command, string parameterName, object? value)
           {
                DbParameter parameter = command.CreateParameter();
                parameter.ParameterName = parameterName;
@@ -694,7 +689,7 @@ namespace UniversaLIS
                          {
                               while (patientReader.Read())
                               {
-                                   Patient patient = new Patient();
+                                   PatientRequest patient = new PatientRequest();
                                    patient.Elements["Sequence#"] = $"{responseMessage.Patients.Count + 1}"; 
                                    for (int i = 0; i < patientReader.FieldCount; i++)
                                    {
@@ -730,7 +725,7 @@ namespace UniversaLIS
                               DbDataReader orderReader = orderCommand.ExecuteReader();
                               while (orderReader.Read())
                               {
-                                   Order order = new Order();
+                                   OrderRequest order = new OrderRequest((PatientRequest)patient);
                                    order.Elements["Sequence#"] = $"{patient.Orders.Count + 1}";
                                    for (int i = 0; i < orderReader.FieldCount; i++)
                                    {

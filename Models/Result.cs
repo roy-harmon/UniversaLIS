@@ -9,6 +9,7 @@ using System.Text.Json.Serialization;
 
 namespace UniversaLIS.Models
 {
+     [Table("ResultRecord")]
      public class Result
      {
           private OrderedDictionary elements = new OrderedDictionary();
