@@ -14,7 +14,7 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <SupportUrl>https://github.com/roy-harmon/IMMULIS</SupportUrl>
+    <SupportUrl>https://github.com/roy-harmon/UniversaLIS</SupportUrl>
     <TargetCulture>en</TargetCulture>
     <ProductName>UniversaLIS</ProductName>
     <PublisherName>Roy Harmon</PublisherName>
@@ -66,7 +66,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="IMMULIS_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -77,6 +76,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
     <PackageReference Include="System.Collections.Specialized" Version="4.3.0" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
     <PackageReference Include="YamlDotNet" Version="13.0.2" />
@@ -95,6 +95,8 @@
     <EmbeddedResource Remove="ProjectInstaller.resx" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="AnalysisReport.sarif" />
+    <None Remove="external_db_create_table_scripts.sql" />
     <None Remove="mock_external.db" />
     <None Remove="upgrade-assistant.clef" />
   </ItemGroup>

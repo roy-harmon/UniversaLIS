@@ -10,24 +10,25 @@ namespace UniversaLIS.Models
           [JsonIgnore]
           private int patientID;
           private PatientBase patient;
+          private List<Result> results = new List<Result>();
 
           [JsonIgnore, ForeignKey(nameof(Patient))]
           public int PatientID { get => patientID; set => patientID = value; }
           [JsonIgnore]
           public PatientBase Patient { get => patient; init => patient = value; }
           [JsonIgnore, NotMapped]
-          public new List<object>? Results { get; set; }
+          public override List<Result> Results { get => results; set => results = value; }
 
           public OrderRequest(PatientRequest patient)
           {
-               SetOrderMessage("O||||||||||||||||||||||||||||||");
+               SetOrderMessage("O||||^^^||||||||||||||||||||||||||");
                this.patient = patient;
                patientID = patient.PatientID;
           }
 
           public OrderRequest()
           {
-               SetOrderMessage("O||||||||||||||||||||||||||||||");
+               SetOrderMessage("O||||^^^||||||||||||||||||||||||||");
                this.patient = new PatientRequest();
           }
 

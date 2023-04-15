@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -8,10 +9,13 @@ namespace UniversaLIS.Models
      public class Order : OrderBase
      {
           private protected int patientID;
+          private List<Result> results = new List<Result>();
           [JsonIgnore, ForeignKey(nameof(PatientID)), InverseProperty("Orders")]
           public Patient Patient { get; set; }
           [JsonIgnore]
           public int PatientID { get => Patient.PatientID; set => Patient.PatientID = value; }
+          [JsonPropertyOrder(100)]
+          public override List<Result> Results { get => results; set => results = value; }
           public Order(string orderMessage, Patient patient)
           {
                SetOrderString(orderMessage);
@@ -27,13 +31,13 @@ namespace UniversaLIS.Models
 
           public Order(Patient patient)
           {
-               SetOrderMessage("O||||||||||||||||||||||||||||||");
+               SetOrderMessage("O||||^^^||||||||||||||||||||||||||");
                Patient = patient;
           }
 
           public Order()
           {
-               SetOrderMessage("O||||||||||||||||||||||||||||||");
+               SetOrderMessage("O||||^^^||||||||||||||||||||||||||");
                Patient = new Patient();
           }
 

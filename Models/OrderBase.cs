@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel.DataAnnotations;
@@ -7,16 +8,31 @@ using System.Text.Json.Serialization;
 
 namespace UniversaLIS.Models
 {
+     [SwaggerSchema(Required = new[] { "Description" })]
      public class OrderBase
      {
           private protected int orderID;
           private List<Comment> comments = new List<Comment>();
           private OrderedDictionary elements = new OrderedDictionary();
           private List<Result> results = new List<Result>();
-          [JsonPropertyOrder(10)]
-          public string? ActionCode { get => (string?)Elements["ActionCode"]; set => Elements["ActionCode"] = value; }
-          [JsonPropertyOrder(22)]
-          public string? BillRef { get => (string?)Elements["BillRef"]; set => Elements["BillRef"] = value; }
+          [JsonIgnore, NotMapped]
+          public OrderedDictionary Elements { get => elements; set => elements = value; }
+
+          [JsonPropertyOrder(0)]
+          [Key]
+          public int OrderID { get => orderID; set => orderID = value; }
+          [JsonPropertyOrder(1)]
+          public string? SpecimenID { get => (string?)Elements["SpecimenID"]; set => Elements["SpecimenID"] = value; }
+          [JsonPropertyOrder(2)]
+          public string? InstrSpecID { get => (string?)Elements["InstrSpecID"]; set => Elements["InstrSpecID"] = value; }
+          [JsonPropertyOrder(3), SwaggerSchema("The test ID field is used to identify a test or battery name. The four parts defined by the " +
+               "specification are the universal test identifier, the test name, the test identifier type, and the manufacturer-defined test code, separated by a delimiter (^). " +
+               "Some manufacturers only utilize the first part; the resulting UniversalTestID string consists of the test code followed by '^^^' due to the unused parts of the field.")]
+          public string UniversalTestID { get => (string)(Elements["UniversalTestID"] ?? "^^^"); set => Elements["UniversalTestID"] = value; }
+          [JsonPropertyOrder(4)]
+          public string? Priority { get => (string?)Elements["Priority"]; set => Elements["Priority"] = value; }
+          [JsonPropertyOrder(5)]
+          public string? OrderDate { get => (string?)Elements["OrderDate"]; set => Elements["OrderDate"] = value; }
           [JsonPropertyOrder(6)]
           public string? CollectionDate { get => (string?)Elements["CollectionDate"]; set => Elements["CollectionDate"] = value; }
           [JsonPropertyOrder(7)]
@@ -25,60 +41,48 @@ namespace UniversaLIS.Models
           public string? CollectionVolume { get => (string?)Elements["CollectionVolume"]; set => Elements["CollectionVolume"] = value; }
           [JsonPropertyOrder(9)]
           public string? CollectorID { get => (string?)Elements["CollectorID"]; set => Elements["CollectorID"] = value; }
+          [JsonPropertyOrder(10)]
+          public string? ActionCode { get => (string?)Elements["ActionCode"]; set => Elements["ActionCode"] = value; }
           [JsonPropertyOrder(11)]
           public string? DangerCode { get => (string?)Elements["DangerCode"]; set => Elements["DangerCode"] = value; }
-          [JsonIgnore, NotMapped]
-          public OrderedDictionary Elements { get => elements; set => elements = value; }
-          [JsonPropertyOrder(23)]
-          public string? InstrSectionID { get => (string?)Elements["InstrSectionID"]; set => Elements["InstrSectionID"] = value; }
-          [JsonPropertyOrder(2)]
-          public string? InstrSpecID { get => (string?)Elements["InstrSpecID"]; set => Elements["InstrSpecID"] = value; }
-          [JsonPropertyOrder(21)]
-          public string? LastReported { get => (string?)Elements["LastReported"]; set => Elements["LastReported"] = value; }
-          [JsonPropertyOrder(19)]
-          public string? LF1 { get => (string?)Elements["LF1"]; set => Elements["LF1"] = value; }
-          [JsonPropertyOrder(20)]
-          public string? LF2 { get => (string?)Elements["LF2"]; set => Elements["LF2"] = value; }
-          [JsonPropertyOrder(27)]
-          public string? NosInfFlag { get => (string?)Elements["NosInfFlag"]; set => Elements["NosInfFlag"] = value; }
-          [JsonPropertyOrder(5)]
-          public string? OrderDate { get => (string?)Elements["OrderDate"]; set => Elements["OrderDate"] = value; }
-          [JsonPropertyOrder(0)]
-          [Key]
-          public int OrderID { get => orderID; set => orderID = value; }
+          [JsonPropertyOrder(12)]
+          public string? RelevantClinicInfo { get => (string?)Elements["RelevantClinicInfo"]; set => Elements["RelevantClinicInfo"] = value; }
+          [JsonPropertyOrder(13)]
+          public string? SpecimenRecvd { get => (string?)Elements["SpecimenRecvd"]; set => Elements["SpecimenRecvd"] = value; }
+          [JsonPropertyOrder(14)]
+          public string? SpecimenDescriptor { get => (string?)Elements["SpecimenDescriptor"]; set => Elements["SpecimenDescriptor"] = value; }
           [JsonPropertyOrder(15)]
           public string? OrderingPhysician { get => (string?)Elements["OrderingPhysician"]; set => Elements["OrderingPhysician"] = value; }
           [JsonPropertyOrder(16)]
           public string? PhysicianTelNo { get => (string?)Elements["PhysicianTelNo"]; set => Elements["PhysicianTelNo"] = value; }
-          [JsonPropertyOrder(4)]
-          public string? Priority { get => (string?)Elements["Priority"]; set => Elements["Priority"] = value; }
-          [JsonPropertyOrder(12)]
-          public string? RelevantClinicInfo { get => (string?)Elements["RelevantClinicInfo"]; set => Elements["RelevantClinicInfo"] = value; }
-          [JsonPropertyOrder(24)]
-          public string? ReportType { get => (string?)Elements["ReportType"]; set => Elements["ReportType"] = value; }
-          [JsonPropertyOrder(25)]
-          public string? Reserved { get => (string?)Elements["Reserved"]; set => Elements["Reserved"] = value; }
-          [JsonPropertyOrder(100)]
-          public virtual List<Result> Results { get => results; set => results = value; }
-          [JsonPropertyOrder(26)]
-          public string? SpecCollectLocation { get => (string?)Elements["SpecCollectLocation"]; set => Elements["SpecCollectLocation"] = value; }
-          [JsonPropertyOrder(14)]
-          public string? SpecimenDescriptor { get => (string?)Elements["SpecimenDescriptor"]; set => Elements["SpecimenDescriptor"] = value; }
-          [JsonPropertyOrder(1)]
-          public string? SpecimenID { get => (string?)Elements["SpecimenID"]; set => Elements["SpecimenID"] = value; }
-          [JsonPropertyOrder(13)]
-          public string? SpecimenRecvd { get => (string?)Elements["SpecimenRecvd"]; set => Elements["SpecimenRecvd"] = value; }
-          [JsonPropertyOrder(29)]
-          public string? SpecInstitution { get => (string?)Elements["SpecInstitution"]; set => Elements["SpecInstitution"] = value; }
-          [JsonPropertyOrder(28)]
-          public string? SpecService { get => (string?)Elements["SpecService"]; set => Elements["SpecService"] = value; }
           [JsonPropertyOrder(17)]
           public string? UF1 { get => (string?)Elements["UF1"]; set => Elements["UF1"] = value; }
           [JsonPropertyOrder(18)]
           public string? UF2 { get => (string?)Elements["UF2"]; set => Elements["UF2"] = value; }
-          [JsonPropertyOrder(3)]
-          public string? UniversalTestID { get => (string?)Elements["UniversalTestID"]; set => Elements["UniversalTestID"] = value; }
-
+          [JsonPropertyOrder(19)]
+          public string? LF1 { get => (string?)Elements["LF1"]; set => Elements["LF1"] = value; }
+          [JsonPropertyOrder(20)]
+          public string? LF2 { get => (string?)Elements["LF2"]; set => Elements["LF2"] = value; }
+          [JsonPropertyOrder(21)]
+          public string? LastReported { get => (string?)Elements["LastReported"]; set => Elements["LastReported"] = value; }
+          [JsonPropertyOrder(22)]
+          public string? BillRef { get => (string?)Elements["BillRef"]; set => Elements["BillRef"] = value; }
+          [JsonPropertyOrder(23)]
+          public string? InstrSectionID { get => (string?)Elements["InstrSectionID"]; set => Elements["InstrSectionID"] = value; }
+          [JsonPropertyOrder(24)]
+          public string? ReportType { get => (string?)Elements["ReportType"]; set => Elements["ReportType"] = value; }
+          [JsonPropertyOrder(25)]
+          public string? Reserved { get => (string?)Elements["Reserved"]; set => Elements["Reserved"] = value; }
+          [JsonPropertyOrder(26)]
+          public string? SpecCollectLocation { get => (string?)Elements["SpecCollectLocation"]; set => Elements["SpecCollectLocation"] = value; }
+          [JsonPropertyOrder(27)]
+          public string? NosInfFlag { get => (string?)Elements["NosInfFlag"]; set => Elements["NosInfFlag"] = value; }
+          [JsonPropertyOrder(28)]
+          public string? SpecService { get => (string?)Elements["SpecService"]; set => Elements["SpecService"] = value; }
+          [JsonPropertyOrder(29)]
+          public string? SpecInstitution { get => (string?)Elements["SpecInstitution"]; set => Elements["SpecInstitution"] = value; }
+          public virtual List<Result> Results { get => results; set => results = value; }
+          // TODO: Add support for comment records.
           [JsonIgnore, NotMapped]
           internal List<Comment> Comments { get => comments; set => comments = value; }
 

@@ -12,81 +12,81 @@ namespace UniversaLIS.Models
           private OrderedDictionary elements = new OrderedDictionary();
           private List<OrderBase> orders = new List<OrderBase>();
           private int patientID;
-          [JsonPropertyOrder(18)]
-          public string? ActiveMeds { get => (string?)Elements["ActiveMeds"]; set => Elements["ActiveMeds"] = value; }
-          [JsonPropertyOrder(9)]
-          public string? Address { get => (string?)Elements["Address"]; set => Elements["Address"] = value; }
-          [JsonPropertyOrder(22)]
-          public string? AdmDates { get => (string?)Elements["AdmDates"]; set => Elements["AdmDates"] = value; }
-          [JsonPropertyOrder(23)]
-          public string? AdmStatus { get => (string?)Elements["AdmStatus"]; set => Elements["AdmStatus"] = value; }
-          [JsonPropertyOrder(26)]
-          public string? AltCode { get => (string?)Elements["AltCode"]; set => Elements["AltCode"] = value; }
-          [JsonPropertyOrder(25)]
-          public string? AltCodeNature { get => (string?)Elements["AltCodeNature"]; set => Elements["AltCodeNature"] = value; }
-          [JsonPropertyOrder(12)]
-          public string? AttendingPhysicianID { get => (string?)Elements["AttendingPhysicianID"]; set => Elements["AttendingPhysicianID"] = value; }
-          [JsonPropertyOrder(17)]
-          public string? Diagnosis { get => (string?)Elements["Diagnosis"]; set => Elements["Diagnosis"] = value; }
-          [JsonPropertyOrder(19)]
-          public string? Diet { get => (string?)Elements["Diet"]; set => Elements["Diet"] = value; }
-          [JsonPropertyOrder(6)]
-          public string? DOB { get => (string?)Elements["DOB"]; set => Elements["DOB"] = value; }
-          [JsonPropertyOrder(33)]
-          public string? DosageCategory { get => (string?)Elements["DosageCategory"]; set => Elements["DosageCategory"] = value; }
           [NotMapped, JsonIgnore]
           public OrderedDictionary Elements { get => elements; set => elements = value; }
-          [JsonPropertyOrder(15)]
-          public string? Height { get => (string?)Elements["Height"]; set => Elements["Height"] = value; }
-          [JsonPropertyOrder(32)]
-          public string? HospInstitution { get => (string?)Elements["HospInstitution"]; set => Elements["HospInstitution"] = value; }
-          [JsonPropertyOrder(31)]
-          public string? HospService { get => (string?)Elements["HospService"]; set => Elements["HospService"] = value; }
-          [JsonPropertyOrder(29)]
-          public string? IsolationStatus { get => (string?)Elements["IsolationStatus"]; set => Elements["IsolationStatus"] = value; }
-          [JsonPropertyOrder(2)]
-          public string? LabPatientID { get => (string?)Elements["LabPatientID"]; set => Elements["LabPatientID"] = value; }
-          [JsonPropertyOrder(30)]
-          public string? Language { get => (string?)Elements["Language"]; set => Elements["Language"] = value; }
-          [JsonPropertyOrder(24)]
-          public string? Location { get => (string?)Elements["Location"]; set => Elements["Location"] = value; }
-          [JsonPropertyOrder(28)]
-          public string? MaritalStatus { get => (string?)Elements["MaritalStatus"]; set => Elements["MaritalStatus"] = value; }
-          [JsonPropertyOrder(5)]
-          public string? MMName { get => (string?)Elements["MMName"]; set => Elements["MMName"] = value; }
-          [JsonPropertyOrder(100)]
-          public virtual List<OrderBase> Orders { get => orders; set => orders = value; }
 
           [JsonPropertyOrder(0)]
           [Key]
           public virtual int PatientID { get => patientID; set => patientID = value; }
+          [JsonPropertyOrder(1)]
+
+          public string? PracticePatientID { get => (string?)Elements["PracticePatientID"]; set => Elements["PracticePatientID"] = value; }
+          [JsonPropertyOrder(2)]
+          public string? LabPatientID { get => (string?)Elements["LabPatientID"]; set => Elements["LabPatientID"] = value; }
           [JsonPropertyOrder(3)]
           public string? PatientID3 { get => (string?)Elements["PatientID3"]; set => Elements["PatientID3"] = value; }
           [JsonPropertyOrder(4)]
           public string? PatientName { get => (string?)Elements["PatientName"]; set => Elements["PatientName"] = value; }
-          [JsonPropertyOrder(20)]
-          public string? PF1 { get => (string?)Elements["PF1"]; set => Elements["PF1"] = value; }
-          [JsonPropertyOrder(21)]
-          public string? PF2 { get => (string?)Elements["PF2"]; set => Elements["PF2"] = value; }
-          [JsonPropertyOrder(1)]
-
-          public string? PracticePatientID { get => (string?)Elements["PracticePatientID"]; set => Elements["PracticePatientID"] = value; }
-          [JsonPropertyOrder(8)]
-          public string? Race { get => (string?)Elements["Race"]; set => Elements["Race"] = value; }
-          [JsonPropertyOrder(27)]
-          public string? Religion { get => (string?)Elements["Religion"]; set => Elements["Religion"] = value; }
-          [JsonPropertyOrder(10)]
-          public string? Reserved { get => (string?)Elements["Reserved"]; set => Elements["Reserved"] = value; }
+          [JsonPropertyOrder(5)]
+          public string? MMName { get => (string?)Elements["MMName"]; set => Elements["MMName"] = value; }
+          [JsonPropertyOrder(6)]
+          public string? DOB { get => (string?)Elements["DOB"]; set => Elements["DOB"] = value; }
           [JsonPropertyOrder(7)]
           public string? Sex { get => (string?)Elements["Sex"]; set => Elements["Sex"] = value; }
+          [JsonPropertyOrder(8)]
+          public string? Race { get => (string?)Elements["Race"]; set => Elements["Race"] = value; }
+          [JsonPropertyOrder(9)]
+          public string? Address { get => (string?)Elements["Address"]; set => Elements["Address"] = value; }
+          [JsonPropertyOrder(10)]
+          public string? Reserved { get => (string?)Elements["Reserved"]; set => Elements["Reserved"] = value; }
+          [JsonPropertyOrder(11)]
+          public string? TelNo { get => (string?)Elements["TelNo"]; set => Elements["TelNo"] = value; }
+          [JsonPropertyOrder(12)]
+          public string? AttendingPhysicianID { get => (string?)Elements["AttendingPhysicianID"]; set => Elements["AttendingPhysicianID"] = value; }
           [JsonPropertyOrder(13)]
           public string? Special1 { get => (string?)Elements["Special1"]; set => Elements["Special1"] = value; }
           [JsonPropertyOrder(14)]
           public string? Special2 { get => (string?)Elements["Special2"]; set => Elements["Special2"] = value; }
-          [JsonPropertyOrder(11)]
-          public string? TelNo { get => (string?)Elements["TelNo"]; set => Elements["TelNo"] = value; }
+          [JsonPropertyOrder(15)]
+          public string? Height { get => (string?)Elements["Height"]; set => Elements["Height"] = value; }
           [JsonPropertyOrder(16)]
           public string? Weight { get => (string?)Elements["Weight"]; set => Elements["Weight"] = value; }
+          [JsonPropertyOrder(17)]
+          public string? Diagnosis { get => (string?)Elements["Diagnosis"]; set => Elements["Diagnosis"] = value; }
+          [JsonPropertyOrder(18)]
+          public string? ActiveMeds { get => (string?)Elements["ActiveMeds"]; set => Elements["ActiveMeds"] = value; }
+          [JsonPropertyOrder(19)]
+          public string? Diet { get => (string?)Elements["Diet"]; set => Elements["Diet"] = value; }
+          [JsonPropertyOrder(20)]
+          public string? PF1 { get => (string?)Elements["PF1"]; set => Elements["PF1"] = value; }
+          [JsonPropertyOrder(21)]
+          public string? PF2 { get => (string?)Elements["PF2"]; set => Elements["PF2"] = value; }
+          [JsonPropertyOrder(22)]
+          public string? AdmDates { get => (string?)Elements["AdmDates"]; set => Elements["AdmDates"] = value; }
+          [JsonPropertyOrder(23)]
+          public string? AdmStatus { get => (string?)Elements["AdmStatus"]; set => Elements["AdmStatus"] = value; }
+          [JsonPropertyOrder(24)]
+          public string? Location { get => (string?)Elements["Location"]; set => Elements["Location"] = value; }
+          [JsonPropertyOrder(25)]
+          public string? AltCodeNature { get => (string?)Elements["AltCodeNature"]; set => Elements["AltCodeNature"] = value; }
+          [JsonPropertyOrder(26)]
+          public string? AltCode { get => (string?)Elements["AltCode"]; set => Elements["AltCode"] = value; }
+          [JsonPropertyOrder(27)]
+          public string? Religion { get => (string?)Elements["Religion"]; set => Elements["Religion"] = value; }
+          [JsonPropertyOrder(28)]
+          public string? MaritalStatus { get => (string?)Elements["MaritalStatus"]; set => Elements["MaritalStatus"] = value; }
+          [JsonPropertyOrder(29)]
+          public string? IsolationStatus { get => (string?)Elements["IsolationStatus"]; set => Elements["IsolationStatus"] = value; }
+          [JsonPropertyOrder(30)]
+          public string? Language { get => (string?)Elements["Language"]; set => Elements["Language"] = value; }
+          [JsonPropertyOrder(31)]
+          public string? HospService { get => (string?)Elements["HospService"]; set => Elements["HospService"] = value; }
+          [JsonPropertyOrder(32)]
+          public string? HospInstitution { get => (string?)Elements["HospInstitution"]; set => Elements["HospInstitution"] = value; }
+          [JsonPropertyOrder(33)]
+          public string? DosageCategory { get => (string?)Elements["DosageCategory"]; set => Elements["DosageCategory"] = value; }
+          [JsonIgnore]
+          public virtual List<OrderBase> Orders { get => orders; set => orders = value; }
 
           private string GetPatientString()
           {
