@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using SQLitePCL;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UniversaLIS;
@@ -58,6 +59,10 @@ namespace REST_LIS
                app.UseAuthorization();
                app.MapGet("/", () => "Hello World!").WithName("HelloWorld").ExcludeFromDescription();
 
+               // Endpoints for records received from testing instrumentation.
+               
+               // Top level is patients. GET to list them, including child entities (Orders containing test information, Results containing test results).
+               // Supports querying by PracticePatientID, PatientName, DOB, and UniversalTestID fields.
                app.MapGet("/reports/patients", ([FromQuery] string? practicePatientID, [FromQuery] string? patientName,
                [FromQuery] string? DOB, [FromQuery] string? universalTestID) =>
                {
@@ -71,6 +76,7 @@ namespace REST_LIS
                     }
                }).WithName("GetPatients").Produces<List<Patient>>(StatusCodes.Status200OK);
 
+               // Get a specific patient record by ID.
                app.MapGet("/reports/patients/{id}", (int id) =>
                {
                     using (PatientDB dB = new PatientDB())
@@ -79,6 +85,10 @@ namespace REST_LIS
                     }
                }).WithName("GetPatientByID").Produces<Patient>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound);
 
+               // Endpoints for requests sent to the LIS for distribution to testing instrumentation. 
+
+               // Top level is patient requests.
+               // POST new requests here to submit them for testing. Include orders.
                app.MapPost("/requests/patients", (PatientRequest patientRequest) =>
                {
                     using (PatientDB dB = new PatientDB())
@@ -87,14 +97,8 @@ namespace REST_LIS
                     }
                }).WithName("PostPatientOrders").Produces(StatusCodes.Status201Created).Produces(StatusCodes.Status400BadRequest);
 
-               app.MapGet("/requests/patients/{id}", (int id) =>
-               {
-                    using (PatientDB dB = new PatientDB())
-                    {
-                         return dB.GetPatientRequestById(id);
-                    }
-               }).WithName("GetPatientOrdersByID").Produces<PatientRequest>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound);
-
+               // GET a list of all patient requests. 
+               // Supports querying by PracticePatientID, PatientName, DOB, and UniversalTestID fields.
                app.MapGet("/requests/patients", ([FromQuery] string? practicePatientID, [FromQuery] string? patientName,
                [FromQuery] string? DOB, [FromQuery] string? universalTestID) =>
                {
@@ -107,6 +111,34 @@ namespace REST_LIS
                          return dB.GetPatientRequests(pPID, ppN, pDOB, puTID);
                     }
                }).WithName("GetPatientRequests").Produces<List<PatientRequest>>(StatusCodes.Status200OK);
+
+               // Get a specific patient request by ID.
+               app.MapGet("/requests/patients/{id}", (int id) =>
+               {
+                    using (PatientDB dB = new PatientDB())
+                    {
+                         return dB.GetPatientRequestById(id);
+                    }
+               }).WithName("GetPatientOrdersByID").Produces<PatientRequest>(StatusCodes.Status200OK).Produces(StatusCodes.Status404NotFound);
+
+               // Update a specific patient request by ID.
+               app.MapPut("/requests/patients/{id}", (int id,
+                    [FromBody(EmptyBodyBehavior = Microsoft.AspNetCore.Mvc.ModelBinding.EmptyBodyBehavior.Disallow)] PatientRequest patient) =>
+               {
+                    using (PatientDB dB = new PatientDB())
+                    {
+                         return dB.PutPatientRequestById(id, patient);
+                    }
+               }).WithName("UpdatePatientOrderByID").Produces<PatientRequest>(StatusCodes.Status200OK).Produces(StatusCodes.Status400BadRequest).Produces(StatusCodes.Status404NotFound);
+
+               // Delete a specific patient request by ID.
+               app.MapDelete("/requests/patients/{id}", (int id) =>
+               {
+                    using (PatientDB dB = new PatientDB())
+                    {
+                         return dB.DeletePatientRequestById(id);
+                    }
+               }).WithName("DeletePatientRequestByID").Produces(StatusCodes.Status204NoContent).Produces(StatusCodes.Status404NotFound);
 
                app.Run();
           }
@@ -173,6 +205,35 @@ namespace REST_LIS
           public IResult GetAllPatients()
           {
                return Results.Ok(this.PatientReports.AsNoTracking().ToList());
+          }
+
+          public IResult DeletePatientRequestById(int id)
+          {
+               if (id > 0)
+               {
+                    PatientRequests.Where(p => p.PatientID.Equals(id)).ExecuteDelete();
+                    return Results.NoContent();
+               }
+               return Results.NotFound();
+          }
+
+          public IResult PutPatientRequestById(int id, PatientRequest patient)
+          {
+               var entity = PatientRequests.Find(id);
+               if (entity == null)
+               {
+                    return Results.NotFound();
+               }
+               try
+               {
+                    Entry(entity).CurrentValues.SetValues(patient);
+                    SaveChanges();
+                    return Results.Ok(entity);
+               }
+               catch (Exception e)
+               {
+                    return Results.BadRequest(e.Message);
+               }
           }
 
           public IResult GetPatientRequestById(int id)

@@ -1,0 +1,1059 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "REST-LIS",
+    "description": "An ASP.NET Core Web API for ordering tests and reporting results through UniversaLIS",
+    "contact": {
+      "name": "Roy Harmon",
+      "url": "https://www.linkedin.com/in/roy-r-harmon/"
+    },
+    "license": {
+      "name": "MIT License",
+      "url": "https://github.com/roy-harmon/UniversaLIS/blob/main/LICENSE"
+    },
+    "version": "v1"
+  },
+  "paths": {
+    "/reports/patients": {
+      "get": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "GetPatients",
+        "parameters": [
+          {
+            "name": "practicePatientID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "patientName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DOB",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "universalTestID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Patient"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/reports/patients/{id}": {
+      "get": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "GetPatientByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Patient"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/requests/patients": {
+      "post": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "PostPatientOrders",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "GetPatientRequests",
+        "parameters": [
+          {
+            "name": "practicePatientID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "patientName",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "DOB",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "universalTestID",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PatientRequest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/requests/patients/{id}": {
+      "get": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "GetPatientOrdersByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientRequest"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "UpdatePatientOrderByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatientRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PatientRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "REST-LIS"
+        ],
+        "operationId": "DeletePatientRequestByID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Order": {
+        "required": [
+          "Description"
+        ],
+        "type": "object",
+        "properties": {
+          "orderID": {
+            "type": "integer",
+            "description": "The unique identifier assigned to the order record in the UniversaLIS internal database.",
+            "format": "int32",
+            "readOnly": true
+          },
+          "specimenID": {
+            "type": "string",
+            "description": "A unique identifier for the specimen assigned by the information system and returned by the instrument.",
+            "nullable": true
+          },
+          "instrSpecID": {
+            "type": "string",
+            "description": "A unique identifier assigned by the instrument, if different from the information system identifier, and returned with results for use in referring to any results.",
+            "nullable": true
+          },
+          "universalTestID": {
+            "type": "string",
+            "description": "The test ID field is used to identify a test or battery name. The four parts defined by the specification are the universal test identifier, the test name, the test identifier type, and the manufacturer-defined test code, separated by a delimiter (^). Some manufacturers only utilize the first part; the resulting UniversalTestID string consists of the test code followed by '^^^' due to the unused parts of the field.",
+            "nullable": true
+          },
+          "priority": {
+            "type": "string",
+            "description": "Test priority code. <br>S = stat<br>A = as soon as possible<br>R = routine<br>C = callback<br>P = preoperative",
+            "nullable": true
+          },
+          "orderDate": {
+            "type": "string",
+            "description": "The date and time the test order should be considered ordered. Usually this will be the date and time the order was recorded. This is the date and time against which the priorities should be considered.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionDate": {
+            "type": "string",
+            "description": "The actual time the specimen was collected or obtained.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionEndTime": {
+            "type": "string",
+            "description": "The end date and time of a timed specimen collection, such as 24-hour urine collection.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionVolume": {
+            "type": "string",
+            "description": "The total volume of specimens such as urine or other bulk collections when only an aliquot is sent to the instrument.",
+            "nullable": true
+          },
+          "collectorID": {
+            "type": "string",
+            "description": "The person and facility which collected the specimen.",
+            "nullable": true
+          },
+          "actionCode": {
+            "type": "string",
+            "description": "The action to be taken. <br>C = cancel request for the battery or tests named<br>A = add the requested tests or batteries to the existing specimen with the patient and specimen identifiers and date/time given in this record<br>N = new requests accompanying a new specimen<br>P = pending specimen<br>L = reserved<br>X = specimen or test already in process<br>Q = treat specimen as a Q/C test specimen",
+            "nullable": true
+          },
+          "dangerCode": {
+            "type": "string",
+            "description": "Either a test or a code indicating any special hazard associated with the specimen, for example, a hepatitis patient or suspected anthrax.",
+            "nullable": true
+          },
+          "relevantClinicInfo": {
+            "type": "string",
+            "description": "Additional information about the specimen. Used to report information such as amount of inspired O2 for blood gases, point in menstrual cycle for cervical pap tests, or other conditions that influence test interpretations.",
+            "nullable": true
+          },
+          "specimenRecvd": {
+            "type": "string",
+            "description": "The actual log-in time recorded in the laboratory.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "specimenDescriptor": {
+            "type": "string",
+            "description": "Specimen type (blood, urine, etc.) followed by specimen source body site, separated by a delimiter (^) character.",
+            "nullable": true
+          },
+          "orderingPhysician": {
+            "type": "string",
+            "description": "The name of the ordering physician.",
+            "nullable": true
+          },
+          "physicianTelNo": {
+            "type": "string",
+            "description": "The telephone number of the requesting physician, to be used in responding to callback orders and for critically abnormal results.",
+            "nullable": true
+          },
+          "uF1": {
+            "type": "string",
+            "description": "User Field Number 1",
+            "nullable": true
+          },
+          "uF2": {
+            "type": "string",
+            "description": "User Field Number 2",
+            "nullable": true
+          },
+          "lF1": {
+            "type": "string",
+            "description": "This is an optional field definable for any use by the laboratory.",
+            "nullable": true
+          },
+          "lF2": {
+            "type": "string",
+            "description": "This is an optional field definable for any use by the laboratory.",
+            "nullable": true
+          },
+          "lastReported": {
+            "type": "string",
+            "description": "When the information system queries the instrument for untransmitted results, the information in this field may be used to control processing on the communications link. Usually, the ordering service would only want those results for which the reporting date and time is greater than the date and time the inquiring system last received results.",
+            "nullable": true
+          },
+          "billRef": {
+            "type": "string",
+            "description": "The billing charge or accounting reference by this instrument for tests performed.",
+            "nullable": true
+          },
+          "instrSectionID": {
+            "type": "string",
+            "description": "The section of the instrument where the test was performed. In the case where multiple instruments are on a single line or a test was moved from one instrument to another, this field will show which instrument or section of an instrument performed the test.",
+            "nullable": true
+          },
+          "reportType": {
+            "type": "string",
+            "description": "O = order record; user asking that analysis be performed<br>C = correction of previously transmitted results<br>P = preliminary results<br>F = final results<br>X = order cannot be done, order cancelled<br>I = in instrument pending<br>Y = no order on record for this test (in response to query)<br>Z = no record of this patient (in response to query)<br>Q = response to query (this record is a response to a request-information query)",
+            "nullable": true
+          },
+          "reserved": {
+            "type": "string",
+            "description": "This field is unused but reserved for future expansion.",
+            "nullable": true
+          },
+          "specCollectLocation": {
+            "type": "string",
+            "description": "The location of specimen collection if different from the patient location.",
+            "nullable": true
+          },
+          "nosInfFlag": {
+            "type": "string",
+            "description": "This field is used for epidemiological reporting purposes and will show whether the organism identified is the result of a nosocomial (hospital-acquired) infection.",
+            "nullable": true
+          },
+          "specService": {
+            "type": "string",
+            "description": "In cases where an individual service may apply to the specimen collected, and the service is different from the patient record service, this field may be used to define the specific service responsible for such collection.",
+            "nullable": true
+          },
+          "specInstitution": {
+            "type": "string",
+            "description": "In cases where the specimen may have been collected in an institution, and the institution is different from the patient record institution, this field may be used to record the institution of specimen collection.",
+            "nullable": true
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Result"
+            },
+            "description": "The list of results associated with this order.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The test order record defines the attributes of a particular request for a clinical instrument’s services and contains all specimen information. An order record will be generated by the information system to request a given test, battery, or set of tests."
+      },
+      "OrderRequest": {
+        "required": [
+          "Description"
+        ],
+        "type": "object",
+        "properties": {
+          "orderID": {
+            "type": "integer",
+            "description": "The unique identifier assigned to the order record in the UniversaLIS internal database.",
+            "format": "int32",
+            "readOnly": true
+          },
+          "specimenID": {
+            "type": "string",
+            "description": "A unique identifier for the specimen assigned by the information system and returned by the instrument.",
+            "nullable": true
+          },
+          "instrSpecID": {
+            "type": "string",
+            "description": "A unique identifier assigned by the instrument, if different from the information system identifier, and returned with results for use in referring to any results.",
+            "nullable": true
+          },
+          "universalTestID": {
+            "type": "string",
+            "description": "The test ID field is used to identify a test or battery name. The four parts defined by the specification are the universal test identifier, the test name, the test identifier type, and the manufacturer-defined test code, separated by a delimiter (^). Some manufacturers only utilize the first part; the resulting UniversalTestID string consists of the test code followed by '^^^' due to the unused parts of the field.",
+            "nullable": true
+          },
+          "priority": {
+            "type": "string",
+            "description": "Test priority code. <br>S = stat<br>A = as soon as possible<br>R = routine<br>C = callback<br>P = preoperative",
+            "nullable": true
+          },
+          "orderDate": {
+            "type": "string",
+            "description": "The date and time the test order should be considered ordered. Usually this will be the date and time the order was recorded. This is the date and time against which the priorities should be considered.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionDate": {
+            "type": "string",
+            "description": "The actual time the specimen was collected or obtained.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionEndTime": {
+            "type": "string",
+            "description": "The end date and time of a timed specimen collection, such as 24-hour urine collection.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "collectionVolume": {
+            "type": "string",
+            "description": "The total volume of specimens such as urine or other bulk collections when only an aliquot is sent to the instrument.",
+            "nullable": true
+          },
+          "collectorID": {
+            "type": "string",
+            "description": "The person and facility which collected the specimen.",
+            "nullable": true
+          },
+          "actionCode": {
+            "type": "string",
+            "description": "The action to be taken. <br>C = cancel request for the battery or tests named<br>A = add the requested tests or batteries to the existing specimen with the patient and specimen identifiers and date/time given in this record<br>N = new requests accompanying a new specimen<br>P = pending specimen<br>L = reserved<br>X = specimen or test already in process<br>Q = treat specimen as a Q/C test specimen",
+            "nullable": true
+          },
+          "dangerCode": {
+            "type": "string",
+            "description": "Either a test or a code indicating any special hazard associated with the specimen, for example, a hepatitis patient or suspected anthrax.",
+            "nullable": true
+          },
+          "relevantClinicInfo": {
+            "type": "string",
+            "description": "Additional information about the specimen. Used to report information such as amount of inspired O2 for blood gases, point in menstrual cycle for cervical pap tests, or other conditions that influence test interpretations.",
+            "nullable": true
+          },
+          "specimenRecvd": {
+            "type": "string",
+            "description": "The actual log-in time recorded in the laboratory.",
+            "format": "yyyyMMddhhmmss",
+            "nullable": true
+          },
+          "specimenDescriptor": {
+            "type": "string",
+            "description": "Specimen type (blood, urine, etc.) followed by specimen source body site, separated by a delimiter (^) character.",
+            "nullable": true
+          },
+          "orderingPhysician": {
+            "type": "string",
+            "description": "The name of the ordering physician.",
+            "nullable": true
+          },
+          "physicianTelNo": {
+            "type": "string",
+            "description": "The telephone number of the requesting physician, to be used in responding to callback orders and for critically abnormal results.",
+            "nullable": true
+          },
+          "uF1": {
+            "type": "string",
+            "description": "User Field Number 1",
+            "nullable": true
+          },
+          "uF2": {
+            "type": "string",
+            "description": "User Field Number 2",
+            "nullable": true
+          },
+          "lF1": {
+            "type": "string",
+            "description": "This is an optional field definable for any use by the laboratory.",
+            "nullable": true
+          },
+          "lF2": {
+            "type": "string",
+            "description": "This is an optional field definable for any use by the laboratory.",
+            "nullable": true
+          },
+          "lastReported": {
+            "type": "string",
+            "description": "When the information system queries the instrument for untransmitted results, the information in this field may be used to control processing on the communications link. Usually, the ordering service would only want those results for which the reporting date and time is greater than the date and time the inquiring system last received results.",
+            "nullable": true
+          },
+          "billRef": {
+            "type": "string",
+            "description": "The billing charge or accounting reference by this instrument for tests performed.",
+            "nullable": true
+          },
+          "instrSectionID": {
+            "type": "string",
+            "description": "The section of the instrument where the test was performed. In the case where multiple instruments are on a single line or a test was moved from one instrument to another, this field will show which instrument or section of an instrument performed the test.",
+            "nullable": true
+          },
+          "reportType": {
+            "type": "string",
+            "description": "O = order record; user asking that analysis be performed<br>C = correction of previously transmitted results<br>P = preliminary results<br>F = final results<br>X = order cannot be done, order cancelled<br>I = in instrument pending<br>Y = no order on record for this test (in response to query)<br>Z = no record of this patient (in response to query)<br>Q = response to query (this record is a response to a request-information query)",
+            "nullable": true
+          },
+          "reserved": {
+            "type": "string",
+            "description": "This field is unused but reserved for future expansion.",
+            "nullable": true
+          },
+          "specCollectLocation": {
+            "type": "string",
+            "description": "The location of specimen collection if different from the patient location.",
+            "nullable": true
+          },
+          "nosInfFlag": {
+            "type": "string",
+            "description": "This field is used for epidemiological reporting purposes and will show whether the organism identified is the result of a nosocomial (hospital-acquired) infection.",
+            "nullable": true
+          },
+          "specService": {
+            "type": "string",
+            "description": "In cases where an individual service may apply to the specimen collected, and the service is different from the patient record service, this field may be used to define the specific service responsible for such collection.",
+            "nullable": true
+          },
+          "specInstitution": {
+            "type": "string",
+            "description": "In cases where the specimen may have been collected in an institution, and the institution is different from the patient record institution, this field may be used to record the institution of specimen collection.",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "The test order record defines the attributes of a particular request for a clinical instrument’s services and contains all specimen information. An order record will be generated by the information system to request a given test, battery, or set of tests."
+      },
+      "Patient": {
+        "type": "object",
+        "properties": {
+          "patientID": {
+            "type": "integer",
+            "description": "The unique identifier assigned to the order record in the UniversaLIS internal database.",
+            "format": "int32",
+            "readOnly": true
+          },
+          "practicePatientID": {
+            "type": "string",
+            "description": "The unique ID assigned and used by the practice to identify the patient and his/her results upon return of the results of testing.",
+            "nullable": true
+          },
+          "labPatientID": {
+            "type": "string",
+            "description": "The unique processing number assigned to the patient by the laboratory.",
+            "nullable": true
+          },
+          "patientID3": {
+            "type": "string",
+            "description": "Optionally used for additional, universal, or manufacturer-defined identifiers.",
+            "nullable": true
+          },
+          "patientName": {
+            "type": "string",
+            "description": "The patient’s name shall be presented in the following format: last name, first name, middle name or initial, suffix, and title, and each of these components shall be separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "mmName": {
+            "type": "string",
+            "description": "The optional mother’s maiden name may be required to distinguish between patients with the same birthdate and last name when registry files are very large.",
+            "nullable": true
+          },
+          "dob": {
+            "type": "string",
+            "description": "The patient's birthdate, presented in YYYYMMDD format.",
+            "format": "yyyyMMdd",
+            "nullable": true
+          },
+          "sex": {
+            "type": "string",
+            "description": "This field shall be represented by M, F, or U.",
+            "nullable": true
+          },
+          "race": {
+            "type": "string",
+            "description": "Abbreviation or full text names of ethnic groups may be entered. Note that multiple answers are permissible, separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "description": "The street address of the patient’s mailing address.",
+            "nullable": true
+          },
+          "reserved": {
+            "type": "string",
+            "description": "This field is reserved for future expansion.",
+            "nullable": true
+          },
+          "telNo": {
+            "type": "string",
+            "description": "The patient’s telephone number.",
+            "nullable": true
+          },
+          "attendingPhysicianID": {
+            "type": "string",
+            "description": "The physician(s) caring for the patient as either names or codes, as agreed upon between the sender and the receiver. Identifiers or names, or both, should be separated by component delimiters (^) and formatted like the PatientName field. Multiple physician names (for example, ordering physician, attending physician, referring physician) shall be separated by repeat delimiters (\\).",
+            "nullable": true
+          },
+          "special1": {
+            "type": "string",
+            "description": "Optional text field for vendor use (each laboratory can use this differently).",
+            "nullable": true
+          },
+          "special2": {
+            "type": "string",
+            "description": "Optional text field for vendor use (each laboratory can use this differently).",
+            "nullable": true
+          },
+          "height": {
+            "type": "string",
+            "description": "Optional numeric field containing the patient’s height. The default units are centimeters. If measured in terms of another unit, the units should also be transmitted separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "weight": {
+            "type": "string",
+            "description": "Optional numeric field containing the patient’s weight. The default units are kilograms. If measured in terms of another unit, for example, pounds, the unit name shall also be transmitted separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "diagnosis": {
+            "type": "string",
+            "description": "This value should be entered either as an ICD-9 code or as free text. If multiple diagnoses are recorded, they shall be separated by repeat delimiters (\\).",
+            "nullable": true
+          },
+          "activeMeds": {
+            "type": "string",
+            "description": "This field is used for patient active medications or those suspected, in overdose situations. The generic name shall be used. This field is of use in interpretation of clinical results.",
+            "nullable": true
+          },
+          "diet": {
+            "type": "string",
+            "description": "This optional field in free text should be used to indicate such conditions that affect results of testing, such as 16-hour fast (for triglycerides) and no red meat (for hemoccult testing).",
+            "nullable": true
+          },
+          "pF1": {
+            "type": "string",
+            "description": "This is a text field for use by the practice; the optional transmitted text will be returned with the results.",
+            "nullable": true
+          },
+          "pF2": {
+            "type": "string",
+            "description": "This is a text field for use by the practice; the optional transmitted text will be returned with the results.",
+            "nullable": true
+          },
+          "admDates": {
+            "type": "string",
+            "description": "Admission and discharge dates, in YYYYMMDD format. The discharge date, when included, follows the admission date and is separated from it by a repeat delimiter (\\).",
+            "nullable": true
+          },
+          "admStatus": {
+            "type": "string",
+            "description": "Admission status, represented by the following minimal list or by extensions agreed upon between the sender and receiver: OP (outpatient), PA (preadmit), IP (inpatient), ER (emergency room).",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "description": "The general clinic location or nursing unit, or ward or bed (or both) of the patient.",
+            "nullable": true
+          },
+          "altCodeNature": {
+            "type": "string",
+            "description": "Nature of Alternative Diagnostic Code and Classifiers. It identifies the class of code or classifiers that are transmitted (e.g., DRGs, or in the future, AVGs [ambulatory visitation groups]).",
+            "nullable": true
+          },
+          "altCode": {
+            "type": "string",
+            "description": "Alternative diagnostic codes and classifications (e.g., DRG codes) can be included in this field. The nature of the diagnostic code is identified in the AltCodeNature field. If multiple codes are included, they should be separated by repeat delimiters (\\). Individual codes can be followed by optional test descriptors (when the latter are present) and must be separated by component delimiters (^).",
+            "nullable": true
+          },
+          "religion": {
+            "type": "string",
+            "description": "When needed, this value shall include the patient’s religion. Codes or names may be sent as agreed upon between the sender and the receiver. Full names of religions may also be sent as required.",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "When required, this value shall indicate the marital status of the patient as follows:<br>M = married<br>S = single<br>D = divorced<br>W = widowed<br>A = separated",
+            "nullable": true
+          },
+          "isolationStatus": {
+            "type": "string",
+            "description": "Isolation codes indicate precautions that must be applied to protect the patient or staff against infection. Multiple precautions can be listed when separated by repeat delimiters (\\). Full text precautions may also be sent.",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "description": "The patient’s primary language. This may be needed when the patient is not fluent in the local language.",
+            "nullable": true
+          },
+          "hospService": {
+            "type": "string",
+            "description": "The hospital service currently assigned to the patient. Both code and text may be sent when separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "hospInstitution": {
+            "type": "string",
+            "description": "The hospital institution currently assigned to the patient. Both code and text may be sent when separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "dosageCategory": {
+            "type": "string",
+            "description": "The patient dosage group. For example, A–ADULT, P1–PEDIATRIC (one to six months), P2–PEDIATRIC (six months to three years), etc.",
+            "nullable": true
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Order"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "This record type contains information about an individual patient."
+      },
+      "PatientRequest": {
+        "type": "object",
+        "properties": {
+          "patientID": {
+            "type": "integer",
+            "description": "The unique identifier assigned to the order record in the UniversaLIS internal database.",
+            "format": "int32",
+            "readOnly": true
+          },
+          "practicePatientID": {
+            "type": "string",
+            "description": "The unique ID assigned and used by the practice to identify the patient and his/her results upon return of the results of testing.",
+            "nullable": true
+          },
+          "labPatientID": {
+            "type": "string",
+            "description": "The unique processing number assigned to the patient by the laboratory.",
+            "nullable": true
+          },
+          "patientID3": {
+            "type": "string",
+            "description": "Optionally used for additional, universal, or manufacturer-defined identifiers.",
+            "nullable": true
+          },
+          "patientName": {
+            "type": "string",
+            "description": "The patient’s name shall be presented in the following format: last name, first name, middle name or initial, suffix, and title, and each of these components shall be separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "mmName": {
+            "type": "string",
+            "description": "The optional mother’s maiden name may be required to distinguish between patients with the same birthdate and last name when registry files are very large.",
+            "nullable": true
+          },
+          "dob": {
+            "type": "string",
+            "description": "The patient's birthdate, presented in YYYYMMDD format.",
+            "format": "yyyyMMdd",
+            "nullable": true
+          },
+          "sex": {
+            "type": "string",
+            "description": "This field shall be represented by M, F, or U.",
+            "nullable": true
+          },
+          "race": {
+            "type": "string",
+            "description": "Abbreviation or full text names of ethnic groups may be entered. Note that multiple answers are permissible, separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "address": {
+            "type": "string",
+            "description": "The street address of the patient’s mailing address.",
+            "nullable": true
+          },
+          "reserved": {
+            "type": "string",
+            "description": "This field is reserved for future expansion.",
+            "nullable": true
+          },
+          "telNo": {
+            "type": "string",
+            "description": "The patient’s telephone number.",
+            "nullable": true
+          },
+          "attendingPhysicianID": {
+            "type": "string",
+            "description": "The physician(s) caring for the patient as either names or codes, as agreed upon between the sender and the receiver. Identifiers or names, or both, should be separated by component delimiters (^) and formatted like the PatientName field. Multiple physician names (for example, ordering physician, attending physician, referring physician) shall be separated by repeat delimiters (\\).",
+            "nullable": true
+          },
+          "special1": {
+            "type": "string",
+            "description": "Optional text field for vendor use (each laboratory can use this differently).",
+            "nullable": true
+          },
+          "special2": {
+            "type": "string",
+            "description": "Optional text field for vendor use (each laboratory can use this differently).",
+            "nullable": true
+          },
+          "height": {
+            "type": "string",
+            "description": "Optional numeric field containing the patient’s height. The default units are centimeters. If measured in terms of another unit, the units should also be transmitted separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "weight": {
+            "type": "string",
+            "description": "Optional numeric field containing the patient’s weight. The default units are kilograms. If measured in terms of another unit, for example, pounds, the unit name shall also be transmitted separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "diagnosis": {
+            "type": "string",
+            "description": "This value should be entered either as an ICD-9 code or as free text. If multiple diagnoses are recorded, they shall be separated by repeat delimiters (\\).",
+            "nullable": true
+          },
+          "activeMeds": {
+            "type": "string",
+            "description": "This field is used for patient active medications or those suspected, in overdose situations. The generic name shall be used. This field is of use in interpretation of clinical results.",
+            "nullable": true
+          },
+          "diet": {
+            "type": "string",
+            "description": "This optional field in free text should be used to indicate such conditions that affect results of testing, such as 16-hour fast (for triglycerides) and no red meat (for hemoccult testing).",
+            "nullable": true
+          },
+          "pF1": {
+            "type": "string",
+            "description": "This is a text field for use by the practice; the optional transmitted text will be returned with the results.",
+            "nullable": true
+          },
+          "pF2": {
+            "type": "string",
+            "description": "This is a text field for use by the practice; the optional transmitted text will be returned with the results.",
+            "nullable": true
+          },
+          "admDates": {
+            "type": "string",
+            "description": "Admission and discharge dates, in YYYYMMDD format. The discharge date, when included, follows the admission date and is separated from it by a repeat delimiter (\\).",
+            "nullable": true
+          },
+          "admStatus": {
+            "type": "string",
+            "description": "Admission status, represented by the following minimal list or by extensions agreed upon between the sender and receiver: OP (outpatient), PA (preadmit), IP (inpatient), ER (emergency room).",
+            "nullable": true
+          },
+          "location": {
+            "type": "string",
+            "description": "The general clinic location or nursing unit, or ward or bed (or both) of the patient.",
+            "nullable": true
+          },
+          "altCodeNature": {
+            "type": "string",
+            "description": "Nature of Alternative Diagnostic Code and Classifiers. It identifies the class of code or classifiers that are transmitted (e.g., DRGs, or in the future, AVGs [ambulatory visitation groups]).",
+            "nullable": true
+          },
+          "altCode": {
+            "type": "string",
+            "description": "Alternative diagnostic codes and classifications (e.g., DRG codes) can be included in this field. The nature of the diagnostic code is identified in the AltCodeNature field. If multiple codes are included, they should be separated by repeat delimiters (\\). Individual codes can be followed by optional test descriptors (when the latter are present) and must be separated by component delimiters (^).",
+            "nullable": true
+          },
+          "religion": {
+            "type": "string",
+            "description": "When needed, this value shall include the patient’s religion. Codes or names may be sent as agreed upon between the sender and the receiver. Full names of religions may also be sent as required.",
+            "nullable": true
+          },
+          "maritalStatus": {
+            "type": "string",
+            "description": "When required, this value shall indicate the marital status of the patient as follows:<br>M = married<br>S = single<br>D = divorced<br>W = widowed<br>A = separated",
+            "nullable": true
+          },
+          "isolationStatus": {
+            "type": "string",
+            "description": "Isolation codes indicate precautions that must be applied to protect the patient or staff against infection. Multiple precautions can be listed when separated by repeat delimiters (\\). Full text precautions may also be sent.",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "description": "The patient’s primary language. This may be needed when the patient is not fluent in the local language.",
+            "nullable": true
+          },
+          "hospService": {
+            "type": "string",
+            "description": "The hospital service currently assigned to the patient. Both code and text may be sent when separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "hospInstitution": {
+            "type": "string",
+            "description": "The hospital institution currently assigned to the patient. Both code and text may be sent when separated by a component delimiter (^).",
+            "nullable": true
+          },
+          "dosageCategory": {
+            "type": "string",
+            "description": "The patient dosage group. For example, A–ADULT, P1–PEDIATRIC (one to six months), P2–PEDIATRIC (six months to three years), etc.",
+            "nullable": true
+          },
+          "orders": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderRequest"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "This record type contains information about an individual patient."
+      },
+      "Result": {
+        "type": "object",
+        "properties": {
+          "resultID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "universalTestID": {
+            "type": "string",
+            "nullable": true
+          },
+          "resultValue": {
+            "type": "string",
+            "nullable": true
+          },
+          "unit": {
+            "type": "string",
+            "nullable": true
+          },
+          "refRange": {
+            "type": "string",
+            "nullable": true
+          },
+          "abnormal": {
+            "type": "string",
+            "nullable": true
+          },
+          "abNature": {
+            "type": "string",
+            "nullable": true
+          },
+          "resStatus": {
+            "type": "string",
+            "nullable": true
+          },
+          "normsChanged": {
+            "type": "string",
+            "nullable": true
+          },
+          "operatorID": {
+            "type": "string",
+            "nullable": true
+          },
+          "testStart": {
+            "type": "string",
+            "nullable": true
+          },
+          "testEnd": {
+            "type": "string",
+            "nullable": true
+          },
+          "instrumentID": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false,
+        "description": "Each result record contains the results of a single analytic determination."
+      }
+    }
+  }
+}
