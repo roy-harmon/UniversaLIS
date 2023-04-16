@@ -16,3 +16,5 @@
 /ProjectInstaller.Designer.cs
 /ProjectInstaller.cs
 /.gitignore
+/REST-LIS/bin/Debug/net6.0-windows
+/REST-LIS/obj
