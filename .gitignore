@@ -2,8 +2,6 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/REST-LIS
-/Properties/config.yml
 /UniversaLIS/upgrade-assistant.clef
 /UniversaLIS/UniLisApi.cs
 /UniversaLIS/swagger.json
@@ -18,10 +16,3 @@
 /ProjectInstaller.Designer.cs
 /ProjectInstaller.cs
 /.gitignore
-/upgrade-assistant.clef
-/UniLisApi.cs
-/ReliableSerialPort.cs
-/Properties/config.yml
-/ProjectInstaller.resx
-/ProjectInstaller.Designer.cs
-/ProjectInstaller.cs
