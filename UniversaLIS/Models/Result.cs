@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -9,7 +10,7 @@ using System.Text.Json.Serialization;
 
 namespace UniversaLIS.Models
 {
-     [Table("ResultRecord")]
+     [Table("ResultRecord"), SwaggerSchema("Each result record contains the results of a single analytic determination.")]
      public class Result
      {
           private OrderedDictionary elements = new OrderedDictionary();

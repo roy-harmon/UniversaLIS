@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -14,7 +15,7 @@ namespace UniversaLIS.Models
           public Patient Patient { get; set; }
           [JsonIgnore]
           public int PatientID { get => Patient.PatientID; set => Patient.PatientID = value; }
-          [JsonPropertyOrder(100)]
+          [JsonPropertyOrder(100), SwaggerSchema("The list of results associated with this order.")]
           public override List<Result> Results { get => results; set => results = value; }
           public Order(string orderMessage, Patient patient)
           {
