@@ -30,7 +30,7 @@ namespace UniversaLIS.Models
 
           [JsonPropertyOrder(3), SwaggerSchema("The test ID field is used to identify a test or battery name. The four parts defined by the " +
                "specification are the universal test identifier, the test name, the test identifier type, and the manufacturer-defined test code, separated by a delimiter (^). " +
-               "Some manufacturers only utilize the first part; the resulting UniversalTestID string consists of the test code followed by '^^^' due to the unused parts of the field.")]
+               "Some manufacturers only utilize the last part; the resulting UniversalTestID string consists of '^^^' followed by the test code due to the unused parts of the field.")]
           public string UniversalTestID { get => (string)(Elements["UniversalTestID"] ?? "^^^"); set => Elements["UniversalTestID"] = value; }
 
           [JsonPropertyOrder(4), SwaggerSchema("Test priority code. <br>S = stat<br>A = as soon as possible<br>R = routine<br>C = callback<br>P = preoperative")]
