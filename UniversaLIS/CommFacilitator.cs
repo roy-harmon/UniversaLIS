@@ -169,7 +169,7 @@ namespace UniversaLIS
                                    {
                                         using (DbCommand command = conn.CreateCommand())
                                         {
-                                             command.CommandText = "UPDATE OrderRequest SET PendingSending = 1 WHERE OrderRequestID = @OrderID";
+                                             command.CommandText = "UPDATE OrderRequest SET PendingSending = 1 WHERE OrderID = @OrderID";
                                              DbParameter parameter = command.CreateParameter();
                                              parameter.ParameterName = "@OrderID";
                                              parameter.Value = orderItem.OrderID;
@@ -251,7 +251,7 @@ namespace UniversaLIS
                     return;
                }
                int position = messageLine.IndexOf(Constants.ETB);
-               if (position >= 0)
+               if (position > 0)
                {
                     bInterFrame = true;
                     if (intermediateFrame?.Length > 2)
@@ -363,8 +363,8 @@ namespace UniversaLIS
                }
                else
                {
-                    int pID;
-                    int oID;
+                    long pID;
+                    long oID;
 #if DEBUG
                     UniversaLIService.AppendToLog("Connecting to database.");
 #endif
@@ -380,14 +380,14 @@ namespace UniversaLIS
                               " MaritalStatus, IsolationStatus, Language, HospService, HospInstitution, DosageCategory) VALUES (@PracticePatientID, @LabPatientID, @PatientID3, @PatientName," +
                               " @MMName, @DOB, @Sex, @Race, @Address, @Reserved, @TelNo, @AttendingPhysicianID, @Special1, @Special2, @Height, @Weight, @Diagnosis, @ActiveMeds, @Diet, @PF1, @PF2," +
                               " @AdmDates, @AdmStatus, @Location, @AltCodeNature, @AltCode, @Religion, @MaritalStatus, @IsolationStatus, @Language, @HospService, @HospInstitution, @DosageCategory);";
-                         const string NEW_ORDER = "INSERT INTO OrderRecord (PatientRecordID, SpecimenID, InstrSpecID, UniversalTestID, Priority, OrderDate, CollectionDate, CollectionEndTime," +
+                         const string NEW_ORDER = "INSERT INTO OrderRecord (PatientID, SpecimenID, InstrSpecID, UniversalTestID, Priority, OrderDate, CollectionDate, CollectionEndTime," +
                               " CollectionVolume, CollectorID, ActionCode, DangerCode, RelevantClinicInfo, SpecimenRecvd, SpecimenDescriptor, OrderingPhysician, PhysicianTelNo, UF1, UF2, LF1, LF2," +
                               " LastReported, BillRef, InstrSectionID, ReportType, Reserved, SpecCollectLocation, NosInfFlag, SpecService, SpecInstitution) VALUES (@Patient_ID, @SpecimenID," +
                               " @InstrSpecID, @UniversalTestID, @Priority, @OrderDate, @CollectionDate, @CollectionEndTime, @CollectionVolume, @CollectorID, @ActionCode, @DangerCode, @RelevantClinicInfo," +
                               " @SpecimenRecvd, @SpecimenDescriptor, @OrderingPhysician, @PhysicianTelNo, @UF1, @UF2, @LF1, @LF2, @LastReported, @BillRef, @InstrSectionID, @ReportType, @Reserved," +
                               " @SpecCollectLocation, @NosInfFlag, @SpecService, @SpecInstitution);";
-                         const string NEW_RESULT = "INSERT INTO ResultRecord (OrderRecordID, UniversalTestID, Result, Unit, RefRange, Abnormal, AbNature, ResStatus, NormsChanged, OperatorID, TestStart," +
-                              " TestEnd, InstrumentID) VALUES (@Order_ID, @UniversalTestID, @Result, @Unit, @RefRange, @Abnormal, @AbNature, @ResStatus, @NormsChanged, @OperatorID, @TestStart, @TestEnd, @InstrumentID);";
+                         const string NEW_RESULT = "INSERT INTO ResultRecord (OrderID, UniversalTestID, ResultValue, Unit, RefRange, Abnormal, AbNature, ResStatus, NormsChanged, OperatorID, TestStart," +
+                              " TestEnd, InstrumentID) VALUES (@Order_ID, @UniversalTestID, @ResultValue, @Unit, @RefRange, @Abnormal, @AbNature, @ResStatus, @NormsChanged, @OperatorID, @TestStart, @TestEnd, @InstrumentID);";
 
                          foreach (var patient in message.Patients)
                          {
@@ -441,15 +441,11 @@ namespace UniversaLIS
                                    {
                                         switch (element.Key)
                                         {
-                                             case "DOB":
-                                             case "AdmDates":
-                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? null : ParseLISDate($"{element.Value}"));
-                                                  break;
                                              case "FrameNumber":
                                              case "Sequence#":
                                                   break;
                                              default:
-                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? null : $"{element.Value}");
+                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? DBNull.Value : $"{element.Value}");
                                                   break;
                                         }
                                    }
@@ -458,7 +454,7 @@ namespace UniversaLIS
                               using (DbCommand command = conn.CreateCommand())
                               {
                                    command.CommandText = LAST_INSERTED;
-                                   pID = (int)(command.ExecuteScalar() ?? 0);
+                                   pID = (long)(command.ExecuteScalar() ?? 0);
                               }
                               foreach (Order order in patient.Orders)
                               {
@@ -508,18 +504,11 @@ namespace UniversaLIS
                                         {
                                              switch (enumerator.Key)
                                              {
-                                                  case "OrderDate":
-                                                  case "CollectionDate":
-                                                  case "CollectionEndTime":
-                                                  case "SpecimenRecvd":
-                                                  case "LastReported":
-                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : ParseLISDate($"{enumerator.Value}"));
-                                                       break;
                                                   case "FrameNumber":
                                                   case "Sequence#":
                                                        break;
                                                   default:
-                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}");
+                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}");
                                                        break;
                                              }
                                         }
@@ -528,7 +517,7 @@ namespace UniversaLIS
                                    using (DbCommand command = conn.CreateCommand())
                                    {
                                         command.CommandText = LAST_INSERTED;
-                                        oID = (int)(command.ExecuteScalar() ?? 0);
+                                        oID = (long)(command.ExecuteScalar() ?? 0);
                                    }
                                    // Use the row ID from each of those order records to add
                                    // result records to the IMM_Results table for each Patient.Order.Result in the message.
@@ -557,24 +546,20 @@ namespace UniversaLIS
                                         {
                                              command.CommandText = NEW_RESULT;
                                              AddWithValue(command, "@Order_ID", oID);
-                                             IDictionaryEnumerator enumerator = order.Elements.GetEnumerator();
+                                             IDictionaryEnumerator enumerator = result.Elements.GetEnumerator();
                                              while (enumerator.MoveNext())
                                              {
                                                   switch (enumerator.Key)
                                                   {
-                                                       case "TestStart":
-                                                       case "TestEnd":
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : ParseLISDate($"{enumerator.Value}"));
-                                                            break;
                                                        case "InstrumentID":
                                                             char[] trimmings = { '\x03', '\x0D' };
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}".Trim(trimmings));
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}".Trim(trimmings));
                                                             break;
                                                        case "FrameNumber":
                                                        case "Sequence#":
                                                             break;
                                                        default:
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? null : $"{enumerator.Value}");
+                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}");
                                                             break;
                                                   }
                                              }
@@ -585,20 +570,6 @@ namespace UniversaLIS
                          }
                     }
                }
-          }
-
-          private static DateTime ParseLISDate(string dateString)
-          {
-               return new DateTime(Convert.ToInt32(dateString.Substring(0, 4)), Convert.ToInt32(dateString.Substring(4, 2)), Convert.ToInt32(dateString.Substring(6, 2)), Convert.ToInt32(dateString.Substring(8, 2)), Convert.ToInt32(dateString.Substring(10, 2)), Convert.ToInt32(dateString.Substring(12, 2)));
-          }
-
-          private static string GetDateString(DateTime dateTime)
-          {
-               if (dateTime.Date.Equals(dateTime))
-               {
-                    return String.Format("{0:yyyyMMdd}", dateTime);
-               }
-               return String.Format("{0:yyyyMMddHHmmss}", dateTime);
           }
 
           private static void AddWithValue(DbCommand command, string parameterName, object? value)
@@ -623,7 +594,7 @@ namespace UniversaLIS
                CommState.RcvTimeout();
           }
 
-          private int SendPatientOrders(string SampleNumber, string testID)
+          private long SendPatientOrders(string SampleNumber, string testID)
           {
                bool isQuery = true;
                // TODO: Find a way to handle delimited lists of test codes.
@@ -641,16 +612,16 @@ namespace UniversaLIS
                     isQuery = false;
                }
                // Query the database for [P]atient and [O]rder records for the sample.
-               using (DbConnection conn = new SqliteConnection(serviceConfig.ConnectionString))
+               using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
                {
                     conn.Open();
-                    int orderCount;
+                    long orderCount;
                     using (DbCommand sqlCommand = conn.CreateCommand())
                     { // Check to see how many orders are pending for the sample.
-                         sqlCommand.CommandText = "SELECT COUNT(OrderRequest.OrderRequestID) AS OrderCount FROM OrderRequest WHERE (SpecimenID LIKE @SampleNumber) AND (UniversalTestID LIKE @TestID) AND (PendingSending = 1);";
+                         sqlCommand.CommandText = "SELECT COUNT(OrderRequest.OrderID) AS OrderCount FROM OrderRequest WHERE (SpecimenID LIKE @SampleNumber) AND (UniversalTestID LIKE @TestID) AND (PendingSending = 1);";
                          AddWithValue(sqlCommand, "@SampleNumber", SampleNumber);
                          AddWithValue(sqlCommand, "@TestID", testID);
-                         orderCount = (int)(sqlCommand.ExecuteScalar() ?? 0);
+                         orderCount = (long)(sqlCommand.ExecuteScalar() ?? 0L);
                     }
 
                     if (orderCount == 0)
@@ -671,7 +642,7 @@ namespace UniversaLIS
                     Message responseMessage = new Message(this);
                     string selectPatientsQuery = "SELECT DISTINCT PatientRequest.* FROM PatientRequest JOIN OrderRequest" +
                          " WHERE (SpecimenID LIKE @Sample_Number) AND (UniversalTestID LIKE @Test_ID) AND PendingSending = 1;";
-                    string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientRequestID LIKE @Patient_ID" +
+                    string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientID LIKE @Patient_ID" +
                          " AND UniversalTestID LIKE @Test_ID AND SpecimenID LIKE @Sample_Number AND PendingSending = 1;";
 
 
@@ -696,11 +667,7 @@ namespace UniversaLIS
                                         string fieldName = patientReader.GetName(i);
                                         switch (fieldName)
                                         {
-                                             case "DOB":
-                                             case "AdmDates":
-                                                  patient.Elements[fieldName] = GetDateString((DateTime)patientReader[fieldName]);
-                                                  break;
-                                             case "PatientRequestID":
+                                             case "PatientID":
                                                   patient.PatientID = patientReader.GetInt32(i);
                                                   break;
                                              default:
@@ -732,14 +699,10 @@ namespace UniversaLIS
                                         string fieldName = orderReader.GetName(i);
                                         switch (fieldName)
                                         {
-                                             case "SpecimenRecvd":
-                                             case "LastReported":
-                                                  order.Elements[fieldName] = GetDateString((DateTime)orderReader[fieldName]);
-                                                  break;
-                                             case "OrderRequestID":
+                                             case "OrderID":
                                                   order.OrderID = Convert.ToInt32(orderReader[fieldName]);
                                                   break;
-                                             case "PatientRequestID":
+                                             case "PatientID":
                                              case "PendingSending":
                                                   break;
                                              default:
@@ -755,7 +718,7 @@ namespace UniversaLIS
                          {
                               using (DbCommand command = conn.CreateCommand())
                               {
-                                   command.CommandText = "UPDATE OrderRequest SET PendingSending = 0 WHERE OrderRequestID = @RequestID";
+                                   command.CommandText = "UPDATE OrderRequest SET PendingSending = 0 WHERE OrderID = @RequestID";
                                    AddWithValue(command, "@RequestID", order.OrderID);
                                    command.ExecuteNonQuery();
                              }
