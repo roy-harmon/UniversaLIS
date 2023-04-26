@@ -9,7 +9,7 @@ Interfaces:
         # In accordance with the ASTM/CLSI standards, it is transmitted in plaintext.
         Password:
         # Provide the name of the serial port connected to the instrument.
-        Portname:   COM2
+        Portname:   COM4
         # Acceptable baud rate values include 1200, 2400, 4800, or 9600 (default). Some systems may also support 19200 or 38400.
         Baud:   9600 
         # Acceptable parity values include None (default), Even, or Odd.
@@ -25,7 +25,7 @@ Interfaces:
         UseLegacyFrameSize:  true
         # AutoSendOrders is the interval in milliseconds for checking the database for new order request messages to send.
         # A value of 0 disables automatically sending orders, and they will only be sent in response to a query message from the instrument.
-        AutoSendOrders:   0
+        AutoSendOrders:   1000
 
       ## Uncomment (and copy if necessary) the following lines to add additional instruments with serial port connections.
       #- ReceiverId:    INSTRUMENT_NAME
@@ -39,24 +39,24 @@ Interfaces:
       #  UseLegacyFrameSize:  false
       #  AutoSendOrders:    false
 
-    Tcp:
-        # The ReceiverId should match the "Sender ID" field on the instrument's LIS configuration screen.
-      - ReceiverId:         TESTING
-        # The password can be empty, but it should always match the password field on the instrument's LIS configuration screen.
-        # This string is compared to the password field of each received message header to verify the identity of the instrument.
-        # It is also included in the message header for outgoing messages.
-        # In accordance with the ASTM/CLSI standards, it is transmitted in plaintext.
-        Password:           
-        # UseLegacyFrameSize determines how long a single message frame can be -- anything longer will be split into intermediate frames. 
-        # Set to true to use ASTM-1394 limit of 240 characters. Set to false to use CLSI-LIS2-A2 limit of 63,993 characters.
-        UseLegacyFrameSize: false
-        # The TCP port number used to communicate with the analyzer. 
-        # The instrument may or may not allow the user to specify a number.
-        # In any case, this value must match the setting on the instrument.
-        Socket:             5678
-        # AutoSendOrders is the interval in milliseconds for checking the database for new order request messages to send.
-        # A value of 0 disables automatically sending orders, and they will only be sent in response to a query message from the instrument.
-        AutoSendOrders:     0
+    #Tcp:
+    #    # The ReceiverId should match the "Sender ID" field on the instrument's LIS configuration screen.
+    #  - ReceiverId:         TESTING
+    #    # The password can be empty, but it should always match the password field on the instrument's LIS configuration screen.
+    #    # This string is compared to the password field of each received message header to verify the identity of the instrument.
+    #    # It is also included in the message header for outgoing messages.
+    #    # In accordance with the ASTM/CLSI standards, it is transmitted in plaintext.
+    #    Password:           
+    #    # UseLegacyFrameSize determines how long a single message frame can be -- anything longer will be split into intermediate frames. 
+    #    # Set to true to use ASTM-1394 limit of 240 characters. Set to false to use CLSI-LIS2-A2 limit of 63,993 characters.
+    #    UseLegacyFrameSize: false
+    #    # The TCP port number used to communicate with the analyzer. 
+    #    # The instrument may or may not allow the user to specify a number.
+    #    # In any case, this value must match the setting on the instrument.
+    #    Socket:             5678
+    #    # AutoSendOrders is the interval in milliseconds for checking the database for new order request messages to send.
+    #    # A value of 0 disables automatically sending orders, and they will only be sent in response to a query message from the instrument.
+    #    AutoSendOrders:     0
  
 # The following settings are used more generally by the program and are not instrument-specific. 
 # Some of these settings are currently unused but planned for a future release.
