@@ -4,7 +4,8 @@ An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written i
 
 ## Installation
 
-The project can be registered as a Windows service, but migration from .NET Framework to .NET Core removed service installers. This functionality should be restored, but until I test it more, I don't know the specifics of installation (presumably InstallUtil). The program can also be executed using the Visual Studio debugger.
+The project can be registered as a Windows service, but migration from .NET Framework to .NET Core removed service installers. This functionality should be restored, and it can be registered as a service using `sc create` (see [the MSDN article](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-create)). 
+The program can also be executed using the Visual Studio debugger.
 
 Please note: The software no longer requires a database server in order to function properly. 
 
