@@ -45,7 +45,6 @@ namespace UniversaLIS
           public CountdownTimer BusyTimer { get; set; } = new CountdownTimer(-1);
           public LisCommState CommState { get; set; }
 
-          readonly ServiceConfig serviceConfig = UniversaLIService.GetYamlSettings().ServiceConfig ?? new();
           internal string GetPortDetails()
           {
                return portSettings.GetPortDetails();
@@ -56,7 +55,7 @@ namespace UniversaLIS
           }
 
           // Use this string when setting up internal database connection functions.
-          public const string INTERNAL_CONNECTION_STRING = "Data Source=internal.db";
+          public const string INTERNAL_CONNECTION_STRING = "Data Source=../UniversaLIS/internal.db";
 
           public CommFacilitator(Serial serialSettings, UniversaLIService LIService)
           {

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using SQLitePCL;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using UniversaLIS;
@@ -40,7 +41,7 @@ namespace REST_LIS
                     });
                     options.EnableAnnotations();
                });
-               builder.Services.AddSingleton<BackgroundService, UniversaLIService>();
+               builder.Services.AddHostedService<UniversaLIService>();
                builder.Services.AddDbContext<PatientDB>();
                builder.Services.ConfigureAll<JsonSerializerOptions>(opts => {
                     opts.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
@@ -54,7 +55,7 @@ namespace REST_LIS
                     app.UseSwagger();
                     app.UseSwaggerUI();
                }
-
+               
                app.UseHttpsRedirection();
                app.UseAuthorization();
                app.MapGet("/", () => "Hello World!").WithName("HelloWorld").ExcludeFromDescription();
@@ -139,7 +140,6 @@ namespace REST_LIS
                          return dB.DeletePatientRequestById(id);
                     }
                }).WithName("DeletePatientRequestByID").Produces(StatusCodes.Status204NoContent).Produces(StatusCodes.Status404NotFound);
-
                app.Run();
           }
      }

@@ -32,14 +32,12 @@ namespace UniversaLIS
                         {
                              LoggerProviderOptions.RegisterProviderOptions<EventLogSettings, EventLogLoggerProvider>(services);
                         }
-
                         services.AddHostedService<UniversaLIService>();
                    })
                    .ConfigureLogging((context, logging) =>
                    {
                         // See: https://github.com/dotnet/runtime/issues/47303
-                        logging.AddConfiguration(
-                            context.Configuration.GetSection("Logging"));
+                        logging.AddConfiguration(context.Configuration.GetSection("Logging"));
                    })
                    .UseWindowsService()
                    .Build();

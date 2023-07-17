@@ -15,11 +15,6 @@ namespace UniversaLIS
           public readonly ILogger<UniversaLIService> EventLogger;
           private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
 
-          public static bool ListenHL7 { get; set; }
-          public static int HL7Port { get; set; }
-          public static string? ExternalDbConnString { get; set; }
-          public static int DbPollInterval { get; set; }
-
           private static YamlSettings yamlSettings = GetSettings();
 
           public static YamlSettings GetYamlSettings()
@@ -34,7 +29,7 @@ namespace UniversaLIS
 
           private static YamlSettings GetSettings()
           {
-               using var reader = new StreamReader("Properties/config.yml");
+               using var reader = new StreamReader("../UniversaLIS/config.yml");
                var yamlText = reader.ReadToEnd();
                var deserializer = new DeserializerBuilder()
                     .Build();
@@ -53,12 +48,16 @@ namespace UniversaLIS
 
           protected override async Task ExecuteAsync(CancellationToken stoppingToken)
           {
-               OnStart();
-               while (!stoppingToken.IsCancellationRequested)
+               try
                {
-                    await Task.Delay(1000, stoppingToken);
+                    OnStart();
+                    Console.WriteLine($"{s_commFacilitators.Count} port(s) active.");
+                    while (!stoppingToken.IsCancellationRequested)
+                    {
+                         await Task.Delay(1000, stoppingToken);
+                    }
                }
-               OnStop();
+               finally { OnStop(); }
           }
 
           protected void OnStart()
