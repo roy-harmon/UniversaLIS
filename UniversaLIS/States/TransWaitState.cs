@@ -35,10 +35,6 @@ namespace UniversaLIS.States
         }
         public void RcvACK()
         {
-#if DEBUG
-            AppendToLog("CurrentMessage.FrameList.Count: " + comm.CurrentMessage.FrameList.Count);
-            AppendToLog("CurrentFrameCounter: " + comm.CurrentFrameCounter);
-#endif
             // If all frames have been sent, end the transmission.
             if (comm.CurrentMessage.FrameList.Count == comm.CurrentFrameCounter)
             {

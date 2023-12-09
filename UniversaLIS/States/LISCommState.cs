@@ -112,9 +112,6 @@ namespace UniversaLIS.States
                 CommState.HaveData();
                 // Change state
                 ChangeToTransENQState();
-#if DEBUG
-                AppendToLog("HaveData complete.");
-#endif
             }
         }
 
@@ -123,30 +120,18 @@ namespace UniversaLIS.States
             CommState = new IdleState(comm);
             comm.CurrentFrameCounter = 0;
             comm.TransTimer.Reset(-1);
-#if DEBUG
-            AppendToLog("CommState changed to IdleState!");
-#endif
         }
         public void ChangeToTransENQState()
         {
             CommState = new TransEnqState(comm);
-#if DEBUG
-            AppendToLog("CommState changed to TransENQState!");
-#endif
         }
         public void ChangeToTransWaitState()
         {
             CommState = new TransWaitState(comm);
-#if DEBUG
-            AppendToLog("CommState changed to TransWaitState!");
-#endif
         }
         public void ChangeToRcvWaitState()
         {
             CommState = new RcvWaitState(comm);
-#if DEBUG
-            AppendToLog("CommState changed to RcvWaitState!");
-#endif
         }
 
         public void TransTimeout()

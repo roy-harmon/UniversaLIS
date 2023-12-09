@@ -69,9 +69,6 @@
                 comm.Send(Constants.ENQ);
                 // Set transTimer = 15
                 comm.TransTimer.Reset(15);
-#if DEBUG
-                UniversaLIService.AppendToLog("Transaction timer reset: 15.");
-#endif
             }
         }
 

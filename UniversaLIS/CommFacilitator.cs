@@ -199,26 +199,11 @@ namespace UniversaLIS
                try
                {
                     idleTimer.Stop();
-#if DEBUG
-                    System.Diagnostics.Stopwatch stopwatch = System.Diagnostics.Stopwatch.StartNew(); // This stopwatch is an attempt at performance optimization. 
-#endif
                     /* There are a few messages that won't end in a NewLine,
                      * so we have to read one character at a time until we run out of them.
                      */
                     // Read one char at a time until the ReadChar times out.
-                    try
-                    {
-                         buffer.Append(port.ReadChars());
-                    }
-                    catch (Exception)
-                    {
-#if DEBUG
-                         stopwatch.Stop();
-#endif
-                    }
-#if DEBUG
-                    UniversaLIService.AppendToLog($"Elapsed port read time: {stopwatch.ElapsedMilliseconds}");
-#endif
+                    buffer.Append(port.ReadChars());
                     UniversaLIService.AppendToLog($"In: \t{buffer}");
                     CommState.RcvInput(buffer.ToString());
                     idleTimer.Start();
@@ -259,7 +244,7 @@ namespace UniversaLIS
                     }
                     else
                     {
-                         intermediateFrame += messageLine.Substring(0, position);
+                         intermediateFrame += messageLine[..position];
                     }
                     return; // Don't process yet; this is an intermediate frame with more to come.
                }
@@ -315,9 +300,6 @@ namespace UniversaLIS
           public void ProcessMessage(Message message)
           {
                /* The message is complete. Deal with it. */
-#if DEBUG
-               UniversaLIService.AppendToLog("Processing message.");
-#endif
                if (message == null)
                {
                     UniversaLIService.AppendToLog("MessageBody is null!");
@@ -327,9 +309,6 @@ namespace UniversaLIS
                if (message.Direction == Message.MessageDirection.Outbound)
                {
                     // Message is outgoing. Queue it up to be sent to the instrument.
-#if DEBUG
-                    UniversaLIService.AppendToLog("Outgoing message, adding to queue...");
-#endif
                     OutboundInstrumentMessageQueue.Enqueue(message);
                }
                else if (message.Direction == Message.MessageDirection.Inbound)
@@ -364,16 +343,10 @@ namespace UniversaLIS
                {
                     long pID;
                     long oID;
-#if DEBUG
-                    UniversaLIService.AppendToLog("Connecting to database.");
-#endif
                     // This is where we have to connect to the database.
                     using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
                     {
                          conn.Open();
-#if DEBUG
-                         UniversaLIService.AppendToLog("Database connection open.");
-#endif
                          const string NEW_PATIENT = "INSERT INTO PatientRecord (PracticePatientID, LabPatientID, PatientID3, PatientName, MMName, DOB, Sex, Race, Address, Reserved, TelNo," +
                               " AttendingPhysicianID, Special1, Special2, Height, Weight, Diagnosis, ActiveMeds, Diet, PF1, PF2, AdmDates, AdmStatus, Location, AltCodeNature, AltCode, Religion," +
                               " MaritalStatus, IsolationStatus, Language, HospService, HospInstitution, DosageCategory) VALUES (@PracticePatientID, @LabPatientID, @PatientID3, @PatientName," +
