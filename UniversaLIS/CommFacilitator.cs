@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.IO;
+using System.Net;
 using System.Text;
 using UniversaLIS.Models;
 using UniversaLIS.States;
@@ -55,7 +56,7 @@ namespace UniversaLIS
           }
 
           // Use this string when setting up internal database connection functions.
-          public const string INTERNAL_CONNECTION_STRING = "Data Source=../UniversaLIS/internal.db";
+          public const string INTERNAL_CONNECTION_STRING = "Data Source=../UniversaLIS/internal.db"; // TODO: Update this DB location!
 
           public CommFacilitator(Serial serialSettings, UniversaLIService LIService)
           {
@@ -76,7 +77,7 @@ namespace UniversaLIS
                CommState = new LisCommState(this);
                RcvTimer = new CountdownTimer(-1, ReceiptTimedOut);
                TransTimer = new CountdownTimer(-1, TransactionTimedOut);
-               CurrentMessage = new Message(this);
+               CurrentMessage = NewMessage();
                try
                {
                     // Set the handler for the DataReceived event.
@@ -131,7 +132,7 @@ namespace UniversaLIS
                     ComPort = new TcpPort(tcpSettings);
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += CommPortDataReceived!;
-                    CurrentMessage = new Message(this);
+                    CurrentMessage = NewMessage();
                     ComPort.Open();
                     AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
@@ -148,6 +149,25 @@ namespace UniversaLIS
                     throw;
                }
           }
+          
+          public Message NewMessage()
+          {
+               return new Message(frameSize,
+                                  password,
+                                  GetYamlSettings()?.ServiceConfig?.LisId,
+                                  UniversaLIService.GetYamlSettings()?.ServiceConfig?.Address,
+                                  UniversaLIService.GetYamlSettings()?.ServiceConfig?.Phone,
+                                  GetPortDetails(),
+                                  receiver_id);
+          }
+
+          public Message NewMessage(char terminator)
+          {
+               Message message = NewMessage();
+               message.Terminator = terminator;
+               return message;
+          }
+
           public void Close()
           {
                try
@@ -602,16 +622,13 @@ namespace UniversaLIS
                          {
                               // Reply with a "no information available from last query" message (terminator = "I")
                               UniversaLIService.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
-                              Message messageBody = new Message(this)
-                              {
-                                   Terminator = 'I'
-                              };
+                              Message messageBody = NewMessage('I');
                               ProcessMessage(messageBody);
                          }
                          // Exit function.
                          return orderCount;
                     }
-                    Message responseMessage = new Message(this);
+                    Message responseMessage = NewMessage();
                     string selectPatientsQuery = "SELECT DISTINCT PatientRequest.* FROM PatientRequest JOIN OrderRequest" +
                          " WHERE (SpecimenID LIKE @Sample_Number) AND (UniversalTestID LIKE @Test_ID) AND PendingSending = 1;";
                     string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientID LIKE @Patient_ID" +

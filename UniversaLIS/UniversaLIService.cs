@@ -14,8 +14,8 @@ namespace UniversaLIS
      {
           public readonly ILogger<UniversaLIService> EventLogger;
           private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
-
-          private static YamlSettings yamlSettings = GetSettings();
+          private readonly Task _completedTask = Task.CompletedTask;
+          private static readonly YamlSettings yamlSettings = GetSettings();
 
           public static YamlSettings GetYamlSettings()
           {
@@ -29,7 +29,16 @@ namespace UniversaLIS
 
           private static YamlSettings GetSettings()
           {
-               using var reader = new StreamReader("../UniversaLIS/config.yml");
+               string configPath;
+               if (Environment.UserInteractive)
+               {
+                    configPath = Path.Combine(Directory.GetCurrentDirectory(), "..\\UniversaLIS\\config.yml");
+               }
+               else
+               {
+                    configPath = Environment.ExpandEnvironmentVariables("%ProgramW6432%\\UniversaLIS\\config.yml");
+               }
+               using var reader = new StreamReader(configPath);
                var yamlText = reader.ReadToEnd();
                var deserializer = new DeserializerBuilder()
                     .Build();
@@ -43,27 +52,19 @@ namespace UniversaLIS
                     return;
                }
                string? message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
-               EventLogger.LogError(message);
+               EventLogger.LogError(message: message);
           }
 
-          protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+          protected override Task ExecuteAsync(CancellationToken stoppingToken)
           {
-               try
-               {
-                    OnStart();
-                    Console.WriteLine($"{s_commFacilitators.Count} port(s) active.");
-                    while (!stoppingToken.IsCancellationRequested)
-                    {
-                         await Task.Delay(1000, stoppingToken);
-                    }
-               }
-               finally { OnStop(); }
+               return Task.Delay(Timeout.Infinite, stoppingToken);
           }
 
           protected void OnStart()
           {
                try
                {
+                    AppendToLog("Starting service; reading config.yml and opening ports.");
                     foreach (var serialPort in GetYamlSettings()?.Interfaces?.Serial ?? Enumerable.Empty<Serial>())
                     {
                          s_commFacilitators.Add(new CommFacilitator(serialPort, this));
@@ -72,6 +73,7 @@ namespace UniversaLIS
                     {
                          s_commFacilitators.Add(new CommFacilitator(tcpPort, this));
                     }
+                    AppendToLog("All configured ports opened.");
                }
                catch (Exception ex)
                {
@@ -110,33 +112,10 @@ namespace UniversaLIS
                File.AppendAllText(txtFile, txtWrite);
           }
 
-
-          public static string CHKSum(string message)
-          {
-               // This function returns the checksum for the data string passed to it.
-               // If I've done it right, the checksum is calculated by binary 8-bit addition of all included characters
-               // with the 8th or parity bit assumed zero. Carries beyond the 8th bit are lost. The 8-bit result is
-               // converted into two printable ASCII Hex characters ranging from 00 to FF, which are then inserted into
-               // the data stream. Hex alpha characters are always uppercase.
-
-               string? checkSum;
-               int ascSum, modVal;
-               ascSum = 0;
-               foreach (char c in message)
-               {
-                    if ((int)c != 2)
-                    {    // Don't count any STX.
-                         ascSum += (int)c;
-                    }
-               }
-               modVal = ascSum % 256;
-               checkSum = modVal.ToString("X");
-               return checkSum.PadLeft(2, '0');
-          }
-
           // <summary>Method invoked when service is started from a debugging console.</summary>
           internal void DebuggingRoutine()
           {
+               AppendToLog("Executing debugging routine...");
                OnStart();
                while (Console.ReadLine() is null)
                {
@@ -144,6 +123,20 @@ namespace UniversaLIS
                     Console.ReadLine();
                }
                OnStop();
+          }
+
+          public override Task StartAsync(CancellationToken cancellationToken)
+          {
+               AppendToLog("Initializing UniversaLIS background service...");
+               OnStart();
+               AppendToLog($"{s_commFacilitators.Count} port(s) active.");
+               return _completedTask;
+          }
+
+          public override Task StopAsync(CancellationToken cancellationToken)
+          {
+               OnStop();
+               return _completedTask;
           }
      }
 

@@ -143,9 +143,9 @@ namespace UniversaLIS.States
                 if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
                 {
                     comm.OutboundInstrumentMessageQueue.Enqueue(comm.CurrentMessage);
-                    comm.CurrentMessage = new Message(comm);
+                    comm.CurrentMessage = comm.NewMessage();
                 }
-                comm.CurrentMessage = new Message(comm);
+                comm.CurrentMessage = comm.NewMessage();
                 comm.CurrentFrameCounter = 0;
                 ChangeToIdleState();
             }
@@ -157,7 +157,7 @@ namespace UniversaLIS.States
                 // Discard last incomplete message.
                 if (comm.CurrentMessage.Terminator < 'E')
                 {
-                    comm.CurrentMessage = new Message(comm);
+                    comm.CurrentMessage = comm.NewMessage();
                 }
                 else
                 {

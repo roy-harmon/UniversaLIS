@@ -39,7 +39,7 @@ namespace UniversaLIS.States
             if (comm.CurrentMessage.FrameList.Count == comm.CurrentFrameCounter)
             {
                 comm.Send(Constants.EOT);
-                comm.CurrentMessage = new Message(comm);
+                comm.CurrentMessage = comm.NewMessage();
             }
             else
             {
@@ -94,7 +94,7 @@ namespace UniversaLIS.States
                 // Maybe stick the message back in the queue to try again later?
                 comm.Send(Constants.EOT);
                 comm.OutboundInstrumentMessageQueue.Enqueue(comm.CurrentMessage);
-                comm.CurrentMessage = new Message(comm);
+                comm.CurrentMessage = comm.NewMessage();
             }
         }
 

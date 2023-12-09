@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UniversaLIS", "UniversaLIS.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "REST-LIS", "..\REST-LIS\REST-LIS.csproj", "{2738C624-2103-4CEF-B76C-29BF5A48A1DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LisMessageModels", "..\LisMessageModels\LisMessageModels.csproj", "{C1B00197-5A73-4A4E-AADD-D28197B6B8DB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2738C624-2103-4CEF-B76C-29BF5A48A1DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1B00197-5A73-4A4E-AADD-D28197B6B8DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1B00197-5A73-4A4E-AADD-D28197B6B8DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1B00197-5A73-4A4E-AADD-D28197B6B8DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1B00197-5A73-4A4E-AADD-D28197B6B8DB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

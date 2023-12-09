@@ -128,7 +128,7 @@ namespace UniversaLIS.States
                // but for some reason the "Result Message" examples in the documentation don't match. 
                // The other messages do, though, so it's probably fine.
                // If the checksum doesn't match, write a <NAK> to the sender.
-               if (checkSum != CHKSum(mainMessage))
+               if (checkSum != Message.CHKSum(mainMessage))
                {
                     return false;
                }
@@ -148,7 +148,7 @@ namespace UniversaLIS.States
                // Discard last incomplete message (if applicable).
                if (comm.CurrentMessage.Terminator < 'E')
                {
-                    comm.CurrentMessage = new Message(comm);
+                    comm.CurrentMessage = comm.NewMessage();
                }
                else
                {
