@@ -10,9 +10,9 @@ namespace UniversaLIS.Models
      public class OrderBase
      {
           private protected int orderID;
-          private List<Comment> comments = new List<Comment>();
-          private OrderedDictionary elements = new OrderedDictionary();
-          private List<Result> results = new List<Result>();
+          private List<Comment> comments = new();
+          private OrderedDictionary elements = new();
+          private List<Result> results = new();
           [JsonIgnore, NotMapped]
           public OrderedDictionary Elements { get => elements; set => elements = value; }
 
@@ -179,40 +179,40 @@ namespace UniversaLIS.Models
                     // Invalid number of elements.
                     throw new Exception("Invalid number of elements in order record string.");
                }
-               Elements["FrameNumber"] = nullifyEmptyString(inArray[0]);
-               Elements["Sequence#"] = nullifyEmptyString(inArray[1]);
-               Elements["SpecimenID"] = nullifyEmptyString(inArray[2]);
-               Elements["InstrSpecID"] = nullifyEmptyString(inArray[3]);
-               Elements["UniversalTestID"] = nullifyEmptyString(inArray[4]);
-               Elements["Priority"] = nullifyEmptyString(inArray[5]);
-               Elements["OrderDate"] = nullifyEmptyString(inArray[6]);
-               Elements["CollectionDate"] = nullifyEmptyString(inArray[7]);
-               Elements["CollectionEndTime"] = nullifyEmptyString(inArray[8]);
-               Elements["CollectionVolume"] = nullifyEmptyString(inArray[9]);
-               Elements["CollectorID"] = nullifyEmptyString(inArray[10]);
-               Elements["ActionCode"] = nullifyEmptyString(inArray[11]);
-               Elements["DangerCode"] = nullifyEmptyString(inArray[12]);
-               Elements["RelevantClinicInfo"] = nullifyEmptyString(inArray[13]);
-               Elements["SpecimenRecvd"] = nullifyEmptyString(inArray[14]);
-               Elements["SpecimenDescriptor"] = nullifyEmptyString(inArray[15]);
-               Elements["OrderingPhysician"] = nullifyEmptyString(inArray[16]);
-               Elements["PhysicianTelNo"] = nullifyEmptyString(inArray[17]);
-               Elements["UF1"] = nullifyEmptyString(inArray[18]);
-               Elements["UF2"] = nullifyEmptyString(inArray[19]);
-               Elements["LF1"] = nullifyEmptyString(inArray[20]);
-               Elements["LF2"] = nullifyEmptyString(inArray[21]);
-               Elements["LastReported"] = nullifyEmptyString(inArray[22]);
-               Elements["BillRef"] = nullifyEmptyString(inArray[23]);
-               Elements["InstrSectionID"] = nullifyEmptyString(inArray[24]);
-               Elements["ReportType"] = nullifyEmptyString(inArray[25]);
-               Elements["Reserved"] = nullifyEmptyString(inArray[26]);
-               Elements["SpecCollectLocation"] = nullifyEmptyString(inArray[27]);
-               Elements["NosInfFlag"] = nullifyEmptyString(inArray[28]);
-               Elements["SpecService"] = nullifyEmptyString(inArray[29]);
-               Elements["SpecInstitution"] = nullifyEmptyString(inArray[30]);
+               Elements["FrameNumber"] = NullifyEmptyString(inArray[0]);
+               Elements["Sequence#"] = NullifyEmptyString(inArray[1]);
+               Elements["SpecimenID"] = NullifyEmptyString(inArray[2]);
+               Elements["InstrSpecID"] = NullifyEmptyString(inArray[3]);
+               Elements["UniversalTestID"] = NullifyEmptyString(inArray[4]);
+               Elements["Priority"] = NullifyEmptyString(inArray[5]);
+               Elements["OrderDate"] = NullifyEmptyString(inArray[6]);
+               Elements["CollectionDate"] = NullifyEmptyString(inArray[7]);
+               Elements["CollectionEndTime"] = NullifyEmptyString(inArray[8]);
+               Elements["CollectionVolume"] = NullifyEmptyString(inArray[9]);
+               Elements["CollectorID"] = NullifyEmptyString(inArray[10]);
+               Elements["ActionCode"] = NullifyEmptyString(inArray[11]);
+               Elements["DangerCode"] = NullifyEmptyString(inArray[12]);
+               Elements["RelevantClinicInfo"] = NullifyEmptyString(inArray[13]);
+               Elements["SpecimenRecvd"] = NullifyEmptyString(inArray[14]);
+               Elements["SpecimenDescriptor"] = NullifyEmptyString(inArray[15]);
+               Elements["OrderingPhysician"] = NullifyEmptyString(inArray[16]);
+               Elements["PhysicianTelNo"] = NullifyEmptyString(inArray[17]);
+               Elements["UF1"] = NullifyEmptyString(inArray[18]);
+               Elements["UF2"] = NullifyEmptyString(inArray[19]);
+               Elements["LF1"] = NullifyEmptyString(inArray[20]);
+               Elements["LF2"] = NullifyEmptyString(inArray[21]);
+               Elements["LastReported"] = NullifyEmptyString(inArray[22]);
+               Elements["BillRef"] = NullifyEmptyString(inArray[23]);
+               Elements["InstrSectionID"] = NullifyEmptyString(inArray[24]);
+               Elements["ReportType"] = NullifyEmptyString(inArray[25]);
+               Elements["Reserved"] = NullifyEmptyString(inArray[26]);
+               Elements["SpecCollectLocation"] = NullifyEmptyString(inArray[27]);
+               Elements["NosInfFlag"] = NullifyEmptyString(inArray[28]);
+               Elements["SpecService"] = NullifyEmptyString(inArray[29]);
+               Elements["SpecInstitution"] = NullifyEmptyString(inArray[30]);
           }
 
-          private static string? nullifyEmptyString(string? input)
+          private static string? NullifyEmptyString(string? input)
           {
                if (input == "") {
                     return null;

@@ -92,14 +92,8 @@
     <None Remove="AnalysisReport.sarif" />
     <None Remove="config.yml" />
     <None Remove="external_db_create_table_scripts.sql" />
-    <None Remove="internal.db" />
     <None Remove="mock_external.db" />
     <None Remove="upgrade-assistant.clef" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="internal.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LisMessageModels\LisMessageModels.csproj" />

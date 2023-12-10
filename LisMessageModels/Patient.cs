@@ -13,8 +13,10 @@ namespace UniversaLIS.Models
      [Table("PatientRecord")]
      public class Patient : PatientBase
      {
-          private List<Order> orders = new List<Order>();
-          private List<Comment> comments = new List<Comment>();
+          private List<Order> orders = new();
+          // Comments can be added at any level. 
+          // TODO: Support comments.
+          private List<Comment> comments = new();
 
           [JsonPropertyOrder(100)]
           public new List<Order> Orders { get => orders; set => orders = value; }

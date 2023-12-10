@@ -10,7 +10,7 @@ namespace UniversaLIS.Models
           [JsonIgnore]
           private int patientID;
           private PatientBase patient;
-          private List<Result> results = new List<Result>();
+          private List<Result> results = new();
 
           [JsonIgnore, ForeignKey(nameof(Patient))]
           public int PatientID { get => patientID; set => patientID = value; }

@@ -11,8 +11,8 @@ namespace UniversaLIS
           {
                public List<Serial>? Serial { get; set; }
                public List<Tcp>? Tcp { get; set; }
-
           }
+          public string? RestLisAddress { get; set; }
      }
      public interface IPortSettings
      {

@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
@@ -13,11 +15,19 @@ namespace UniversaLIS
      public partial class UniversaLIService : BackgroundService
      {
           public readonly ILogger<UniversaLIService> EventLogger;
-          private static readonly List<CommFacilitator> s_commFacilitators = new List<CommFacilitator>();
+          private static readonly List<CommFacilitator> s_commFacilitators = new();
           private readonly Task _completedTask = Task.CompletedTask;
           private static readonly YamlSettings yamlSettings = GetSettings();
+          private static readonly HttpClient client = new();
 
-          public static YamlSettings GetYamlSettings()
+          public HttpResponseMessage SendRestLisRequest(HttpMethod method, string relativeUri, object body)
+          {
+               HttpRequestMessage message = new HttpRequestMessage(method, relativeUri);
+               message.Content = (HttpContent?)body;
+               return client.Send(message);
+          }
+
+          public YamlSettings GetYamlSettings()
           {
                return yamlSettings;
           }
@@ -80,6 +90,7 @@ namespace UniversaLIS
                     HandleEx(ex);
                     throw;
                }
+               client.BaseAddress = new Uri(GetYamlSettings()?.RestLisAddress ?? "https://localhost:7194/");
           }
           protected void OnStop()
           {
@@ -138,6 +149,7 @@ namespace UniversaLIS
                OnStop();
                return _completedTask;
           }
+
      }
 
 }

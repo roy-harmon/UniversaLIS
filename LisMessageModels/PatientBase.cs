@@ -11,8 +11,8 @@ namespace UniversaLIS.Models
      [SwaggerSchema("This record type contains information about an individual patient.")]
      public class PatientBase
      {
-          private OrderedDictionary elements = new OrderedDictionary();
-          private List<OrderBase> orders = new List<OrderBase>();
+          private OrderedDictionary elements = new();
+          private List<OrderBase> orders = new();
           private int patientID;
           [NotMapped, JsonIgnore]
           public OrderedDictionary Elements { get => elements; set => elements = value; }

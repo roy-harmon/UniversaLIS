@@ -13,8 +13,8 @@ namespace UniversaLIS.Models
      [Table("ResultRecord"), SwaggerSchema("Each result record contains the results of a single analytic determination.")]
      public class Result
      {
-          private OrderedDictionary elements = new OrderedDictionary();
-          private List<Comment> comments = new List<Comment>();
+          private OrderedDictionary elements = new();
+          private List<Comment> comments = new();
           private int resultID;
           private int orderID;
 
@@ -114,7 +114,7 @@ namespace UniversaLIS.Models
 
           public string GetJsonString()
           {
-               OrderedDictionary fieldList = new OrderedDictionary();
+               OrderedDictionary fieldList = new();
                IDictionaryEnumerator enumerator = elements.GetEnumerator();
                while (enumerator.MoveNext())
                {

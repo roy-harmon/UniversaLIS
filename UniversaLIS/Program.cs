@@ -39,7 +39,6 @@ namespace UniversaLIS
                         // See: https://github.com/dotnet/runtime/issues/47303
                         logging.AddConfiguration(context.Configuration.GetSection("Logging"));
                    })
-                   .UseWindowsService()
                    .Build();
                     host.Run();
                }

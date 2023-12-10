@@ -10,7 +10,7 @@ namespace UniversaLIS.Models
      public class Order : OrderBase
      {
           private protected int patientID;
-          private List<Result> results = new List<Result>();
+          private List<Result> results = new();
           [JsonIgnore, ForeignKey(nameof(PatientID)), InverseProperty("Orders")]
           public Patient Patient { get; set; }
           [JsonIgnore]

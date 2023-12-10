@@ -7,11 +7,11 @@ namespace UniversaLIS.States
     public class LisCommState : ILISState
     {
         public ILISState CommState { get; set; }
-        public CommFacilitator comm { get; set; }
+        public CommFacilitator Comm { get; set; }
         public LisCommState(CommFacilitator comm)
         {
-            this.comm = comm;
-            CommState = new IdleState(this.comm);
+            this.Comm = comm;
+            CommState = new IdleState(this.Comm);
         }
         public void RcvInput(string InputString)
         {
@@ -52,7 +52,7 @@ namespace UniversaLIS.States
                 // Transition to TransWaitState.
                 ChangeToTransWaitState();
             }
-            if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count < comm.CurrentFrameCounter)
+            if (CommState is TransWaitState && Comm.CurrentMessage.FrameList.Count < Comm.CurrentFrameCounter)
             {
                 // When all frames have been sent, return to IdleState.
                 ChangeToIdleState();
@@ -84,7 +84,7 @@ namespace UniversaLIS.States
             {
                 // Return to Idle.
                 ChangeToIdleState();
-                if (comm.OutboundInstrumentMessageQueue.Count > 0)
+                if (Comm.OutboundInstrumentMessageQueue.Count > 0)
                 {
                     // Don't make the operator wait for the timer tick.
                     IdleCheck();
@@ -95,7 +95,7 @@ namespace UniversaLIS.States
         public void RcvNAK()
         {
             CommState.RcvNAK();
-            if (CommState is TransWaitState && comm.NumNAK == 6)
+            if (CommState is TransWaitState && Comm.NumNAK == 6)
             {
                 ChangeToIdleState();
             }
@@ -117,21 +117,21 @@ namespace UniversaLIS.States
 
         public void ChangeToIdleState()
         {
-            CommState = new IdleState(comm);
-            comm.CurrentFrameCounter = 0;
-            comm.TransTimer.Reset(-1);
+            CommState = new IdleState(Comm);
+            Comm.CurrentFrameCounter = 0;
+            Comm.TransTimer.Reset(-1);
         }
         public void ChangeToTransENQState()
         {
-            CommState = new TransEnqState(comm);
+            CommState = new TransEnqState(Comm);
         }
         public void ChangeToTransWaitState()
         {
-            CommState = new TransWaitState(comm);
+            CommState = new TransWaitState(Comm);
         }
         public void ChangeToRcvWaitState()
         {
-            CommState = new RcvWaitState(comm);
+            CommState = new RcvWaitState(Comm);
         }
 
         public void TransTimeout()
@@ -139,14 +139,14 @@ namespace UniversaLIS.States
             if (CommState is TransEnqState || CommState is TransWaitState)
             {
                 // Send EOT and return to idle state.
-                comm.Send(Constants.EOT);
-                if (CommState is TransWaitState && comm.CurrentMessage.FrameList.Count > comm.CurrentFrameCounter)
+                Comm.Send(Constants.EOT);
+                if (CommState is TransWaitState && Comm.CurrentMessage.FrameList.Count > Comm.CurrentFrameCounter)
                 {
-                    comm.OutboundInstrumentMessageQueue.Enqueue(comm.CurrentMessage);
-                    comm.CurrentMessage = comm.NewMessage();
+                    Comm.OutboundInstrumentMessageQueue.Enqueue(Comm.CurrentMessage);
+                    Comm.CurrentMessage = Comm.NewMessage();
                 }
-                comm.CurrentMessage = comm.NewMessage();
-                comm.CurrentFrameCounter = 0;
+                Comm.CurrentMessage = Comm.NewMessage();
+                Comm.CurrentFrameCounter = 0;
                 ChangeToIdleState();
             }
         }
@@ -155,21 +155,21 @@ namespace UniversaLIS.States
             if (CommState is RcvWaitState)
             {
                 // Discard last incomplete message.
-                if (comm.CurrentMessage.Terminator < 'E')
+                if (Comm.CurrentMessage.Terminator < 'E')
                 {
-                    comm.CurrentMessage = comm.NewMessage();
+                    Comm.CurrentMessage = Comm.NewMessage();
                 }
                 else
                 {
-                    comm.ProcessMessage(comm.CurrentMessage);
+                    Comm.ProcessMessage(Comm.CurrentMessage);
                 }
                 // Return to idle state.
-                CommState = new IdleState(comm);
+                CommState = new IdleState(Comm);
             }
         }
         public void IdleCheck()
         {
-            if (CommState is IdleState && comm.OutboundInstrumentMessageQueue.Count > 0)
+            if (CommState is IdleState && Comm.OutboundInstrumentMessageQueue.Count > 0)
             {
                 HaveData();
             }

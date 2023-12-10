@@ -102,7 +102,7 @@ namespace UniversaLIS.States
                return true;
           }
 
-          private bool CheckChecksum(string InputString)
+          private static bool CheckChecksum(string InputString)
           {
                string message = InputString;
                string mainMessage;

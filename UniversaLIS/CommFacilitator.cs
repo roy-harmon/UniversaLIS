@@ -1,22 +1,19 @@
-﻿using Microsoft.Data.Sqlite;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.IO;
-using System.Net;
+using System.Linq;
+using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using UniversaLIS.Models;
 using UniversaLIS.States;
-using static UniversaLIS.UniversaLIService;
+
 // TODO: Escape special characters in message fields, remove any delimiter characters within field contents.
-// TODO: Consider field mappings when constructing SQL commands.
 namespace UniversaLIS
 {
 
-    public class CommFacilitator
+     public class CommFacilitator
      {
-          private const string LAST_INSERTED = "select last_insert_rowid();";
           private bool bInterFrame = false;
           private readonly IPortAdapter ComPort;
           private readonly IPortSettings portSettings;
@@ -37,7 +34,7 @@ namespace UniversaLIS
 
           public CountdownTimer TransTimer { get; set; }
 
-          private readonly System.Timers.Timer idleTimer = new System.Timers.Timer();
+          private readonly System.Timers.Timer idleTimer = new();
 
           internal string? receiver_id;
           internal int frameSize;
@@ -54,9 +51,6 @@ namespace UniversaLIS
           {
                ComPort.Send(messageText);
           }
-
-          // Use this string when setting up internal database connection functions.
-          public const string INTERNAL_CONNECTION_STRING = "Data Source=../UniversaLIS/internal.db"; // TODO: Update this DB location!
 
           public CommFacilitator(Serial serialSettings, UniversaLIService LIService)
           {
@@ -83,7 +77,7 @@ namespace UniversaLIS
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += CommPortDataReceived!;
                     ComPort.Open();
-                    AppendToLog($"Port opened: {serialSettings.Portname}");
+                    UniversaLIService.AppendToLog($"Port opened: {serialSettings.Portname}");
                     idleTimer.AutoReset = true;
                     idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
                     if (serialSettings.AutoSendOrders > 0)
@@ -99,7 +93,7 @@ namespace UniversaLIS
                }
                catch (FileNotFoundException ex)
                {
-                    AppendToLog($"Error opening port: {serialSettings.Portname} Not Found!");
+                    UniversaLIService.AppendToLog($"Error opening port: {serialSettings.Portname} Not Found!");
                     service.HandleEx(ex);
                }
                catch (Exception ex)
@@ -134,7 +128,7 @@ namespace UniversaLIS
                     ComPort.PortDataReceived += CommPortDataReceived!;
                     CurrentMessage = NewMessage();
                     ComPort.Open();
-                    AppendToLog($"Socket opened: {tcpSettings.Socket}");
+                    UniversaLIService.AppendToLog($"Socket opened: {tcpSettings.Socket}");
                     idleTimer.AutoReset = true;
                     idleTimer.Elapsed += new System.Timers.ElapsedEventHandler(IdleTime);
                     if (tcpSettings.AutoSendOrders > 0)
@@ -154,9 +148,9 @@ namespace UniversaLIS
           {
                return new Message(frameSize,
                                   password,
-                                  GetYamlSettings()?.ServiceConfig?.LisId,
-                                  UniversaLIService.GetYamlSettings()?.ServiceConfig?.Address,
-                                  UniversaLIService.GetYamlSettings()?.ServiceConfig?.Phone,
+                                  service.GetYamlSettings()?.ServiceConfig?.LisId,
+                                  service.GetYamlSettings()?.ServiceConfig?.Address,
+                                  service.GetYamlSettings()?.ServiceConfig?.Phone,
                                   GetPortDetails(),
                                   receiver_id);
           }
@@ -179,28 +173,11 @@ namespace UniversaLIS
                     while (OutboundInstrumentMessageQueue.Count > 0)
                     {
                          Message message = OutboundInstrumentMessageQueue.Dequeue();
-
-                         using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
-                         {
-                              foreach (Patient patientItem in message.Patients)
-                              {
-                                   foreach (Order orderItem in patientItem.Orders)
-                                   {
-                                        using (DbCommand command = conn.CreateCommand())
-                                        {
-                                             command.CommandText = "UPDATE OrderRequest SET PendingSending = 1 WHERE OrderID = @OrderID";
-                                             DbParameter parameter = command.CreateParameter();
-                                             parameter.ParameterName = "@OrderID";
-                                             parameter.Value = orderItem.OrderID;
-                                             command.Parameters.Add(parameter);
-                                             command.ExecuteNonQuery();
-                                        }
-                                   }
-                              }
-                         }
+                         // Send each message's patient records to the REST-LIS API to reset their Pending status.
+                         service.SendRestLisRequest(HttpMethod.Post, "/requests/pending", message.Patients);
                     }
                     ComPort.Close();
-                    AppendToLog($"Port closed: {ComPort.PortName}");
+                    UniversaLIService.AppendToLog($"Port closed: {ComPort.PortName}");
                }
                catch (Exception ex)
                {
@@ -215,7 +192,7 @@ namespace UniversaLIS
                 * parse the message line-by-line.
                 */
                IPortAdapter port = (IPortAdapter)sender;
-               StringBuilder buffer = new StringBuilder();
+               StringBuilder buffer = new();
                try
                {
                     idleTimer.Stop();
@@ -361,215 +338,8 @@ namespace UniversaLIS
                }
                else
                {
-                    long pID;
-                    long oID;
-                    // This is where we have to connect to the database.
-                    using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
-                    {
-                         conn.Open();
-                         const string NEW_PATIENT = "INSERT INTO PatientRecord (PracticePatientID, LabPatientID, PatientID3, PatientName, MMName, DOB, Sex, Race, Address, Reserved, TelNo," +
-                              " AttendingPhysicianID, Special1, Special2, Height, Weight, Diagnosis, ActiveMeds, Diet, PF1, PF2, AdmDates, AdmStatus, Location, AltCodeNature, AltCode, Religion," +
-                              " MaritalStatus, IsolationStatus, Language, HospService, HospInstitution, DosageCategory) VALUES (@PracticePatientID, @LabPatientID, @PatientID3, @PatientName," +
-                              " @MMName, @DOB, @Sex, @Race, @Address, @Reserved, @TelNo, @AttendingPhysicianID, @Special1, @Special2, @Height, @Weight, @Diagnosis, @ActiveMeds, @Diet, @PF1, @PF2," +
-                              " @AdmDates, @AdmStatus, @Location, @AltCodeNature, @AltCode, @Religion, @MaritalStatus, @IsolationStatus, @Language, @HospService, @HospInstitution, @DosageCategory);";
-                         const string NEW_ORDER = "INSERT INTO OrderRecord (PatientID, SpecimenID, InstrSpecID, UniversalTestID, Priority, OrderDate, CollectionDate, CollectionEndTime," +
-                              " CollectionVolume, CollectorID, ActionCode, DangerCode, RelevantClinicInfo, SpecimenRecvd, SpecimenDescriptor, OrderingPhysician, PhysicianTelNo, UF1, UF2, LF1, LF2," +
-                              " LastReported, BillRef, InstrSectionID, ReportType, Reserved, SpecCollectLocation, NosInfFlag, SpecService, SpecInstitution) VALUES (@Patient_ID, @SpecimenID," +
-                              " @InstrSpecID, @UniversalTestID, @Priority, @OrderDate, @CollectionDate, @CollectionEndTime, @CollectionVolume, @CollectorID, @ActionCode, @DangerCode, @RelevantClinicInfo," +
-                              " @SpecimenRecvd, @SpecimenDescriptor, @OrderingPhysician, @PhysicianTelNo, @UF1, @UF2, @LF1, @LF2, @LastReported, @BillRef, @InstrSectionID, @ReportType, @Reserved," +
-                              " @SpecCollectLocation, @NosInfFlag, @SpecService, @SpecInstitution);";
-                         const string NEW_RESULT = "INSERT INTO ResultRecord (OrderID, UniversalTestID, ResultValue, Unit, RefRange, Abnormal, AbNature, ResStatus, NormsChanged, OperatorID, TestStart," +
-                              " TestEnd, InstrumentID) VALUES (@Order_ID, @UniversalTestID, @ResultValue, @Unit, @RefRange, @Abnormal, @AbNature, @ResStatus, @NormsChanged, @OperatorID, @TestStart, @TestEnd, @InstrumentID);";
-
-                         foreach (var patient in message.Patients)
-                         {
-                              /* * Patient fields: * *
-                               *  Note: Fields marked with "=/=" are listed in the Siemens interface specification as not officially supported.
-                               *  These fields may or may not actually be functional (see the instrument's specification for details)
-                               *  so initial development efforts will focus primarily on known supported fields.
-                               * 0 Record Type
-                               * 1 Sequence# Definition
-                               * 2 Practice Assigned PatientID3
-                               * 3 LabPatientID  =/=
-                               * 4 PatientID3  =/=
-                               * 5 PatientName
-                               * 6 MMName  =/=
-                               * 7 DOB *
-                               * 8 Patient's Sex
-                               * 9 Race-Ethnic Origin  =/=
-                               *10 Patient's Address  =/=
-                               *11 Reserved  =/=
-                               *12 Patient's Phone#  =/=
-                               *13 AttendingPhysicianID  =/=
-                               *14 Special1  =/=
-                               *15 Special2  =/=
-                               *16 Height  =/=
-                               *17 Weight  =/=
-                               *18 Diagnosis  =/=
-                               *19 ActiveMeds  =/=
-                               *20 Diet  =/=
-                               *21 PF1  =/=
-                               *22 PF2  =/=
-                               *23 AdmDates  =/= *
-                               *24 AdmStatus  =/=
-                               *25 Location  =/=
-                               *26 AltCodeNature  =/=
-                               *27 AltCode  =/=
-                               *28 Religion  =/=
-                               *29 MaritalStatus  =/=
-                               *30 IsolationStatus  =/=
-                               *31 Language  =/=
-                               *32 HospService  =/=
-                               *33 HospInstitution  =/=
-                               *34 DosageCategory  =/=
-                               */
-                              UniversaLIService.AppendToLog("Adding patient.");
-                              // Transmit a patient record to the PatientRecord table,
-                              // grab the row ID, and use it to add order records to the OrderRecord table.
-                              using (DbCommand command = conn.CreateCommand())
-                              {
-                                   command.CommandText = NEW_PATIENT;
-                                   foreach(DictionaryEntry element in patient.Elements)
-                                   {
-                                        switch (element.Key)
-                                        {
-                                             case "FrameNumber":
-                                             case "Sequence#":
-                                                  break;
-                                             default:
-                                                  AddWithValue(command, $"@{element.Key}", $"{element.Value}" == "" ? DBNull.Value : $"{element.Value}");
-                                                  break;
-                                        }
-                                   }
-                                   command.ExecuteNonQuery();
-                              }
-                              using (DbCommand command = conn.CreateCommand())
-                              {
-                                   command.CommandText = LAST_INSERTED;
-                                   pID = (long)(command.ExecuteScalar() ?? 0);
-                              }
-                              foreach (Order order in patient.Orders)
-                              {
-                                   /*
-                                   *  * Order Fields: * *
-                                   *  Note: Fields marked with "=/=" are listed in the Siemens interface specification as not officially supported.
-                                   *  These fields may or may not actually be functional.
-                                   *	0	Record Type (O)
-                                   *	1	Sequence#
-                                   *	2	SpecimenID
-                                   *	3	InstrSpecID
-                                   *	4	UniversalTestID
-                                   *	5	Priority
-                                   *	6	OrderDate*
-                                   *	7	CollectionDate*
-                                   *	8	CollectionEndTime*
-                                   *	9	CollectionVolume
-                                   *	10	CollectorID
-                                   *	11	ActionCode
-                                   *	12	DangerCode
-                                   *	13	RelevantClinicInfo
-                                   *	14	SpecimenRecvd*
-                                   *	15	SpecimenDescriptor,Specimen Type,Specimen Source
-                                   *	16	OrderingPhysician
-                                   *	17	PhysicianTelNo
-                                   *	18	UF1
-                                   *	19	UF2
-                                   *	20	LF1
-                                   *	21	LF2
-                                   *	22	LastReported*
-                                   *	23	BillRef
-                                   *	24	InstrSectionID
-                                   *	25	ReportType
-                                   *	26	Reserved
-                                   *	27	SpecCollectLocation
-                                   *	28	NosInfFlag
-                                   *	29	SpecService
-                                   *	30	SpecInstitution
-                                    */
-                                   UniversaLIService.AppendToLog("Adding order.");
-                                   using (DbCommand command = conn.CreateCommand())
-                                   {
-                                        command.CommandText = NEW_ORDER;
-                                        AddWithValue(command, "@Patient_ID", pID);
-                                        IDictionaryEnumerator enumerator = order.Elements.GetEnumerator();
-                                        while (enumerator.MoveNext())
-                                        {
-                                             switch (enumerator.Key)
-                                             {
-                                                  case "FrameNumber":
-                                                  case "Sequence#":
-                                                       break;
-                                                  default:
-                                                       AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}");
-                                                       break;
-                                             }
-                                        }
-                                        command.ExecuteNonQuery();
-                                   }
-                                   using (DbCommand command = conn.CreateCommand())
-                                   {
-                                        command.CommandText = LAST_INSERTED;
-                                        oID = (long)(command.ExecuteScalar() ?? 0);
-                                   }
-                                   // Use the row ID from each of those order records to add
-                                   // result records to the IMM_Results table for each Patient.Order.Result in the message.
-                                   foreach (var result in order.Results)
-                                   {
-                                        /* * Result Fields: * *
-                                        *  Note: Fields marked with "=/=" are listed in the Siemens interface specification as not officially supported.
-                                        *  These fields may or may not actually be functional.
-                                        *	0	Record Type (R)
-                                        *	1	Sequence#
-                                        *	2	UniversalTestID
-                                        *	3	Result
-                                        *	4	Unit
-                                        *	5	ReferenceRanges
-                                        *	6	Abnormal
-                                        *	7	AbNature
-                                        *	8	ResStatus
-                                        *	9	NormsChanged
-                                        *	10	OperatorID
-                                        *	11	Date\Time Test Started
-                                        *	12	Date\Time Test Completed
-                                        *	13	InstrumentID
-                                         */
-                                        UniversaLIService.AppendToLog("Adding result.");
-                                        using (DbCommand command = conn.CreateCommand())
-                                        {
-                                             command.CommandText = NEW_RESULT;
-                                             AddWithValue(command, "@Order_ID", oID);
-                                             IDictionaryEnumerator enumerator = result.Elements.GetEnumerator();
-                                             while (enumerator.MoveNext())
-                                             {
-                                                  switch (enumerator.Key)
-                                                  {
-                                                       case "InstrumentID":
-                                                            char[] trimmings = { '\x03', '\x0D' };
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}".Trim(trimmings));
-                                                            break;
-                                                       case "FrameNumber":
-                                                       case "Sequence#":
-                                                            break;
-                                                       default:
-                                                            AddWithValue(command, $"@{enumerator.Key}", $"{enumerator.Value}" == "" ? DBNull.Value : $"{enumerator.Value}");
-                                                            break;
-                                                  }
-                                             }
-                                             command.ExecuteNonQuery();
-                                        }
-                                   }
-                              }
-                         }
-                    }
+                    service.SendRestLisRequest(HttpMethod.Post, "/reports", message.Patients.Cast<Patient>());
                }
-          }
-
-          private static void AddWithValue(DbCommand command, string parameterName, object? value)
-          {
-               DbParameter parameter = command.CreateParameter();
-               parameter.ParameterName = parameterName;
-               parameter.Value = value;
-               command.Parameters.Add(parameter);
           }
 
           private void ProcessQuery(Query query)
@@ -589,143 +359,48 @@ namespace UniversaLIS
           private long SendPatientOrders(string SampleNumber, string testID)
           {
                bool isQuery = true;
+               string endpoint = "/requests/samples";
                // TODO: Find a way to handle delimited lists of test codes.
                if (testID == "ALL")
                {
                     testID = "%";
                }
-               // If no SampleNumber is provided, use the % wildcard to get all pending orders.
+               // If no SampleNumber is provided, get all pending orders.
                if (SampleNumber.Length == 0)
                {
                     SampleNumber = "%";
+               }
+               else
+               {
+                    endpoint = $"{endpoint}/{SampleNumber}";
                }
                if (SampleNumber == "%")
                {
                     isQuery = false;
                }
-               // Query the database for [P]atient and [O]rder records for the sample.
-               using (DbConnection conn = new SqliteConnection(INTERNAL_CONNECTION_STRING))
-               {
-                    conn.Open();
-                    long orderCount;
-                    using (DbCommand sqlCommand = conn.CreateCommand())
-                    { // Check to see how many orders are pending for the sample.
-                         sqlCommand.CommandText = "SELECT COUNT(OrderRequest.OrderID) AS OrderCount FROM OrderRequest WHERE (SpecimenID LIKE @SampleNumber) AND (UniversalTestID LIKE @TestID) AND (PendingSending = 1);";
-                         AddWithValue(sqlCommand, "@SampleNumber", SampleNumber);
-                         AddWithValue(sqlCommand, "@TestID", testID);
-                         orderCount = (long)(sqlCommand.ExecuteScalar() ?? 0L);
-                    }
-
-                    if (orderCount == 0)
-                    {    // No pending orders. 
-                         if (isQuery)
-                         {
-                              // Reply with a "no information available from last query" message (terminator = "I")
-                              UniversaLIService.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
-                              Message messageBody = NewMessage('I');
-                              ProcessMessage(messageBody);
-                         }
-                         // Exit function.
-                         return orderCount;
-                    }
-                    Message responseMessage = NewMessage();
-                    string selectPatientsQuery = "SELECT DISTINCT PatientRequest.* FROM PatientRequest JOIN OrderRequest" +
-                         " WHERE (SpecimenID LIKE @Sample_Number) AND (UniversalTestID LIKE @Test_ID) AND PendingSending = 1;";
-                    string selectOrdersQuery = "SELECT * FROM OrderRequest WHERE PatientID LIKE @Patient_ID" +
-                         " AND UniversalTestID LIKE @Test_ID AND SpecimenID LIKE @Sample_Number AND PendingSending = 1;";
-
-
-                    using (DbCommand command = conn.CreateCommand())
-                    {
-                         command.CommandText = selectPatientsQuery;
-                         AddWithValue(command, "@Sample_Number", SampleNumber);
-                         AddWithValue(command, "@Test_ID", testID);
-                         DbDataReader patientReader = command.ExecuteReader();
-                         if (!patientReader.HasRows)
-                         {
-                              return 0;
-                         }
-                         else
-                         {
-                              while (patientReader.Read())
-                              {
-                                   PatientRequest patient = new PatientRequest();
-                                   patient.Elements["Sequence#"] = $"{responseMessage.Patients.Count + 1}"; 
-                                   for (int i = 0; i < patientReader.FieldCount; i++)
-                                   {
-                                        string fieldName = patientReader.GetName(i);
-                                        switch (fieldName)
-                                        {
-                                             case "PatientID":
-                                                  patient.PatientID = patientReader.GetInt32(i);
-                                                  break;
-                                             default:
-                                                  patient.Elements[fieldName] = $"{patientReader[fieldName]}";
-                                                  break;
-                                        }
-                                   }
-                                   responseMessage.Patients.Add(patient);
-                              }
-                         }
-
-                         patientReader.Close();
-                    }
-                    foreach (var patient in responseMessage.Patients)
-                    {
-                         using (DbCommand orderCommand = conn.CreateCommand())
-                         {
-                              orderCommand.CommandText = selectOrdersQuery;
-                              AddWithValue(orderCommand, "@Patient_ID", patient.PatientID);
-                              AddWithValue(orderCommand, "@Sample_Number", SampleNumber);
-                              AddWithValue(orderCommand, "@Test_ID", testID);
-                              DbDataReader orderReader = orderCommand.ExecuteReader();
-                              while (orderReader.Read())
-                              {
-                                   OrderRequest order = new OrderRequest((PatientRequest)patient);
-                                   order.Elements["Sequence#"] = $"{patient.Orders.Count + 1}";
-                                   for (int i = 0; i < orderReader.FieldCount; i++)
-                                   {
-                                        string fieldName = orderReader.GetName(i);
-                                        switch (fieldName)
-                                        {
-                                             case "OrderID":
-                                                  order.OrderID = Convert.ToInt32(orderReader[fieldName]);
-                                                  break;
-                                             case "PatientID":
-                                             case "PendingSending":
-                                                  break;
-                                             default:
-                                                  order.Elements[fieldName] = $"{orderReader[fieldName]}";
-                                                  break;
-                                        }
-                                   }
-                                   patient.Orders.Add(order);
-                              }
-                              orderReader.Close();
-                         }
-                         foreach (var order in patient.Orders)
-                         {
-                              using (DbCommand command = conn.CreateCommand())
-                              {
-                                   command.CommandText = "UPDATE OrderRequest SET PendingSending = 0 WHERE OrderID = @RequestID";
-                                   AddWithValue(command, "@RequestID", order.OrderID);
-                                   command.ExecuteNonQuery();
-                             }
-                              
-                         }
-                    }
-
-                    if (isQuery)
-                    {
-                         responseMessage.Terminator = 'F';
-                    }
-                    else
-                    {
-                         responseMessage.Terminator = 'N';
-                    }
-                    ProcessMessage(responseMessage);
-                    return orderCount;
+               // Query the REST-LIS server for [P]atient and [O]rder records for the sample.
+               HttpResponseMessage response = service.SendRestLisRequest(HttpMethod.Get, endpoint, "");
+               Stream responseStream = response.Content.ReadAsStream();
+               List<PatientRequest> patientRequests = JsonSerializer.Deserialize<List<PatientRequest>>(responseStream) ?? new();
+               if (isQuery && patientRequests.Count == 0) {
+                    // Reply with a "no information available from last query" message (terminator = "I")
+                    UniversaLIService.AppendToLog($"No information available from last query (sample number: {SampleNumber})");
+                    Message messageBody = NewMessage('I');
+                    ProcessMessage(messageBody);
                }
+               Message responseMessage = NewMessage();
+               responseMessage.Patients.AddRange(patientRequests);
+               if (isQuery)
+               {
+                    responseMessage.Terminator = 'F';
+               }
+               else
+               {
+                    responseMessage.Terminator = 'N';
+               }
+               ProcessMessage(responseMessage);
+
+               return patientRequests.Count;
           }
 
           public void TransactionTimedOut(object? sender, EventArgs e)
