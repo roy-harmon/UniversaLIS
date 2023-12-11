@@ -1,10 +1,9 @@
-﻿using UniversaLIS.Models;
-using static UniversaLIS.UniversaLIService;
+﻿using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS.States
 {
 
-    public class LisCommState : ILISState
+     public class LisCommState : ILISState
     {
         public ILISState CommState { get; set; }
         public CommFacilitator Comm { get; set; }

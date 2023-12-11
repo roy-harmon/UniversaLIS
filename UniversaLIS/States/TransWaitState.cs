@@ -1,10 +1,9 @@
-﻿using UniversaLIS.Models;
-using static UniversaLIS.UniversaLIService;
+﻿using static UniversaLIS.UniversaLIService;
 
 namespace UniversaLIS.States
 {
 
-    class TransWaitState : ILISState
+     class TransWaitState : ILISState
     {
 
         public TransWaitState(CommFacilitator comm)

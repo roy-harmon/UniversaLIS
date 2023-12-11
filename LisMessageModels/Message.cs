@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UniversaLIS.Models
+﻿namespace UniversaLIS.Models
 {
      /* Example of unidirectional message structure/hierarchy:
       * Header

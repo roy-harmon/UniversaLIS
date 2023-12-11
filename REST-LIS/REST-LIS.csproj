@@ -4,6 +4,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <Nullable>enable</Nullable>
+    <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>REST_LIS</RootNamespace>
     <Configurations>Debug;Release</Configurations>
@@ -11,6 +12,10 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+    <Title>REST-LIS</Title>
+  </PropertyGroup>
+  <PropertyGroup>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,12 +30,13 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.11" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UniversaLIS\UniversaLIS.csproj" />
+    <ProjectReference Include="..\LisMessageModels\LisMessageModels.csproj" />
   </ItemGroup>
 
 </Project>

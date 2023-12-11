@@ -70,4 +70,4 @@ ServiceConfig:
     # OPTIONAL: A telephone number for voice communication with the sender. As with Address, this seems unlikely to be useful in practice.
     Phone:
 # The REST-LIS service should also be available to manage the database. Set its base URI here.
-RestLisAddress: https://localhost:7194/
+RestLisAddress: https://localhost:5001/

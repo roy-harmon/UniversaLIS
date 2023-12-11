@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UniversaLIS.Models
+﻿namespace UniversaLIS.Models
 {
-    public class Query
+     public class Query
     {
         public string QueryMessage
         {

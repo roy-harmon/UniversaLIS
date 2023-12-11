@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using YamlDotNet.Serialization;
@@ -23,7 +23,7 @@ namespace UniversaLIS
           public HttpResponseMessage SendRestLisRequest(HttpMethod method, string relativeUri, object body)
           {
                HttpRequestMessage message = new HttpRequestMessage(method, relativeUri);
-               message.Content = (HttpContent?)body;
+               message.Content = JsonContent.Create(body);
                return client.Send(message);
           }
 
@@ -42,7 +42,7 @@ namespace UniversaLIS
                string configPath;
                if (Environment.UserInteractive)
                {
-                    configPath = Path.Combine(Directory.GetCurrentDirectory(), "..\\UniversaLIS\\config.yml");
+                    configPath = Path.Combine(Directory.GetCurrentDirectory(), "\\config.yml");
                }
                else
                {
@@ -90,7 +90,7 @@ namespace UniversaLIS
                     HandleEx(ex);
                     throw;
                }
-               client.BaseAddress = new Uri(GetYamlSettings()?.RestLisAddress ?? "https://localhost:7194/");
+               client.BaseAddress = new Uri(GetYamlSettings()?.RestLisAddress ?? "https://localhost:5001/");
           }
           protected void OnStop()
           {
