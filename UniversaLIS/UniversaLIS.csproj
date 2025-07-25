@@ -29,6 +29,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Configurations>Debug;Release</Configurations>
+    <SelfContained>true</SelfContained>
   </PropertyGroup>
   <PropertyGroup>
      <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -38,6 +39,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
