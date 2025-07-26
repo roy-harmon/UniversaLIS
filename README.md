@@ -4,9 +4,12 @@ An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written i
 
 The UniversaLIS project handles communication with laboratory instruments, transmitting data between connected analyzers and an internal SQLite database. The RESTLIS project (see below) has been added to enable communication via REST API for transmitting data to and from the SQLite database.
 
+### DISCLAIMER 
+This project was created to help streamline workflows in laboratories with limited access to paid alternatives, making healthcare more accessible to all. That said, it is still under development and has not been exhaustively validated. Please use this software wisely, and test it as thoroughly as possible with your hardware and software before relying on its performance in a production environment. I do my best to provide quality software, but I can't be certain there are no bugs. Therefore, I make no guarantees and you use this software at your own risk.
+
 ## Installation
 
-The project can be registered as a Windows service, but migration from .NET Framework to .NET Core removed service installers. This functionality should be restored, and it can be registered as a service using `sc create` (see [the MSDN article](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-create)).
+The project can be registered as a Windows service, but the migration from .NET Framework to .NET Core removed service installers. This functionality should be restored now, and it can be registered as a service using `sc create` (see [the MSDN article](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/sc-create)).
 
 The program can also be executed using the Visual Studio debugger.
 
