@@ -3,7 +3,7 @@
 namespace UniversaLIS.States
 {
 
-     class TransWaitState : ILISState
+     internal sealed class TransWaitState : ILISState
     {
 
         public TransWaitState(CommFacilitator comm)

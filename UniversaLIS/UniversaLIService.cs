@@ -14,7 +14,7 @@ namespace UniversaLIS
 {
      public partial class UniversaLIService : BackgroundService
      {
-          public readonly ILogger<UniversaLIService> EventLogger;
+          private readonly ILogger<UniversaLIService> EventLogger;
           private static readonly List<CommFacilitator> s_commFacilitators = new();
           private readonly Task _completedTask = Task.CompletedTask;
           private static readonly YamlSettings yamlSettings = GetSettings();
@@ -42,7 +42,7 @@ namespace UniversaLIS
                string configPath;
                if (Environment.UserInteractive)
                {
-                    configPath = Path.Combine(Directory.GetCurrentDirectory(), "\\config.yml");
+                    configPath = Path.Join(Directory.GetCurrentDirectory(), "\\config.yml");
                }
                else
                {
@@ -55,14 +55,13 @@ namespace UniversaLIS
                return deserializer.Deserialize<YamlSettings>(yamlText) ?? new YamlSettings();
           }
 
-          public void HandleEx(Exception ex)
+          public void HandleExeption(Exception ex)
           {
                if (ex is null)
                {
                     return;
                }
-               string? message = ex.Source + " - Error: " + ex.Message + "\n" + ex.TargetSite + "\n" + ex.StackTrace;
-               EventLogger.LogError(message: message);
+               EventLogger.LogError(message: (string?)$"{ex.Source} - Error: {ex.Message}\n{ex.TargetSite}\n{ex.StackTrace}");
           }
 
           protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -87,7 +86,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    HandleEx(ex);
+                    HandleExeption(ex);
                     throw;
                }
                client.BaseAddress = new Uri(GetYamlSettings()?.RestLisAddress ?? "https://localhost:5001/");
@@ -105,7 +104,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    HandleEx(ex);
+                    HandleExeption(ex);
                     throw;
                }
           }

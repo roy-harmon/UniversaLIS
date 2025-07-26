@@ -6,7 +6,7 @@ using System.Threading;
 namespace UniversaLIS
 {
      
-     public class CommPort : IPortAdapter
+     public class CommPort : IPortAdapter, IDisposable
      {
           private readonly SerialPort serialPort = new SerialPort();
           private readonly CommFacilitator facilitator;
@@ -45,7 +45,7 @@ namespace UniversaLIS
           {
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
-               string txtFile = string.Format($"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog-{serialPort.PortName}_{0}-{1}-{2}.txt",
+               string txtFile = string.Format(System.Globalization.CultureInfo.InvariantCulture, $"{publicFolder}\\UniversaLIS\\Serial_Logs\\SerialLog-{serialPort.PortName}_{0}-{1}-{2}.txt",
                     date.Year, $"{date.Month}".PadLeft(2, '0'), date.Day);
                if (!Directory.Exists($"{publicFolder}\\UniversaLIS\\Serial_Logs\\"))
                {
@@ -75,7 +75,7 @@ namespace UniversaLIS
                serialPort.Close();
           }
 
-          string GetCharString()
+          private string GetCharString()
           {
                char readChar = (char)serialPort.ReadChar();
                return $"{readChar}";
@@ -104,7 +104,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    facilitator.service.HandleEx(ex);
+                    facilitator.service.HandleExeption(ex);
                     throw;
                }
                return buffer.ToString();
@@ -112,6 +112,12 @@ namespace UniversaLIS
           string IPortAdapter.PortType()
           {
                return "serial";
+          }
+
+          public void Dispose()
+          {
+               Close();
+               GC.SuppressFinalize(this);
           }
      }
 }

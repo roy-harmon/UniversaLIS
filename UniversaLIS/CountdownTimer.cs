@@ -2,7 +2,7 @@
 
 namespace UniversaLIS
 {
-     public class CountdownTimer
+     public class CountdownTimer : IDisposable
      {
           public CountdownTimer(int Duration)
           {
@@ -39,7 +39,7 @@ namespace UniversaLIS
           }
           private int duration;
           public int RemainingDuration { get; set; }
-          private readonly System.Timers.Timer timer = new System.Timers.Timer(1000);
+          private readonly System.Timers.Timer timer = new(1000);
           public event EventHandler? Timeout;
           public void OnTimeout()
           {
@@ -63,6 +63,12 @@ namespace UniversaLIS
                {
                     RemainingDuration--;
                }
+          }
+
+          public void Dispose()
+          {
+               timer.Dispose();
+               GC.SuppressFinalize(this);
           }
      }
 }

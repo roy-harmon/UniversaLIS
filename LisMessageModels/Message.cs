@@ -24,7 +24,7 @@
           public MessageDirection Direction { get; set; }
           public List<string> FrameList { get; set; } = new List<string>();
 
-          private bool isReady = false;
+          private bool isReady;
 
           public List<PatientBase> Patients { get; set; } = new List<PatientBase>();
 

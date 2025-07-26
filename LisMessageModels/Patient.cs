@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
-[assembly: InternalsVisibleTo("REST-LIS")]
+[assembly: InternalsVisibleTo("RESTLIS")]
 
 namespace UniversaLIS.Models
 {

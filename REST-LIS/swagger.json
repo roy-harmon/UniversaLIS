@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "REST-LIS",
+    "title": "RESTLIS",
     "description": "An ASP.NET Core Web API for ordering tests and reporting results through UniversaLIS",
     "contact": {
       "name": "Roy Harmon",
@@ -17,7 +17,7 @@
     "/reports/patients": {
       "get": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "GetPatients",
         "parameters": [
@@ -70,7 +70,7 @@
     "/reports/patients/{id}": {
       "get": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "GetPatientByID",
         "parameters": [
@@ -104,7 +104,7 @@
     "/requests/patients": {
       "post": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "PostPatientOrders",
         "requestBody": {
@@ -128,7 +128,7 @@
       },
       "get": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "GetPatientRequests",
         "parameters": [
@@ -181,7 +181,7 @@
     "/requests/patients/{id}": {
       "get": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "GetPatientOrdersByID",
         "parameters": [
@@ -213,7 +213,7 @@
       },
       "put": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "UpdatePatientOrderByID",
         "parameters": [
@@ -258,7 +258,7 @@
       },
       "delete": {
         "tags": [
-          "REST-LIS"
+          "RESTLIS"
         ],
         "operationId": "DeletePatientRequestByID",
         "parameters": [

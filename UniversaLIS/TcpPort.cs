@@ -6,16 +6,16 @@ using System.Text;
 
 namespace UniversaLIS
 {
-     
-     partial class TcpPort : IPortAdapter
+
+     internal sealed partial class TcpPort : IPortAdapter, IDisposable
      {
           private const int BUFFER_SIZE = 64000;
 
           // Please note that UniversaLIS currently supports only one TCP connection per port.
-          readonly TcpListener server;
-          Socket? client;
-          readonly byte[] readBuffer = new byte[BUFFER_SIZE];
-          readonly StringBuilder incomingData = new StringBuilder();
+          private readonly TcpListener server;
+          private Socket? client;
+          private readonly byte[] readBuffer = new byte[BUFFER_SIZE];
+          private readonly StringBuilder incomingData = new StringBuilder();
           private readonly string portName;
           public TcpPort(Tcp tcpSettings)
           {
@@ -35,7 +35,7 @@ namespace UniversaLIS
           private readonly System.Timers.Timer portTimer = new System.Timers.Timer();
 
           /* This procedure may or may not evolve into something useful. */
-          protected void CheckDataReceived()
+          internal void CheckDataReceived()
           {
                bool timedOut = false;
                if (!(client is null) && client.Connected)
@@ -133,6 +133,11 @@ namespace UniversaLIS
                {
                     throw new ArgumentNullException(nameof(messageText));
                }
+          }
+
+          public void Dispose()
+          {
+               throw new NotImplementedException();
           }
      }
 }

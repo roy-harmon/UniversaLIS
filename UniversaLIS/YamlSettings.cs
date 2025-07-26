@@ -16,11 +16,11 @@ namespace UniversaLIS
      }
      public interface IPortSettings
      {
-          public string? ReceiverId { get; set; }
-          public string? Password { get; set; }
-          public bool UseLegacyFrameSize { get; set; }
-          public int AutoSendOrders { get; set; }
-          public string GetPortDetails();
+          string? ReceiverId { get; set; }
+          string? Password { get; set; }
+          bool UseLegacyFrameSize { get; set; }
+          int AutoSendOrders { get; set; }
+          string GetPortDetails();
      }
      public class Tcp : IPortSettings
      {

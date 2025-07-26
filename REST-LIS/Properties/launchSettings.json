@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "REST_LIS": {
+    "RESTLIS": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

@@ -12,9 +12,9 @@ using UniversaLIS.States;
 namespace UniversaLIS
 {
 
-     public class CommFacilitator
+     public class CommFacilitator : IDisposable
      {
-          private bool bInterFrame = false;
+          private bool bInterFrame;
           private readonly IPortAdapter ComPort;
           private readonly IPortSettings portSettings;
           internal UniversaLIService service;
@@ -26,7 +26,7 @@ namespace UniversaLIS
 
           private string? intermediateFrame;
 
-          public int NumNAK { get; set; } = 0;
+          public int NumNAK { get; set; }
 
           public Queue<Message> OutboundInstrumentMessageQueue { get; set; } = new Queue<Message>();
 
@@ -94,11 +94,11 @@ namespace UniversaLIS
                catch (FileNotFoundException ex)
                {
                     UniversaLIService.AppendToLog($"Error opening port: {serialSettings.Portname} Not Found!");
-                    service.HandleEx(ex);
+                    service.HandleExeption(ex);
                }
                catch (Exception ex)
                {
-                    service.HandleEx(ex);
+                    service.HandleExeption(ex);
                     throw;
                }
           }
@@ -139,7 +139,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    service.HandleEx(ex);
+                    service.HandleExeption(ex);
                     throw;
                }
           }
@@ -173,7 +173,7 @@ namespace UniversaLIS
                     while (OutboundInstrumentMessageQueue.Count > 0)
                     {
                          Message message = OutboundInstrumentMessageQueue.Dequeue();
-                         // Send each message's patient records to the REST-LIS API to reset their Pending status.
+                         // Send each message's patient records to the RESTLIS API to reset their Pending status.
                          service.SendRestLisRequest(HttpMethod.Post, "/requests/pending", message.Patients);
                     }
                     ComPort.Close();
@@ -181,12 +181,12 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    service.HandleEx(ex);
+                    service.HandleExeption(ex);
                     throw;
                }
           }
 
-          void CommPortDataReceived(object sender, EventArgs e)
+          private void CommPortDataReceived(object sender, EventArgs e)
           {
                /* When new data is received, 
                 * parse the message line-by-line.
@@ -207,7 +207,7 @@ namespace UniversaLIS
                }
                catch (Exception ex)
                {
-                    service.HandleEx(ex);
+                    service.HandleExeption(ex);
                     throw;
                }
           }
@@ -231,7 +231,7 @@ namespace UniversaLIS
                     UniversaLIService.AppendToLog($"Invalid message: {messageLine}");
                     return;
                }
-               int position = messageLine.IndexOf(Constants.ETB);
+               int position = messageLine.IndexOf(Constants.ETB, StringComparison.InvariantCulture);
                if (position > 0)
                {
                     bInterFrame = true;
@@ -378,7 +378,7 @@ namespace UniversaLIS
                {
                     isQuery = false;
                }
-               // Query the REST-LIS server for [P]atient and [O]rder records for the sample.
+               // Query the RESTLIS server for [P]atient and [O]rder records for the sample.
                HttpResponseMessage response = service.SendRestLisRequest(HttpMethod.Get, endpoint, "");
                Stream responseStream = response.Content.ReadAsStream();
                List<PatientRequest> patientRequests = JsonSerializer.Deserialize<List<PatientRequest>>(responseStream) ?? new();
@@ -422,6 +422,12 @@ namespace UniversaLIS
                }
                // Now that all pending requests have been sent, restart the timer.
                idleTimer.Start();
+          }
+
+          public void Dispose()
+          {
+               Close();
+               GC.SuppressFinalize(this);
           }
      }
 }

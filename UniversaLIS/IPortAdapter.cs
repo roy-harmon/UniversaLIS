@@ -2,15 +2,15 @@
 
 namespace UniversaLIS
 {
-     interface IPortAdapter
+     internal interface IPortAdapter
      {
-          public string PortName { get; }
-          public string PortType();
-          public void Send(string messageText);
-          public void Open();
-          public void Close();
+          string PortName { get; }
+          string PortType();
+          void Send(string messageText);
+          void Open();
+          void Close();
           internal string ReadChars();
-          public virtual event EventHandler PortDataReceived
+          virtual event EventHandler PortDataReceived
           {
                add
                {

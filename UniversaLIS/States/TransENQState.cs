@@ -3,7 +3,7 @@
 namespace UniversaLIS.States
 {
 
-    class TransEnqState : ILISState
+     internal sealed class TransEnqState : ILISState
     {
 
         private readonly CommFacilitator comm;

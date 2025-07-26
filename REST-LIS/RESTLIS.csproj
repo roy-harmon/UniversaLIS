@@ -6,17 +6,18 @@
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>REST_LIS</RootNamespace>
+    <RootNamespace>RESTLIS</RootNamespace>
     <Configurations>Debug;Release</Configurations>
-    <StartupObject>REST_LIS.Program</StartupObject>
+    <StartupObject>RESTLIS.Program</StartupObject>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateDocumentationFile>False</GenerateDocumentationFile>
     <ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-    <Title>REST-LIS</Title>
+    <Title>RESTLIS</Title>
     <SelfContained>true</SelfContained>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
   </PropertyGroup>
 
   <ItemGroup>

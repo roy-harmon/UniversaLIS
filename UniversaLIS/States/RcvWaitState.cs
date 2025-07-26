@@ -4,7 +4,7 @@ using static UniversaLIS.UniversaLIService;
 namespace UniversaLIS.States
 {
 
-     class RcvWaitState : ILISState
+     internal sealed class RcvWaitState : ILISState
      {
           // Track the current frame number to ensure that the received frame is correct.
           public int ExpectedFrame = 1;
@@ -45,7 +45,7 @@ namespace UniversaLIS.States
                // Compare the frame number and checksum to see whether the frame is good or bad.
                bool isFrameGood;
                // Compare frame numbers.
-               if (InputString.TrimStart('\x02').StartsWith(ExpectedFrame.ToString()))
+               if (InputString.TrimStart('\x02').StartsWith(ExpectedFrame.ToString(System.Globalization.CultureInfo.InvariantCulture), System.StringComparison.InvariantCulture))
                {
                     isFrameGood = true;
                }

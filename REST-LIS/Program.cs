@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using UniversaLIS.Models;
 
-namespace REST_LIS
+namespace RESTLIS
 {
      public class Program
      {
@@ -26,7 +26,7 @@ namespace REST_LIS
                     options.SwaggerDoc("v1", new OpenApiInfo
                     {
                          Version = "v1",
-                         Title = "REST-LIS",
+                         Title = "RESTLIS",
                          Description = "An ASP.NET Core Web API for ordering tests and reporting results through UniversaLIS",
                          Contact = new OpenApiContact
                          {
@@ -157,12 +157,12 @@ namespace REST_LIS
           }
      }
 
-     class PatientDB : DbContext
+     internal sealed class PatientDB : DbContext
      {
           private const string LAST_INSERTED = "select last_insert_rowid();";
           public PatientDB() { }
 
-          readonly JsonSerializerOptions jsonOptions = new()
+          private readonly JsonSerializerOptions jsonOptions = new()
           {
                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
                ReferenceHandler = ReferenceHandler.IgnoreCycles
@@ -212,7 +212,7 @@ namespace REST_LIS
 
           public IResult GetPatient(HttpContext context)
           {
-               int id = int.Parse($"{context.Request.RouteValues["id"]}");
+               int id = int.Parse($"{context.Request.RouteValues["id"]}", System.Globalization.CultureInfo.InvariantCulture);
                return GetPatient(id);
           }
 
@@ -310,7 +310,7 @@ namespace REST_LIS
                // Query the database for [P]atient and [O]rder records for the sample.
                using DbConnection conn = new SqliteConnection(Database.GetConnectionString());
                conn.Open();
-               IList<PatientRequest> patientRequests = new List<PatientRequest>();
+               List<PatientRequest> patientRequests = [];
                long orderCount;
                using (DbCommand sqlCommand = conn.CreateCommand())
                { // Check to see how many orders are pending for the sample.
@@ -384,7 +384,7 @@ namespace REST_LIS
                                    switch (fieldName)
                                    {
                                         case "OrderID":
-                                             order.OrderID = Convert.ToInt32(orderReader[fieldName]);
+                                             order.OrderID = Convert.ToInt32(orderReader[fieldName], System.Globalization.CultureInfo.InvariantCulture);
                                              break;
                                         case "PatientID":
                                         case "PendingSending":

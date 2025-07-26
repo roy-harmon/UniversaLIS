@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net8.0-windows7.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -40,6 +40,11 @@
   <PropertyGroup>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <NoWin32Manifest>true</NoWin32Manifest>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <NeutralLanguage>en</NeutralLanguage>
+    <NeutralResourcesLanguageAttribute>en</NeutralResourcesLanguageAttribute>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -60,9 +65,17 @@
     <Compile Update="UniversaLIService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
     </None>
   </ItemGroup>
   <ItemGroup>

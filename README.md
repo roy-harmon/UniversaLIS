@@ -2,7 +2,7 @@
 
 An LIS system for ASTM/CLSI-compliant clinical laboratory instruments, written in C#. Originally created for Siemens IMMULITE systems, but expanded to work with any system that complies with ASTM-1381/1394 or CLSI-LIS1-A/LIS2-A2 specifications.
 
-The UniversaLIS project handles communication with laboratory instruments, transmitting data between connected analyzers and an internal SQLite database. The REST-LIS project (see below) has been added to enable communication via REST API for transmitting data to and from the SQLite database.
+The UniversaLIS project handles communication with laboratory instruments, transmitting data between connected analyzers and an internal SQLite database. The RESTLIS project (see below) has been added to enable communication via REST API for transmitting data to and from the SQLite database.
 
 ## Installation
 
@@ -14,7 +14,7 @@ Please note: The software no longer requires a database server in order to funct
 
 ## Database
 
-This Windows service has been restructured to use an internal SQLite database, so it is no longer dependent on an external database server. Instead, it accepts test requests and reports results via a REST API (working title: "REST-LIS").
+This Windows service has been restructured to use an internal SQLite database, so it is no longer dependent on an external database server. Instead, it accepts test requests and reports results via a REST API (working title: "RESTLIS").
 
 ## Configuration
 
