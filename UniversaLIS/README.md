@@ -17,7 +17,7 @@ Please note: The software no longer requires a database server in order to funct
 
 ## Database
 
-This Windows service has been restructured to use an internal SQLite database, so it is no longer dependent on an external database server. Instead, it accepts test requests and reports results via a REST API (working title: "RESTLIS").
+This program now uses an internal SQLite database, so it is no longer dependent on an external database server. Instead, it accepts test requests and reports results via a REST API (working title: "RESTLIS").
 
 ## Configuration
 
