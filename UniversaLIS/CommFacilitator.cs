@@ -201,7 +201,7 @@ namespace UniversaLIS
                      */
                     // Read one char at a time until the ReadChar times out.
                     buffer.Append(port.ReadChars());
-                    UniversaLIService.AppendToLog($"In: \t{buffer}");
+                    ComPort.AppendToLog($"In: \t{buffer}");
                     CommState.RcvInput(buffer.ToString());
                     idleTimer.Start();
                }

@@ -34,6 +34,10 @@ The OpenAPI specification will be provided along with more details as the variou
 
 Please note that the original functionality (monitoring external database tables for test requests and populating tables with test results) has been removed but may be recreated as a separate utility in the future.
 
+## Logging
+
+The application keeps a log of all data sent and received. These can be found under "UniversaLIS" in the public folder ('C:\ProgramData\UniversaLIS' on Windows, for example).
+
 ---
 
 ## Usage

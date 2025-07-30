@@ -113,7 +113,7 @@ namespace UniversaLIS
           {
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
-               string txtFile = $"{publicFolder}\\UniversaLIS\\Tcp_Logs\\TcpLog-{portName}_{date.Year}-{date.Month}-{date.Day}.txt";
+               string txtFile = $"{publicFolder}\\UniversaLIS\\Tcp_Logs\\TcpLog-{portName}_{date.Year}-{date.Month.ToString().PadLeft(2, '0')}-{date.Day.ToString().PadLeft(2, '0')}.txt";
                if (!Directory.Exists($"{publicFolder}\\UniversaLIS\\Tcp_Logs\\"))
                {
                     Directory.CreateDirectory($"{publicFolder}\\UniversaLIS\\Tcp_Logs\\");
