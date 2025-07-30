@@ -14,11 +14,13 @@ namespace UniversaLIS
           // Please note that UniversaLIS currently supports only one TCP connection per port.
           private readonly TcpListener server;
           private Socket? client;
+          private readonly CommFacilitator facilitator;
           private readonly byte[] readBuffer = new byte[BUFFER_SIZE];
           private readonly StringBuilder incomingData = new StringBuilder();
           private readonly string portName;
-          public TcpPort(Tcp tcpSettings)
+          public TcpPort(Tcp tcpSettings, CommFacilitator facilitator)
           {
+               this.facilitator = facilitator;
                int port = tcpSettings.Socket;
                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
                server = new TcpListener(localAddr, port);
@@ -111,6 +113,10 @@ namespace UniversaLIS
 
           public void AppendToLog(string txt)
           {
+               if (!facilitator.service.GetYamlSettings().ServiceConfig?.LoggingEnabled ?? false)
+               {
+                    return;
+               }
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
                string txtFile = $"{publicFolder}\\UniversaLIS\\Tcp_Logs\\TcpLog-{portName}_{date.Year}-{date.Month.ToString().PadLeft(2, '0')}-{date.Day.ToString().PadLeft(2, '0')}.txt";

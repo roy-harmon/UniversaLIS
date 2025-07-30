@@ -123,7 +123,7 @@ namespace UniversaLIS
                {
                     // Set the port properties and try to open it.
                     receiver_id = tcpSettings.ReceiverId;
-                    ComPort = new TcpPort(tcpSettings);
+                    ComPort = new TcpPort(tcpSettings, this);
                     // Set the handler for the DataReceived event.
                     ComPort.PortDataReceived += CommPortDataReceived!;
                     CurrentMessage = NewMessage();

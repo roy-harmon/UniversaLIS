@@ -84,6 +84,7 @@ namespace UniversaLIS
           public string? LisId { get; set; }
           public string? Address { get; set; }
           public string? Phone { get; set; }
+          public bool LoggingEnabled { get; set; }
      }
 
 
