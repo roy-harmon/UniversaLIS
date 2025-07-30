@@ -43,6 +43,10 @@ namespace UniversaLIS
 
           public void AppendToLog(string txt)
           {
+               if (!facilitator.service.GetYamlSettings().ServiceConfig?.LoggingEnabled ?? false)
+               {
+                    return;
+               }
                string? publicFolder = Environment.GetEnvironmentVariable("AllUsersProfile");
                var date = DateTime.Now;
                string txtFile = string.Format(System.Globalization.CultureInfo.InvariantCulture,

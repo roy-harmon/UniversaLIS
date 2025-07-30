@@ -123,7 +123,7 @@ namespace UniversaLIS
           {
                AppendToLog("Executing debugging routine...");
                OnStart();
-               Console.WriteLine("UniversaLIS is running. Press any key to exit...");
+               Console.WriteLine("UniversaLIS is now running. Press Enter key to exit...");
                while (Console.ReadLine() is null)
                {
                     // Not sure why it doesn't work without looping anymore. 
