@@ -39,12 +39,8 @@ namespace UniversaLIS
 
           private static YamlSettings GetSettings()
           {
-               string configPath;
-               if (Environment.UserInteractive)
-               {
-                    configPath = Path.Join(Directory.GetCurrentDirectory(), "\\config.yml");
-               }
-               else
+               string configPath = Path.Join(Directory.GetCurrentDirectory(), "\\config.yml");
+               if (!File.Exists(configPath))
                {
                     configPath = Environment.ExpandEnvironmentVariables("%ProgramW6432%\\UniversaLIS\\config.yml");
                }

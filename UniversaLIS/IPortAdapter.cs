@@ -10,6 +10,8 @@ namespace UniversaLIS
           void Open();
           void Close();
           internal string ReadChars();
+          void AppendToLog(string txt);
+
           virtual event EventHandler PortDataReceived
           {
                add
